@@ -1,9 +1,9 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hay-kot/httpkit/errchain"
@@ -28,12 +28,11 @@ func (ctrl *V1Controller) HandleAssetGet() errchain.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := services.NewContext(r.Context())
 		assetIDParam := chi.URLParam(r, "id")
-		assetIDParam = strings.ReplaceAll(assetIDParam, "-", "") // Remove dashes
-		// Convert the asset ID to an int64
-		assetID, err := strconv.ParseInt(assetIDParam, 10, 64)
-		if err != nil {
-			return err
+		assetID, ok := repo.ParseAssetID(assetIDParam)
+		if !ok {
+			return validate.NewRequestError(fmt.Errorf("invalid asset id"), http.StatusBadRequest)
 		}
+		var err error
 		pageParam := r.URL.Query().Get("page")
 		var page int64 = -1
 		if pageParam != "" {
@@ -52,7 +51,7 @@ func (ctrl *V1Controller) HandleAssetGet() errchain.HandlerFunc {
 			}
 		}
 
-		items, err := ctrl.repo.Items.QueryByAssetID(r.Context(), ctx.GID, repo.AssetID(assetID), int(page), int(pageSize))
+		items, err := ctrl.repo.Items.QueryByAssetID(r.Context(), ctx.GID, assetID, int(page), int(pageSize))
 		if err != nil {
 			log.Err(err).Msg("failed to get item")
 			return validate.NewRequestError(err, http.StatusInternalServerError)

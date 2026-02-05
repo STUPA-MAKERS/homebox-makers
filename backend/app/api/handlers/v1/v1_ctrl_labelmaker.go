@@ -3,8 +3,6 @@ package v1
 import (
 	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/hay-kot/httpkit/errchain"
@@ -108,14 +106,13 @@ func (ctrl *V1Controller) HandleGetItemLabel() errchain.HandlerFunc {
 func (ctrl *V1Controller) HandleGetAssetLabel() errchain.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		assetIDParam := chi.URLParam(r, "id")
-		assetIDParam = strings.ReplaceAll(assetIDParam, "-", "")
-		assetID, err := strconv.ParseInt(assetIDParam, 10, 64)
-		if err != nil {
-			return err
+		assetID, ok := repo.ParseAssetID(assetIDParam)
+		if !ok {
+			return validate.NewRequestError(fmt.Errorf("invalid asset id"), http.StatusBadRequest)
 		}
 
 		auth := services.NewContext(r.Context())
-		item, err := ctrl.repo.Items.QueryByAssetID(auth, auth.GID, repo.AssetID(assetID), 0, 1)
+		item, err := ctrl.repo.Items.QueryByAssetID(auth, auth.GID, assetID, 0, 1)
 		if err != nil {
 			return err
 		}
