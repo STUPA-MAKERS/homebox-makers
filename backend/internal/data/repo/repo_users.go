@@ -195,6 +195,10 @@ func (r *UserRepository) UpdateDefaultGroup(ctx context.Context, id uuid.UUID, g
 	return r.db.User.UpdateOneID(id).SetDefaultGroupID(groupID).Exec(ctx)
 }
 
+func (r *UserRepository) AddGroupToUser(ctx context.Context, userID uuid.UUID, groupID uuid.UUID) error {
+	return r.db.User.UpdateOneID(userID).AddGroupIDs(groupID).Exec(ctx)
+}
+
 func (r *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	_, err := r.db.User.Delete().Where(user.ID(id)).Exec(ctx)
 	return err

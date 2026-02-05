@@ -15,8 +15,14 @@ services:
     environment:
       - HBOX_DEBUG=true
       - HBOX_LOGGER_LEVEL=-1
-      - HBOX_ALLOW_REGISTRATION=true
+      - HBOX_OPTIONS_ALLOW_REGISTRATION=false
+      - HBOX_OIDC_ENABLED=true
+      - HBOX_OIDC_ISSUER_URL=https://idp.reutlingen.university/realms/master
+      - HBOX_OIDC_CLIENT_ID=homebox.reutlingen.university
+      - HBOX_OIDC_CLIENT_SECRET=${HBOX_OIDC_CLIENT_SECRET}
+      - HBOX_OIDC_TENANT_ID=${HBOX_OIDC_TENANT_ID}
+      - HBOX_OPTIONS_TRUST_PROXY=true
     ports:
-      - 3100:7745
+      - 8091:7745
     volumes:
       - ./homebox-data:/data/

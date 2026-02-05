@@ -235,7 +235,7 @@ func (svc *UserService) Login(ctx context.Context, username, password string, ex
 // LoginOIDC creates a session token for a user authenticated via OIDC.
 // It now uses issuer + subject for identity association (OIDC spec compliance).
 // If the user doesn't exist, it will create one.
-func (svc *UserService) LoginOIDC(ctx context.Context, issuer, subject, email, name string) (UserAuthTokenDetail, error) {
+func (svc *UserService) LoginOIDC(ctx context.Context, issuer, subject, email, name, tenantID string) (UserAuthTokenDetail, error) {
 	issuer = strings.TrimSpace(issuer)
 	subject = strings.TrimSpace(subject)
 	email = strings.ToLower(strings.TrimSpace(email))
@@ -244,6 +244,15 @@ func (svc *UserService) LoginOIDC(ctx context.Context, issuer, subject, email, n
 	if issuer == "" || subject == "" {
 		log.Warn().Str("issuer", issuer).Str("subject", subject).Msg("OIDC login missing issuer or subject")
 		return UserAuthTokenDetail{}, ErrorInvalidLogin
+	}
+
+	var targetGroupID uuid.UUID
+	if tenantID != "" {
+		var err error
+		targetGroupID, err = uuid.Parse(tenantID)
+		if err != nil {
+			log.Warn().Err(err).Str("tenant_id", tenantID).Msg("Invalid tenant ID provided in OIDC config")
+		}
 	}
 
 	// Try to get existing user by OIDC identity
@@ -271,7 +280,7 @@ func (svc *UserService) LoginOIDC(ctx context.Context, issuer, subject, email, n
 	// Create user if still not resolved
 	if usr.ID == uuid.Nil {
 		log.Debug().Str("issuer", issuer).Str("subject", subject).Msg("OIDC user not found, creating new user")
-		usr, err = svc.registerOIDCUser(ctx, issuer, subject, email, name)
+		usr, err = svc.registerOIDCUser(ctx, issuer, subject, email, name, targetGroupID)
 		if err != nil {
 			if ent.IsConstraintError(err) {
 				if usr2, gerr := svc.repos.Users.GetOneOIDC(ctx, issuer, subject); gerr == nil {
@@ -288,15 +297,41 @@ func (svc *UserService) LoginOIDC(ctx context.Context, issuer, subject, email, n
 		}
 	}
 
+	// Ensure membership in target group if configured
+	if targetGroupID != uuid.Nil {
+		hasGroup := false
+		for _, gid := range usr.GroupIDs {
+			if gid == targetGroupID {
+				hasGroup = true
+				break
+			}
+		}
+		if !hasGroup {
+			log.Info().Str("user_id", usr.ID.String()).Str("group_id", targetGroupID.String()).Msg("Adding user to configured tenant group")
+			if err := svc.repos.Users.AddGroupToUser(ctx, usr.ID, targetGroupID); err != nil {
+				log.Err(err).Msg("Failed to add user to configured tenant group")
+			}
+		}
+	}
+
 	return svc.createSessionToken(ctx, usr.ID, true)
 }
 
 // registerOIDCUser creates a new user for OIDC authentication with issuer+subject identity.
-func (svc *UserService) registerOIDCUser(ctx context.Context, issuer, subject, email, name string) (repo.UserOut, error) {
-	group, err := svc.repos.Groups.GroupCreate(ctx, "Home", uuid.Nil)
-	if err != nil {
-		log.Err(err).Msg("Failed to create group for OIDC user")
-		return repo.UserOut{}, err
+func (svc *UserService) registerOIDCUser(ctx context.Context, issuer, subject, email, name string, targetGroupID uuid.UUID) (repo.UserOut, error) {
+	var groupID uuid.UUID
+	createDefaults := false
+
+	if targetGroupID != uuid.Nil {
+		groupID = targetGroupID
+	} else {
+		group, err := svc.repos.Groups.GroupCreate(ctx, "Home", uuid.Nil)
+		if err != nil {
+			log.Err(err).Msg("Failed to create group for OIDC user")
+			return repo.UserOut{}, err
+		}
+		groupID = group.ID
+		createDefaults = true
 	}
 
 	usrCreate := repo.UserCreate{
@@ -304,8 +339,8 @@ func (svc *UserService) registerOIDCUser(ctx context.Context, issuer, subject, e
 		Email:          email,
 		Password:       nil,
 		IsSuperuser:    false,
-		DefaultGroupID: group.ID,
-		IsOwner:        true,
+		DefaultGroupID: groupID,
+		IsOwner:        createDefaults,
 	}
 
 	entUser, err := svc.repos.Users.CreateWithOIDC(ctx, usrCreate, issuer, subject)
@@ -313,19 +348,21 @@ func (svc *UserService) registerOIDCUser(ctx context.Context, issuer, subject, e
 		return repo.UserOut{}, err
 	}
 
-	log.Debug().Str("issuer", issuer).Str("subject", subject).Msg("creating default tags for OIDC user")
-	for _, tag := range defaultTags() {
-		_, err := svc.repos.Tags.Create(ctx, group.ID, tag)
-		if err != nil {
-			log.Err(err).Msg("Failed to create default tag")
+	if createDefaults {
+		log.Debug().Str("issuer", issuer).Str("subject", subject).Msg("creating default tags for OIDC user")
+		for _, tag := range defaultTags() {
+			_, err := svc.repos.Tags.Create(ctx, groupID, tag)
+			if err != nil {
+				log.Err(err).Msg("Failed to create default tag")
+			}
 		}
-	}
 
-	log.Debug().Str("issuer", issuer).Str("subject", subject).Msg("creating default locations for OIDC user")
-	for _, location := range defaultLocations() {
-		_, err := svc.repos.Locations.Create(ctx, group.ID, location)
-		if err != nil {
-			log.Err(err).Msg("Failed to create default location")
+		log.Debug().Str("issuer", issuer).Str("subject", subject).Msg("creating default locations for OIDC user")
+		for _, location := range defaultLocations() {
+			_, err := svc.repos.Locations.Create(ctx, groupID, location)
+			if err != nil {
+				log.Err(err).Msg("Failed to create default location")
+			}
 		}
 	}
 

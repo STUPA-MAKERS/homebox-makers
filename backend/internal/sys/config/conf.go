@@ -96,6 +96,7 @@ type OIDCConf struct {
 	ButtonText         string        `yaml:"button_text"          conf:"default:Sign in with OIDC"`
 	StateExpiry        time.Duration `yaml:"state_expiry"         conf:"default:10m"`
 	RequestTimeout     time.Duration `yaml:"request_timeout"      conf:"default:30s"`
+	TenantID           string        `yaml:"tenant_id"`
 }
 
 type BarcodeAPIConf struct {

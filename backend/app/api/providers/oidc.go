@@ -220,7 +220,7 @@ func (p *OIDCProvider) AuthenticateWithBaseURL(baseURL, expectedNonce, pkceVerif
 	}
 
 	// Use the dedicated OIDC login method (issuer + subject identity)
-	sessionToken, err := p.service.LoginOIDC(r.Context(), claims.Issuer, claims.Subject, email, claims.Name)
+	sessionToken, err := p.service.LoginOIDC(r.Context(), claims.Issuer, claims.Subject, email, claims.Name, p.config.TenantID)
 	if err != nil {
 		log.Err(err).Str("email", email).Str("issuer", claims.Issuer).Str("subject", claims.Subject).Msg("OIDC login failed")
 		return services.UserAuthTokenDetail{}, fmt.Errorf("OIDC login failed: %w", err)
