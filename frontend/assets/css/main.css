@@ -38,13 +38,13 @@
     }
 
     .theme-makers {
-        --background: 0 0% 0%; /* True Black */
-        --background-accent: 240 4% 4%; /* Near black for elevation */
+        --background: 34 4% 4%; /* True Black */
+        --background-accent: 0 0% 0%; /* Near black for elevation */
         --foreground: 210 20% 98%; /* White text */
         --primary: 34 100% 47%; /* #f18700 - Brand Orange */
         --primary-foreground: 0 0% 0%; /* Black text on orange */
         --secondary-foreground: 34 100% 47%;
-        --secondary: 0 0% 0%;
+        --secondary: 33.1 74.36% 7.65%;
         --accent: 34 100% 47%;
         --accent-foreground: 0 0% 0%;
         --muted: 240 5% 15%;
