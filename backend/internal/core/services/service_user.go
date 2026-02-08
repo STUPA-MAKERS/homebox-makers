@@ -241,6 +241,8 @@ func (svc *UserService) LoginOIDC(ctx context.Context, issuer, subject, email, n
 	email = strings.ToLower(strings.TrimSpace(email))
 	name = strings.TrimSpace(name)
 
+	log.Info().Str("issuer", issuer).Str("subject", subject).Str("email", email).Str("tenant_id", tenantID).Msg("Processing OIDC login")
+
 	if issuer == "" || subject == "" {
 		log.Warn().Str("issuer", issuer).Str("subject", subject).Msg("OIDC login missing issuer or subject")
 		return UserAuthTokenDetail{}, ErrorInvalidLogin

@@ -71,6 +71,7 @@ func NewOIDCProvider(service *services.UserService, config *config.OIDCConf, opt
 		Str("issuer", config.IssuerURL).
 		Str("client_id", config.ClientID).
 		Str("scope", config.Scope).
+		Str("tenant_id", config.TenantID).
 		Msg("OIDC provider initialized successfully with discovery")
 
 	return &OIDCProvider{

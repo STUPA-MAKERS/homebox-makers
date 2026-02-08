@@ -69,3 +69,5 @@ frontend/blob-report/
 frontend/playwright/.cache/
 
 /homebox-data/
+
+tmp/
