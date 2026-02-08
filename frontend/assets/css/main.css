@@ -37,19 +37,38 @@
         --radius: 0.5rem;
     }
 
-    /*
-  * The below themes are based on the daisyUI themes which are licensed under the MIT License.
-  * Copyright (c) 2020 Pouya Saadeghi
-  * The  license can be found here https://github.com/saadeghi/daisyui/tree/v2
-  *
-  * The themes were converted to CSS variables by tonya and licensed under the MIT License.
-  * Copyright (c) 2025 tonya
-  * The license can be found here https://gist.github.com/tonyaellie/b9e683ae61ade6527b2cc3215fcc38e8
-  *
-  * The radius were converted to css variables by n0acar and licensed under the MIT License.
-  * Copyright (c) 2024 n0acar
-  * The license can be found here https://github.com/n0acar/tiny-projects
-  */
+    .theme-makers {
+        --background: 0 0% 0%; /* True Black */
+        --background-accent: 240 4% 4%; /* Near black for elevation */
+        --foreground: 210 20% 98%; /* White text */
+        --primary: 34 100% 47%; /* #f18700 - Brand Orange */
+        --primary-foreground: 0 0% 0%; /* Black text on orange */
+        --secondary: 271 91% 75%; /* #c084fc - Purple Accent */
+        --secondary-foreground: 0 0% 0%;
+        --accent: 34 100% 47%;
+        --accent-foreground: 0 0% 0%;
+        --muted: 240 5% 15%;
+        --muted-foreground: 240 5% 65%;
+        --card: 0 0% 4%; /* #0a0a0a - Surface color */
+        --card-foreground: 210 20% 98%;
+        --popover: 0 0% 4%;
+        --popover-foreground: 210 20% 98%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --input: 240 6% 16%; /* #27272a - Border/Input color */
+        --border: 240 6% 16%;
+        --ring: 34 100% 47%;
+        --sidebar-background: 0 0% 4%;
+        --sidebar-foreground: 240 5% 65%;
+        --sidebar-primary: 34 100% 47%;
+        --sidebar-primary-foreground: 0 0% 0%;
+        --sidebar-accent: 240 6% 10%;
+        --sidebar-accent-foreground: 210 20% 98%;
+        --sidebar-border: 240 6% 16%;
+        --sidebar-ring: 34 100% 47%;
+
+        --radius: 0.75rem;
+    }
 
     .theme-aqua {
         --background: 219 53% 43%;
@@ -733,10 +752,7 @@
 
         --radius: 0.2rem;
 
-        font-family:
-            Chalkboard,
-            comic sans ms,
-            sanssecondaryerif;
+        font-family: Chalkboard,comic sans ms, sanssecondaryerif;
     }
     .theme-autumn {
         --background: 0 0% 95%;
