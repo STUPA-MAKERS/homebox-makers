@@ -38,6 +38,10 @@
     }
 
     .theme-makers {
+        .group\/tag-chip {
+            color: black !important;
+        }
+
         --background: 34 4% 4%; /* True Black */
         --background-accent: 0 0% 0%; /* Near black for elevation */
         --foreground: 210 20% 98%; /* White text */
