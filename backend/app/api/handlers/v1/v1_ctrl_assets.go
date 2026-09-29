@@ -21,7 +21,7 @@ import (
 //	@Tags		Items
 //	@Produce	json
 //	@Param		id	path		string	true	"Asset ID"
-//	@Success	200	{object}	repo.PaginationResult[repo.ItemSummary]{}
+//	@Success	200	{object}	repo.PaginationResult[repo.EntitySummary]{}
 //	@Router		/v1/assets/{id} [GET]
 //	@Security	Bearer
 func (ctrl *V1Controller) HandleAssetGet() errchain.HandlerFunc {
@@ -51,7 +51,7 @@ func (ctrl *V1Controller) HandleAssetGet() errchain.HandlerFunc {
 			}
 		}
 
-		items, err := ctrl.repo.Items.QueryByAssetID(r.Context(), ctx.GID, assetID, int(page), int(pageSize))
+		items, err := ctrl.repo.Entities.QueryByAssetID(r.Context(), ctx.GID, assetID, int(page), int(pageSize))
 		if err != nil {
 			log.Err(err).Msg("failed to get item")
 			return validate.NewRequestError(err, http.StatusInternalServerError)

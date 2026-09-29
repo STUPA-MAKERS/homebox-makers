@@ -49,7 +49,7 @@ func (ctrl *V1Controller) HandleGetLocationLabel() errchain.HandlerFunc {
 		}
 
 		auth := services.NewContext(r.Context())
-		location, err := ctrl.repo.Locations.GetOneByGroup(auth, auth.GID, ID)
+		location, err := ctrl.repo.Entities.GetContainerByGroup(auth, auth.GID, ID)
 		if err != nil {
 			return err
 		}
@@ -77,15 +77,15 @@ func (ctrl *V1Controller) HandleGetItemLabel() errchain.HandlerFunc {
 		}
 
 		auth := services.NewContext(r.Context())
-		item, err := ctrl.repo.Items.GetOneByGroup(auth, auth.GID, ID)
+		item, err := ctrl.repo.Entities.GetOneByGroup(auth, auth.GID, ID)
 		if err != nil {
 			return err
 		}
 
 		description := ""
 
-		if item.Location != nil {
-			description += fmt.Sprintf("\nLocation: %s", item.Location.Name)
+		if item.Parent != nil {
+			description += fmt.Sprintf("\nLocation: %s", item.Parent.Name)
 		}
 
 		hbURL := GetHBURL(r, &ctrl.config.Options, ctrl.url)
@@ -101,7 +101,7 @@ func (ctrl *V1Controller) HandleGetItemLabel() errchain.HandlerFunc {
 //	@Param		id		path		string	true	"Asset ID"
 //	@Param		print	query		bool	false	"Print this label, defaults to false"
 //	@Success	200		{string}	string	"image/png"
-//	@Router		/v1/labelmaker/assets/{id} [GET]
+//	@Router		/v1/labelmaker/asset/{id} [GET]
 //	@Security	Bearer
 func (ctrl *V1Controller) HandleGetAssetLabel() errchain.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -112,7 +112,7 @@ func (ctrl *V1Controller) HandleGetAssetLabel() errchain.HandlerFunc {
 		}
 
 		auth := services.NewContext(r.Context())
-		item, err := ctrl.repo.Items.QueryByAssetID(auth, auth.GID, assetID, 0, 1)
+		item, err := ctrl.repo.Entities.QueryByAssetID(auth, auth.GID, assetID, 0, 1)
 		if err != nil {
 			return err
 		}
@@ -123,8 +123,8 @@ func (ctrl *V1Controller) HandleGetAssetLabel() errchain.HandlerFunc {
 
 		description := item.Items[0].Name
 
-		if item.Items[0].Location != nil {
-			description += fmt.Sprintf("\nLocation: %s", item.Items[0].Location.Name)
+		if item.Items[0].Parent != nil {
+			description += fmt.Sprintf("\nLocation: %s", item.Items[0].Parent.Name)
 		}
 
 		hbURL := GetHBURL(r, &ctrl.config.Options, ctrl.url)

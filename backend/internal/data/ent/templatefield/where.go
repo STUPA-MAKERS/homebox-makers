@@ -81,6 +81,21 @@ func TextValue(v string) predicate.TemplateField {
 	return predicate.TemplateField(sql.FieldEQ(FieldTextValue, v))
 }
 
+// NumberValue applies equality check predicate on the "number_value" field. It's identical to NumberValueEQ.
+func NumberValue(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldEQ(FieldNumberValue, v))
+}
+
+// BooleanValue applies equality check predicate on the "boolean_value" field. It's identical to BooleanValueEQ.
+func BooleanValue(v bool) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldEQ(FieldBooleanValue, v))
+}
+
+// TimeValue applies equality check predicate on the "time_value" field. It's identical to TimeValueEQ.
+func TimeValue(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldEQ(FieldTimeValue, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.TemplateField {
 	return predicate.TemplateField(sql.FieldEQ(FieldCreatedAt, v))
@@ -396,21 +411,121 @@ func TextValueContainsFold(v string) predicate.TemplateField {
 	return predicate.TemplateField(sql.FieldContainsFold(FieldTextValue, v))
 }
 
-// HasItemTemplate applies the HasEdge predicate on the "item_template" edge.
-func HasItemTemplate() predicate.TemplateField {
+// NumberValueEQ applies the EQ predicate on the "number_value" field.
+func NumberValueEQ(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldEQ(FieldNumberValue, v))
+}
+
+// NumberValueNEQ applies the NEQ predicate on the "number_value" field.
+func NumberValueNEQ(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldNEQ(FieldNumberValue, v))
+}
+
+// NumberValueIn applies the In predicate on the "number_value" field.
+func NumberValueIn(vs ...int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldIn(FieldNumberValue, vs...))
+}
+
+// NumberValueNotIn applies the NotIn predicate on the "number_value" field.
+func NumberValueNotIn(vs ...int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldNotIn(FieldNumberValue, vs...))
+}
+
+// NumberValueGT applies the GT predicate on the "number_value" field.
+func NumberValueGT(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldGT(FieldNumberValue, v))
+}
+
+// NumberValueGTE applies the GTE predicate on the "number_value" field.
+func NumberValueGTE(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldGTE(FieldNumberValue, v))
+}
+
+// NumberValueLT applies the LT predicate on the "number_value" field.
+func NumberValueLT(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldLT(FieldNumberValue, v))
+}
+
+// NumberValueLTE applies the LTE predicate on the "number_value" field.
+func NumberValueLTE(v int) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldLTE(FieldNumberValue, v))
+}
+
+// NumberValueIsNil applies the IsNil predicate on the "number_value" field.
+func NumberValueIsNil() predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldIsNull(FieldNumberValue))
+}
+
+// NumberValueNotNil applies the NotNil predicate on the "number_value" field.
+func NumberValueNotNil() predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldNotNull(FieldNumberValue))
+}
+
+// BooleanValueEQ applies the EQ predicate on the "boolean_value" field.
+func BooleanValueEQ(v bool) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldEQ(FieldBooleanValue, v))
+}
+
+// BooleanValueNEQ applies the NEQ predicate on the "boolean_value" field.
+func BooleanValueNEQ(v bool) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldNEQ(FieldBooleanValue, v))
+}
+
+// TimeValueEQ applies the EQ predicate on the "time_value" field.
+func TimeValueEQ(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldEQ(FieldTimeValue, v))
+}
+
+// TimeValueNEQ applies the NEQ predicate on the "time_value" field.
+func TimeValueNEQ(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldNEQ(FieldTimeValue, v))
+}
+
+// TimeValueIn applies the In predicate on the "time_value" field.
+func TimeValueIn(vs ...time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldIn(FieldTimeValue, vs...))
+}
+
+// TimeValueNotIn applies the NotIn predicate on the "time_value" field.
+func TimeValueNotIn(vs ...time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldNotIn(FieldTimeValue, vs...))
+}
+
+// TimeValueGT applies the GT predicate on the "time_value" field.
+func TimeValueGT(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldGT(FieldTimeValue, v))
+}
+
+// TimeValueGTE applies the GTE predicate on the "time_value" field.
+func TimeValueGTE(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldGTE(FieldTimeValue, v))
+}
+
+// TimeValueLT applies the LT predicate on the "time_value" field.
+func TimeValueLT(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldLT(FieldTimeValue, v))
+}
+
+// TimeValueLTE applies the LTE predicate on the "time_value" field.
+func TimeValueLTE(v time.Time) predicate.TemplateField {
+	return predicate.TemplateField(sql.FieldLTE(FieldTimeValue, v))
+}
+
+// HasEntityTemplate applies the HasEdge predicate on the "entity_template" edge.
+func HasEntityTemplate() predicate.TemplateField {
 	return predicate.TemplateField(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ItemTemplateTable, ItemTemplateColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, EntityTemplateTable, EntityTemplateColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasItemTemplateWith applies the HasEdge predicate on the "item_template" edge with a given conditions (other predicates).
-func HasItemTemplateWith(preds ...predicate.ItemTemplate) predicate.TemplateField {
+// HasEntityTemplateWith applies the HasEdge predicate on the "entity_template" edge with a given conditions (other predicates).
+func HasEntityTemplateWith(preds ...predicate.EntityTemplate) predicate.TemplateField {
 	return predicate.TemplateField(func(s *sql.Selector) {
-		step := newItemTemplateStep()
+		step := newEntityTemplateStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

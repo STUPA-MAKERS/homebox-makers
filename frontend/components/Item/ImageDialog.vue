@@ -38,10 +38,10 @@
         image.originalType = params.originalType;
         image.thumbnailSrc = params.thumbnailSrc;
       } else if (params.type === "attachment") {
-        image.originalSrc = api.authURL(`/items/${params.itemId}/attachments/${params.attachmentId}`);
+        image.originalSrc = api.authURL(`/entities/${params.itemId}/attachments/${params.attachmentId}`);
         image.originalType = params.mimeType;
         image.thumbnailSrc = params.thumbnailId
-          ? api.authURL(`/items/${params.itemId}/attachments/${params.thumbnailId}`)
+          ? api.authURL(`/entities/${params.itemId}/attachments/${params.thumbnailId}`)
           : image.originalSrc;
       }
     });
@@ -73,10 +73,17 @@
 
 <template>
   <Dialog :dialog-id="DialogID.ItemImage">
-    <DialogContent class="w-auto border-transparent bg-transparent p-0" disable-close>
+    <DialogContent
+      class="max-h-[90svh] w-auto max-w-[min(calc(100vw_-_1rem),32rem)] border-transparent bg-transparent p-0 md:max-w-lg"
+      disable-close
+    >
       <picture>
         <source :srcset="image.originalSrc" :type="image.originalType" />
-        <img :src="image.thumbnailSrc" alt="attachment image" />
+        <img
+          :src="image.thumbnailSrc"
+          alt="attachment image"
+          class="min-w-64 max-w-[min(calc(100vw_-_1rem),32rem)] md:w-auto md:max-w-lg"
+        />
       </picture>
       <Button variant="destructive" size="icon" class="absolute right-[84px] top-1" @click="deleteAttachment">
         <MdiDelete />
