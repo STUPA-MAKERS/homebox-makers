@@ -33,7 +33,7 @@ permissions:
 
 env:
   DOCKERHUB_REPO: sysadminsmedia/homebox
-  GHCR_REPO: ghcr.io/${{ github.repository }}
+  GHCR_REPO: ghcr.io/stupa-makers/homebox-makers  # lowercase: OCI names allow no capitals, and the org is STUPA-MAKERS
 
 jobs:
   build:
