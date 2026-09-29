@@ -14,7 +14,6 @@
   import { Button } from "@/components/ui/button";
   import LanguageSelector from "~/components/App/LanguageSelector.vue";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-  import AppHeaderText from "~/components/App/HeaderText.vue";
   import FormTextField from "~/components/Form/TextField.vue";
   import FormPassword from "~/components/Form/Password.vue";
   import FormCheckbox from "~/components/Form/Checkbox.vue";
@@ -246,10 +245,7 @@
         }"
       >
         <div class="z-10">
-          <h2 class="mt-1 text-foreground">
-            <span class="sr-only">STUPA MAKERS Homebox</span>
-            <AppHeaderText class="h-16 sm:h-20 lg:h-24" />
-          </h2>
+          <h1 class="sr-only">STUPA MAKERS Homebox</h1>
         </div>
         <TooltipProvider :delay-duration="0">
           <div class="z-10 ml-auto mt-6 flex items-center gap-4 sm:mt-0">
@@ -463,12 +459,6 @@
         </div>
       </div>
     </div>
-    <footer v-if="status" class="bottom-0 mt-auto w-full pb-4 text-center">
-      <p class="text-center text-sm">
-        {{ $t("global.version", { version: status.build.version }) }} ~
-        {{ $t("global.build", { build: status.build.commit }) }}
-      </p>
-    </footer>
   </div>
 </template>
 
