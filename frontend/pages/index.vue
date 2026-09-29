@@ -14,7 +14,7 @@
   import { Button } from "@/components/ui/button";
   import LanguageSelector from "~/components/App/LanguageSelector.vue";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-  import AppLogo from "~/components/App/Logo.vue";
+  import AppHeaderText from "~/components/App/HeaderText.vue";
   import FormTextField from "~/components/Form/TextField.vue";
   import FormPassword from "~/components/Form/Password.vue";
   import FormCheckbox from "~/components/Form/Checkbox.vue";
@@ -101,6 +101,8 @@
   const password = ref("");
   const canRegister = ref(false);
   const remember = ref(false);
+  // With OIDC on, the password login is collapsed and SSO is the primary action.
+  const showLocalLogin = ref(false);
 
   const groupToken = computed<string>({
     get() {
@@ -245,10 +247,9 @@
         }"
       >
         <div class="z-10">
-          <h2 class="mt-1 flex text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            HomeB
-            <AppLogo class="-mb-4 w-12" />
-            x
+          <h2 class="mt-1 text-foreground">
+            <span class="sr-only">STUPA MAKERS Homebox</span>
+            <AppHeaderText class="h-16 sm:h-20 lg:h-24" />
           </h2>
           <p
             class="ml-1 text-lg"
@@ -373,73 +374,75 @@
                     {{ $t("index.login") }}
                   </CardTitle>
                 </CardHeader>
-                <CardContent v-if="status?.oidc?.allowLocal !== false" class="flex flex-col gap-2">
-                  <template v-if="status && status.demo">
-                    <p class="text-center text-xs italic">
-                      {{ $t("global.demo_instance") }}
-                    </p>
-                    <p class="text-center text-xs">
-                      <b>{{ $t("global.email") }}</b> demo@example.com
-                    </p>
-                    <p class="text-center text-xs">
-                      <b>{{ $t("global.password") }}</b> demodemo
-                    </p>
+                <CardContent class="flex flex-col gap-3">
+                  <template v-if="status?.oidc?.enabled">
+                    <Button type="button" size="lg" class="w-full" @click="loginWithOIDC">
+                      <MdiLogin class="mr-2 size-5" />
+                      {{ status.oidc.buttonText || "Sign in with OIDC" }}
+                    </Button>
+                    <Button
+                      v-if="status?.oidc?.allowLocal !== false"
+                      type="button"
+                      variant="link"
+                      class="text-muted-foreground"
+                      :aria-expanded="showLocalLogin"
+                      aria-controls="local-login"
+                      @click="showLocalLogin = !showLocalLogin"
+                    >
+                      {{ showLocalLogin ? $t("index.local_login_hide") : $t("index.local_login_show") }}
+                    </Button>
                   </template>
-                  <FormTextField
-                    id="login-username"
-                    v-model="email"
-                    :label="$t('global.email')"
-                    name="username"
-                    autocomplete="username"
-                    :required="true"
-                  />
-                  <FormPassword
-                    id="login-password"
-                    v-model="loginPassword"
-                    :label="$t('global.password')"
-                    name="password"
-                    autocomplete="current-password"
-                    :required="true"
-                  />
-                  <div class="flex items-center justify-between">
-                    <div class="max-w-[140px]">
-                      <FormCheckbox v-model="remember" :label="$t('index.remember_me')" />
+                  <div
+                    v-if="status?.oidc?.allowLocal !== false && (!status?.oidc?.enabled || showLocalLogin)"
+                    id="local-login"
+                    class="flex flex-col gap-2"
+                  >
+                    <template v-if="status && status.demo">
+                      <p class="text-center text-xs italic">
+                        {{ $t("global.demo_instance") }}
+                      </p>
+                      <p class="text-center text-xs">
+                        <b>{{ $t("global.email") }}</b> demo@example.com
+                      </p>
+                      <p class="text-center text-xs">
+                        <b>{{ $t("global.password") }}</b> demodemo
+                      </p>
+                    </template>
+                    <FormTextField
+                      id="login-username"
+                      v-model="email"
+                      :label="$t('global.email')"
+                      name="username"
+                      autocomplete="username"
+                      :required="true"
+                    />
+                    <FormPassword
+                      id="login-password"
+                      v-model="loginPassword"
+                      :label="$t('global.password')"
+                      name="password"
+                      autocomplete="current-password"
+                      :required="true"
+                    />
+                    <div class="flex items-center justify-between">
+                      <div class="max-w-[140px]">
+                        <FormCheckbox v-model="remember" :label="$t('index.remember_me')" />
+                      </div>
+                      <NuxtLink to="/forgot-password" class="text-sm hover:underline">
+                        {{ $t("index.forgot_password") }}
+                      </NuxtLink>
                     </div>
-                    <NuxtLink to="/forgot-password" class="text-sm hover:underline">
-                      {{ $t("index.forgot_password") }}
-                    </NuxtLink>
+                    <Button
+                      class="w-full"
+                      type="submit"
+                      :variant="status?.oidc?.enabled ? 'outline' : 'default'"
+                      :class="loading ? 'loading' : ''"
+                      :disabled="loading"
+                    >
+                      {{ $t("index.login") }}
+                    </Button>
                   </div>
                 </CardContent>
-                <CardFooter class="flex flex-col gap-2">
-                  <Button
-                    v-if="status?.oidc?.allowLocal !== false"
-                    class="w-full"
-                    type="submit"
-                    :class="loading ? 'loading' : ''"
-                    :disabled="loading"
-                  >
-                    {{ $t("index.login") }}
-                  </Button>
-
-                  <div
-                    v-if="status?.oidc?.enabled && status?.oidc?.allowLocal !== false"
-                    class="flex w-full items-center gap-2"
-                  >
-                    <hr class="flex-1" />
-                    <span class="text-xs text-muted-foreground">{{ $t("index.or") }}</span>
-                    <hr class="flex-1" />
-                  </div>
-
-                  <Button
-                    v-if="status?.oidc?.enabled"
-                    type="button"
-                    variant="outline"
-                    class="w-full"
-                    @click="loginWithOIDC"
-                  >
-                    {{ status.oidc.buttonText || "Sign in with OIDC" }}
-                  </Button>
-                </CardFooter>
               </Card>
             </form>
           </Transition>

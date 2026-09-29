@@ -510,6 +510,8 @@
         "disabled_registration": "Registration Disabled",
         "dont_join_group": "Don't want to join a group?",
         "forgot_password": "Forgot your password?",
+        "local_login_hide": "Hide password sign-in",
+        "local_login_show": "Sign in with email and password",
         "forgot_password_check_email": "If that email is associated with an account, a reset link is on its way. The link expires in one hour.",
         "forgot_password_send": "Send reset link",
         "forgot_password_subtitle": "Enter the email for your account and we'll send you a link to reset your password.",

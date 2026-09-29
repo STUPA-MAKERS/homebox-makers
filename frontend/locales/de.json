@@ -462,6 +462,8 @@
         "disabled_registration": "Registrierung deaktiviert",
         "dont_join_group": "Möchtest du nicht einer Gruppe beitreten?",
         "forgot_password": "Passwort vergessen?",
+        "local_login_hide": "Passwort-Anmeldung ausblenden",
+        "local_login_show": "Mit E-Mail und Passwort anmelden",
         "joining_group": "Du trittst einer bereits bestehenden Gruppe bei!",
         "login": "Anmelden",
         "or": "oder",
