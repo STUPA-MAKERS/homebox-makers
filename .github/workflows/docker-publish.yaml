@@ -1,18 +1,8 @@
 name: Docker publish
 
-# No nightly schedule: the fork deploys by building on its own host, not from this image.
+# Pull requests only: this proves that the Dockerfile builds. The fork deploys by building
+# on its own host, so an image published from here would have no user.
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'Dockerfile'
-      - '.dockerignore'
-      - '.github/workflows/docker-publish.yaml'
-    ignore:
-      - 'docs/**'
-    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
     paths:
