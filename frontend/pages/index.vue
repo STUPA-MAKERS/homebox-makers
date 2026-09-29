@@ -90,7 +90,6 @@
     "autumn",
     "acid",
   ]);
-  const isEvilForegroundTheme = useIsThemeInList(["light", "aqua", "fantasy", "autumn", "night"]);
   const isLofiTheme = useIsThemeInList(["lofi"]);
 
   const route = useRoute();
@@ -251,15 +250,6 @@
             <span class="sr-only">STUPA MAKERS Homebox</span>
             <AppHeaderText class="h-16 sm:h-20 lg:h-24" />
           </h2>
-          <p
-            class="ml-1 text-lg"
-            :class="{
-              'text-foreground': !isEvilForegroundTheme,
-              'text-white': isLofiTheme,
-            }"
-          >
-            {{ $t("index.tagline") }}
-          </p>
         </div>
         <TooltipProvider :delay-duration="0">
           <div class="z-10 ml-auto mt-6 flex items-center gap-4 sm:mt-0">
