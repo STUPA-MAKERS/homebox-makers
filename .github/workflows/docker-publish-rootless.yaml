@@ -1,29 +1,9 @@
 name: Docker publish rootless
 
+# The fork uses neither the hardened nor the rootless image, and each build pulls base
+# images from public.ecr.aws, whose rate limit then fails the other builds. Start by hand.
 on:
-  schedule:
-    - cron: '00 0 * * *'
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'Dockerfile.rootless'
-      - '.dockerignore'
-      - '.github/workflows/docker-publish-rootless.yaml'
-    ignore:
-      - 'docs/**'
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'Dockerfile.rootless'
-      - '.dockerignore'
-      - '.github/workflows/docker-publish-rootless.yaml'
-    ignore:
-      - 'docs/**'
+  workflow_dispatch:
 
 permissions:
   contents: read        # Access to repository contents
