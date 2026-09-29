@@ -8,6 +8,7 @@
   type Props = {
     locs: TreeItem[];
     treeId: string;
+    showItems?: boolean;
   };
 
   const { openDialog } = useDialog();
@@ -38,16 +39,16 @@
         variant="outline"
         size="sm"
         type="button"
-        :aria-label="$t('components.location.create_modal.title') || $t('global.create')"
-        @click="openDialog(DialogID.CreateLocation)"
+        :aria-label="$t('global.create')"
+        @click="openDialog(DialogID.CreateEntity, { params: { baseType: 'location' } })"
       >
-        {{ $t("components.location.create_modal.title") || $t("global.create") }}
+        {{ $t("global.create") }}
       </Button>
     </div>
 
     <ul role="tree" :aria-labelledby="treeId" class="space-y-1">
       <li v-for="item in sortedLocs" :key="item.id" role="treeitem">
-        <LocationTreeNode :item="item" :tree-id="treeId" />
+        <LocationTreeNode :item="item" :tree-id="treeId" :show-items="props.showItems ?? true" />
       </li>
     </ul>
   </div>

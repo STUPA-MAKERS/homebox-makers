@@ -14,11 +14,11 @@
   import { Button } from "@/components/ui/button";
   import LanguageSelector from "~/components/App/LanguageSelector.vue";
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-  import AppLogo from "~/components/App/Logo.vue";
   import FormTextField from "~/components/Form/TextField.vue";
   import FormPassword from "~/components/Form/Password.vue";
   import FormCheckbox from "~/components/Form/Checkbox.vue";
   import PasswordScore from "~/components/global/PasswordScore.vue";
+  import { PASSWORD_MIN_LENGTH, PASSWORD_RULES } from "~/lib/passwords";
 
   const { t } = useI18n();
 
@@ -31,7 +31,12 @@
     middleware: [
       () => {
         const ctx = useAuthContext();
+        const route = useRoute();
         if (ctx.isAuthorized()) {
+          // Preserve invitation token when redirecting authenticated users
+          if (route.query.token) {
+            return `/home?token=${encodeURIComponent(route.query.token as string)}`;
+          }
           return "/home";
         } else {
           console.log("Logged out, clearing collectionId preference");
@@ -56,7 +61,7 @@
 
     if (data.demo) {
       username.value = "demo@example.com";
-      password.value = "demo";
+      password.value = "demodemo";
     }
     return data;
   });
@@ -64,7 +69,7 @@
   whenever(status, status => {
     if (status?.demo) {
       email.value = "demo@example.com";
-      loginPassword.value = "demo";
+      loginPassword.value = "demodemo";
     }
 
     // Auto-redirect to OIDC if autoRedirect is enabled, but not if there's an OIDC initialization error
@@ -84,7 +89,6 @@
     "autumn",
     "acid",
   ]);
-  const isEvilForegroundTheme = useIsThemeInList(["light", "aqua", "fantasy", "autumn", "night"]);
   const isLofiTheme = useIsThemeInList(["lofi"]);
 
   const route = useRoute();
@@ -95,6 +99,8 @@
   const password = ref("");
   const canRegister = ref(false);
   const remember = ref(false);
+  // With OIDC on, the password login is collapsed and SSO is the primary action.
+  const showLocalLogin = ref(false);
 
   const groupToken = computed<string>({
     get() {
@@ -215,8 +221,8 @@
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col">
-    <div class="absolute top-0 -z-10 min-w-full fill-primary">
+  <div class="relative flex min-h-screen flex-col">
+    <div class="pointer-events-none absolute top-0 z-0 min-w-full fill-primary">
       <div class="flex min-h-[20vh] flex-col bg-primary" />
       <svg
         class="fill-primary drop-shadow-xl"
@@ -230,7 +236,7 @@
         />
       </svg>
     </div>
-    <div>
+    <div class="relative z-10">
       <header
         class="mx-auto p-4 sm:flex sm:items-end sm:p-6 lg:p-14"
         :class="{
@@ -239,20 +245,7 @@
         }"
       >
         <div class="z-10">
-          <h2 class="mt-1 flex text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            HomeB
-            <AppLogo class="-mb-4 w-12" />
-            x
-          </h2>
-          <p
-            class="ml-1 text-lg"
-            :class="{
-              'text-foreground': !isEvilForegroundTheme,
-              'text-white': isLofiTheme,
-            }"
-          >
-            {{ $t("index.tagline") }}
-          </p>
+          <h1 class="sr-only">STUPA MAKERS Homebox</h1>
         </div>
         <TooltipProvider :delay-duration="0">
           <div class="z-10 ml-auto mt-6 flex items-center gap-4 sm:mt-0">
@@ -299,7 +292,7 @@
       <div class="grid min-h-[50vh] p-6 sm:place-items-center">
         <div>
           <Transition name="slide-fade">
-            <form v-if="registerForm" @submit.prevent="registerUser">
+            <form v-if="registerForm" id="register-form" name="register" method="post" @submit.prevent="registerUser">
               <Card class="md:w-[500px]">
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
@@ -308,15 +301,42 @@
                   </CardTitle>
                 </CardHeader>
                 <CardContent class="flex flex-col gap-2">
-                  <FormTextField v-model="email" :label="$t('index.set_email')" data-testid="email-input" />
-                  <FormTextField v-model="username" :label="$t('index.set_name')" data-testid="name-input" />
+                  <FormTextField
+                    id="register-email"
+                    v-model="email"
+                    :label="$t('index.set_email')"
+                    type="email"
+                    name="email"
+                    autocomplete="username"
+                    :required="true"
+                    data-testid="email-input"
+                  />
+                  <FormTextField
+                    id="register-name"
+                    v-model="username"
+                    :label="$t('index.set_name')"
+                    name="name"
+                    autocomplete="name"
+                    :required="true"
+                    data-testid="name-input"
+                  />
                   <div v-if="!(groupToken == '')" class="pb-1 pt-4 text-center">
                     <p>{{ $t("index.joining_group") }}</p>
                     <button type="button" class="text-xs underline" @click="groupToken = ''">
                       {{ $t("index.dont_join_group") }}
                     </button>
                   </div>
-                  <FormPassword v-model="password" :label="$t('index.set_password')" data-testid="password-input" />
+                  <FormPassword
+                    id="register-password"
+                    v-model="password"
+                    :label="$t('index.set_password')"
+                    name="new-password"
+                    autocomplete="new-password"
+                    :min-length="PASSWORD_MIN_LENGTH"
+                    :passwordrules="PASSWORD_RULES"
+                    :required="true"
+                    data-testid="password-input"
+                  />
                   <PasswordScore v-model:valid="canRegister" :password="password" />
                 </CardContent>
                 <CardFooter>
@@ -332,7 +352,7 @@
                 </CardFooter>
               </Card>
             </form>
-            <form v-else @submit.prevent="login">
+            <form v-else id="login-form" name="login" method="post" @submit.prevent="login">
               <Card class="md:w-[500px]">
                 <CardHeader>
                   <CardTitle class="flex items-center gap-2">
@@ -340,54 +360,75 @@
                     {{ $t("index.login") }}
                   </CardTitle>
                 </CardHeader>
-                <CardContent v-if="status?.oidc?.allowLocal !== false" class="flex flex-col gap-2">
-                  <template v-if="status && status.demo">
-                    <p class="text-center text-xs italic">
-                      {{ $t("global.demo_instance") }}
-                    </p>
-                    <p class="text-center text-xs">
-                      <b>{{ $t("global.email") }}</b> demo@example.com
-                    </p>
-                    <p class="text-center text-xs">
-                      <b>{{ $t("global.password") }}</b> demo
-                    </p>
+                <CardContent class="flex flex-col gap-3">
+                  <template v-if="status?.oidc?.enabled">
+                    <Button type="button" size="lg" class="w-full" @click="loginWithOIDC">
+                      <MdiLogin class="mr-2 size-5" />
+                      {{ status.oidc.buttonText || "Sign in with OIDC" }}
+                    </Button>
+                    <Button
+                      v-if="status?.oidc?.allowLocal !== false"
+                      type="button"
+                      variant="link"
+                      class="text-muted-foreground"
+                      :aria-expanded="showLocalLogin"
+                      aria-controls="local-login"
+                      @click="showLocalLogin = !showLocalLogin"
+                    >
+                      {{ showLocalLogin ? $t("index.local_login_hide") : $t("index.local_login_show") }}
+                    </Button>
                   </template>
-                  <FormTextField v-model="email" :label="$t('global.email')" />
-                  <FormPassword v-model="loginPassword" :label="$t('global.password')" />
-                  <div class="max-w-[140px]">
-                    <FormCheckbox v-model="remember" :label="$t('index.remember_me')" />
+                  <div
+                    v-if="status?.oidc?.allowLocal !== false && (!status?.oidc?.enabled || showLocalLogin)"
+                    id="local-login"
+                    class="flex flex-col gap-2"
+                  >
+                    <template v-if="status && status.demo">
+                      <p class="text-center text-xs italic">
+                        {{ $t("global.demo_instance") }}
+                      </p>
+                      <p class="text-center text-xs">
+                        <b>{{ $t("global.email") }}</b> demo@example.com
+                      </p>
+                      <p class="text-center text-xs">
+                        <b>{{ $t("global.password") }}</b> demodemo
+                      </p>
+                    </template>
+                    <FormTextField
+                      id="login-username"
+                      v-model="email"
+                      :label="$t('global.email')"
+                      name="username"
+                      autocomplete="username"
+                      :required="true"
+                    />
+                    <FormPassword
+                      id="login-password"
+                      v-model="loginPassword"
+                      :label="$t('global.password')"
+                      name="password"
+                      autocomplete="current-password"
+                      :required="true"
+                    />
+                    <div class="flex items-center justify-between">
+                      <div class="max-w-[140px]">
+                        <FormCheckbox v-model="remember" :label="$t('index.remember_me')" />
+                      </div>
+                      <NuxtLink to="/forgot-password" class="text-sm hover:underline">
+                        {{ $t("index.forgot_password") }}
+                      </NuxtLink>
+                    </div>
+                    <Button
+                      class="w-full"
+                      type="submit"
+                      :variant="status?.oidc?.enabled ? 'outline' : 'default'"
+                      :class="loading ? 'loading' : ''"
+                      :disabled="loading"
+                    >
+                      {{ $t("index.login") }}
+                    </Button>
                   </div>
                 </CardContent>
-                <CardFooter class="flex flex-col gap-2">
-                  <Button
-                    v-if="status?.oidc?.allowLocal !== false"
-                    class="w-full"
-                    type="submit"
-                    :class="loading ? 'loading' : ''"
-                    :disabled="loading"
-                  >
-                    {{ $t("index.login") }}
-                  </Button>
-
-                  <div
-                    v-if="status?.oidc?.enabled && status?.oidc?.allowLocal !== false"
-                    class="flex w-full items-center gap-2"
-                  >
-                    <hr class="flex-1" />
-                    <span class="text-xs text-muted-foreground">{{ $t("index.or") }}</span>
-                    <hr class="flex-1" />
-                  </div>
-
-                  <Button
-                    v-if="status?.oidc?.enabled"
-                    type="button"
-                    variant="outline"
-                    class="w-full"
-                    @click="loginWithOIDC"
-                  >
-                    {{ status.oidc.buttonText || "Sign in with OIDC" }}
-                  </Button>
-                </CardFooter>
               </Card>
             </form>
           </Transition>
@@ -418,12 +459,6 @@
         </div>
       </div>
     </div>
-    <footer v-if="status" class="bottom-0 mt-auto w-full pb-4 text-center">
-      <p class="text-center text-sm">
-        {{ $t("global.version", { version: status.build.version }) }} ~
-        {{ $t("global.build", { build: status.build.commit }) }}
-      </p>
-    </footer>
   </div>
 </template>
 

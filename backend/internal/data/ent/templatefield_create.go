@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/sysadminsmedia/homebox/backend/internal/data/ent/itemtemplate"
+	"github.com/sysadminsmedia/homebox/backend/internal/data/ent/entitytemplate"
 	"github.com/sysadminsmedia/homebox/backend/internal/data/ent/templatefield"
 )
 
@@ -90,6 +90,48 @@ func (_c *TemplateFieldCreate) SetNillableTextValue(v *string) *TemplateFieldCre
 	return _c
 }
 
+// SetNumberValue sets the "number_value" field.
+func (_c *TemplateFieldCreate) SetNumberValue(v int) *TemplateFieldCreate {
+	_c.mutation.SetNumberValue(v)
+	return _c
+}
+
+// SetNillableNumberValue sets the "number_value" field if the given value is not nil.
+func (_c *TemplateFieldCreate) SetNillableNumberValue(v *int) *TemplateFieldCreate {
+	if v != nil {
+		_c.SetNumberValue(*v)
+	}
+	return _c
+}
+
+// SetBooleanValue sets the "boolean_value" field.
+func (_c *TemplateFieldCreate) SetBooleanValue(v bool) *TemplateFieldCreate {
+	_c.mutation.SetBooleanValue(v)
+	return _c
+}
+
+// SetNillableBooleanValue sets the "boolean_value" field if the given value is not nil.
+func (_c *TemplateFieldCreate) SetNillableBooleanValue(v *bool) *TemplateFieldCreate {
+	if v != nil {
+		_c.SetBooleanValue(*v)
+	}
+	return _c
+}
+
+// SetTimeValue sets the "time_value" field.
+func (_c *TemplateFieldCreate) SetTimeValue(v time.Time) *TemplateFieldCreate {
+	_c.mutation.SetTimeValue(v)
+	return _c
+}
+
+// SetNillableTimeValue sets the "time_value" field if the given value is not nil.
+func (_c *TemplateFieldCreate) SetNillableTimeValue(v *time.Time) *TemplateFieldCreate {
+	if v != nil {
+		_c.SetTimeValue(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *TemplateFieldCreate) SetID(v uuid.UUID) *TemplateFieldCreate {
 	_c.mutation.SetID(v)
@@ -104,23 +146,23 @@ func (_c *TemplateFieldCreate) SetNillableID(v *uuid.UUID) *TemplateFieldCreate 
 	return _c
 }
 
-// SetItemTemplateID sets the "item_template" edge to the ItemTemplate entity by ID.
-func (_c *TemplateFieldCreate) SetItemTemplateID(id uuid.UUID) *TemplateFieldCreate {
-	_c.mutation.SetItemTemplateID(id)
+// SetEntityTemplateID sets the "entity_template" edge to the EntityTemplate entity by ID.
+func (_c *TemplateFieldCreate) SetEntityTemplateID(id uuid.UUID) *TemplateFieldCreate {
+	_c.mutation.SetEntityTemplateID(id)
 	return _c
 }
 
-// SetNillableItemTemplateID sets the "item_template" edge to the ItemTemplate entity by ID if the given value is not nil.
-func (_c *TemplateFieldCreate) SetNillableItemTemplateID(id *uuid.UUID) *TemplateFieldCreate {
+// SetNillableEntityTemplateID sets the "entity_template" edge to the EntityTemplate entity by ID if the given value is not nil.
+func (_c *TemplateFieldCreate) SetNillableEntityTemplateID(id *uuid.UUID) *TemplateFieldCreate {
 	if id != nil {
-		_c = _c.SetItemTemplateID(*id)
+		_c = _c.SetEntityTemplateID(*id)
 	}
 	return _c
 }
 
-// SetItemTemplate sets the "item_template" edge to the ItemTemplate entity.
-func (_c *TemplateFieldCreate) SetItemTemplate(v *ItemTemplate) *TemplateFieldCreate {
-	return _c.SetItemTemplateID(v.ID)
+// SetEntityTemplate sets the "entity_template" edge to the EntityTemplate entity.
+func (_c *TemplateFieldCreate) SetEntityTemplate(v *EntityTemplate) *TemplateFieldCreate {
+	return _c.SetEntityTemplateID(v.ID)
 }
 
 // Mutation returns the TemplateFieldMutation object of the builder.
@@ -166,6 +208,14 @@ func (_c *TemplateFieldCreate) defaults() {
 		v := templatefield.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := _c.mutation.BooleanValue(); !ok {
+		v := templatefield.DefaultBooleanValue
+		_c.mutation.SetBooleanValue(v)
+	}
+	if _, ok := _c.mutation.TimeValue(); !ok {
+		v := templatefield.DefaultTimeValue()
+		_c.mutation.SetTimeValue(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := templatefield.DefaultID()
 		_c.mutation.SetID(v)
@@ -205,6 +255,12 @@ func (_c *TemplateFieldCreate) check() error {
 		if err := templatefield.TextValueValidator(v); err != nil {
 			return &ValidationError{Name: "text_value", err: fmt.Errorf(`ent: validator failed for field "TemplateField.text_value": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.BooleanValue(); !ok {
+		return &ValidationError{Name: "boolean_value", err: errors.New(`ent: missing required field "TemplateField.boolean_value"`)}
+	}
+	if _, ok := _c.mutation.TimeValue(); !ok {
+		return &ValidationError{Name: "time_value", err: errors.New(`ent: missing required field "TemplateField.time_value"`)}
 	}
 	return nil
 }
@@ -265,21 +321,33 @@ func (_c *TemplateFieldCreate) createSpec() (*TemplateField, *sqlgraph.CreateSpe
 		_spec.SetField(templatefield.FieldTextValue, field.TypeString, value)
 		_node.TextValue = value
 	}
-	if nodes := _c.mutation.ItemTemplateIDs(); len(nodes) > 0 {
+	if value, ok := _c.mutation.NumberValue(); ok {
+		_spec.SetField(templatefield.FieldNumberValue, field.TypeInt, value)
+		_node.NumberValue = value
+	}
+	if value, ok := _c.mutation.BooleanValue(); ok {
+		_spec.SetField(templatefield.FieldBooleanValue, field.TypeBool, value)
+		_node.BooleanValue = value
+	}
+	if value, ok := _c.mutation.TimeValue(); ok {
+		_spec.SetField(templatefield.FieldTimeValue, field.TypeTime, value)
+		_node.TimeValue = value
+	}
+	if nodes := _c.mutation.EntityTemplateIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   templatefield.ItemTemplateTable,
-			Columns: []string{templatefield.ItemTemplateColumn},
+			Table:   templatefield.EntityTemplateTable,
+			Columns: []string{templatefield.EntityTemplateColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(itemtemplate.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(entitytemplate.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.item_template_fields = &nodes[0]
+		_node.entity_template_fields = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

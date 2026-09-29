@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/sysadminsmedia/homebox/backend/internal/data/ent/itemtemplate"
+	"github.com/sysadminsmedia/homebox/backend/internal/data/ent/entitytemplate"
 	"github.com/sysadminsmedia/homebox/backend/internal/data/ent/templatefield"
 )
 
@@ -31,31 +31,37 @@ type TemplateField struct {
 	Type templatefield.Type `json:"type,omitempty"`
 	// TextValue holds the value of the "text_value" field.
 	TextValue string `json:"text_value,omitempty"`
+	// NumberValue holds the value of the "number_value" field.
+	NumberValue int `json:"number_value,omitempty"`
+	// BooleanValue holds the value of the "boolean_value" field.
+	BooleanValue bool `json:"boolean_value,omitempty"`
+	// TimeValue holds the value of the "time_value" field.
+	TimeValue time.Time `json:"time_value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TemplateFieldQuery when eager-loading is set.
-	Edges                TemplateFieldEdges `json:"edges"`
-	item_template_fields *uuid.UUID
-	selectValues         sql.SelectValues
+	Edges                  TemplateFieldEdges `json:"edges"`
+	entity_template_fields *uuid.UUID
+	selectValues           sql.SelectValues
 }
 
 // TemplateFieldEdges holds the relations/edges for other nodes in the graph.
 type TemplateFieldEdges struct {
-	// ItemTemplate holds the value of the item_template edge.
-	ItemTemplate *ItemTemplate `json:"item_template,omitempty"`
+	// EntityTemplate holds the value of the entity_template edge.
+	EntityTemplate *EntityTemplate `json:"entity_template,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// ItemTemplateOrErr returns the ItemTemplate value or an error if the edge
+// EntityTemplateOrErr returns the EntityTemplate value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e TemplateFieldEdges) ItemTemplateOrErr() (*ItemTemplate, error) {
-	if e.ItemTemplate != nil {
-		return e.ItemTemplate, nil
+func (e TemplateFieldEdges) EntityTemplateOrErr() (*EntityTemplate, error) {
+	if e.EntityTemplate != nil {
+		return e.EntityTemplate, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: itemtemplate.Label}
+		return nil, &NotFoundError{label: entitytemplate.Label}
 	}
-	return nil, &NotLoadedError{edge: "item_template"}
+	return nil, &NotLoadedError{edge: "entity_template"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -63,13 +69,17 @@ func (*TemplateField) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case templatefield.FieldBooleanValue:
+			values[i] = new(sql.NullBool)
+		case templatefield.FieldNumberValue:
+			values[i] = new(sql.NullInt64)
 		case templatefield.FieldName, templatefield.FieldDescription, templatefield.FieldType, templatefield.FieldTextValue:
 			values[i] = new(sql.NullString)
-		case templatefield.FieldCreatedAt, templatefield.FieldUpdatedAt:
+		case templatefield.FieldCreatedAt, templatefield.FieldUpdatedAt, templatefield.FieldTimeValue:
 			values[i] = new(sql.NullTime)
 		case templatefield.FieldID:
 			values[i] = new(uuid.UUID)
-		case templatefield.ForeignKeys[0]: // item_template_fields
+		case templatefield.ForeignKeys[0]: // entity_template_fields
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
@@ -128,12 +138,30 @@ func (_m *TemplateField) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.TextValue = value.String
 			}
+		case templatefield.FieldNumberValue:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field number_value", values[i])
+			} else if value.Valid {
+				_m.NumberValue = int(value.Int64)
+			}
+		case templatefield.FieldBooleanValue:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field boolean_value", values[i])
+			} else if value.Valid {
+				_m.BooleanValue = value.Bool
+			}
+		case templatefield.FieldTimeValue:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field time_value", values[i])
+			} else if value.Valid {
+				_m.TimeValue = value.Time
+			}
 		case templatefield.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field item_template_fields", values[i])
+				return fmt.Errorf("unexpected type %T for field entity_template_fields", values[i])
 			} else if value.Valid {
-				_m.item_template_fields = new(uuid.UUID)
-				*_m.item_template_fields = *value.S.(*uuid.UUID)
+				_m.entity_template_fields = new(uuid.UUID)
+				*_m.entity_template_fields = *value.S.(*uuid.UUID)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -148,9 +176,9 @@ func (_m *TemplateField) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryItemTemplate queries the "item_template" edge of the TemplateField entity.
-func (_m *TemplateField) QueryItemTemplate() *ItemTemplateQuery {
-	return NewTemplateFieldClient(_m.config).QueryItemTemplate(_m)
+// QueryEntityTemplate queries the "entity_template" edge of the TemplateField entity.
+func (_m *TemplateField) QueryEntityTemplate() *EntityTemplateQuery {
+	return NewTemplateFieldClient(_m.config).QueryEntityTemplate(_m)
 }
 
 // Update returns a builder for updating this TemplateField.
@@ -193,6 +221,15 @@ func (_m *TemplateField) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("text_value=")
 	builder.WriteString(_m.TextValue)
+	builder.WriteString(", ")
+	builder.WriteString("number_value=")
+	builder.WriteString(fmt.Sprintf("%v", _m.NumberValue))
+	builder.WriteString(", ")
+	builder.WriteString("boolean_value=")
+	builder.WriteString(fmt.Sprintf("%v", _m.BooleanValue))
+	builder.WriteString(", ")
+	builder.WriteString("time_value=")
+	builder.WriteString(_m.TimeValue.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

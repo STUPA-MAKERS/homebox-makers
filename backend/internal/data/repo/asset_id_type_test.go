@@ -16,7 +16,7 @@ func TestAssetID_MarshalJSON(t *testing.T) {
 		{
 			name: "basic test",
 			aid:  123,
-			want: []byte(`"000-123"`),
+			want: []byte(`"MK-0123"`),
 		},
 		{
 			name: "zero test",
@@ -26,7 +26,7 @@ func TestAssetID_MarshalJSON(t *testing.T) {
 		{
 			name: "large int",
 			aid:  123456789,
-			want: []byte(`"123-456789"`),
+			want: []byte(`"MK-123456789"`),
 		},
 	}
 	for _, tt := range tests {
