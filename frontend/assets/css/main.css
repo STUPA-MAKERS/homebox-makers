@@ -8,8 +8,8 @@
         --background: 232 12% 13%;
         --background-accent: 232 12% 18%;
         --foreground: 0 0% 95%;
-        --primary: 34 100% 47%;
-        --primary-foreground: 0 0% 100%;
+        --primary: 153 100% 33%; /* #00a75d - STUPA-Cloud green */
+        --primary-foreground: 0 0% 0%;
         --secondary: 232 12% 20%;
         --secondary-foreground: 0 0% 95%;
         --accent: 232 12% 20%;
@@ -24,11 +24,11 @@
         --destructive-foreground: 0 0% 100%;
         --input: 232 12% 20%;
         --border: 232 12% 20%;
-        --ring: 34 100% 47%;
+        --ring: 153 100% 33%;
         --sidebar-background: 232 12% 13%;
         --sidebar-foreground: 0 0% 95%;
-        --sidebar-primary: 34 100% 47%;
-        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-primary: 153 100% 33%;
+        --sidebar-primary-foreground: 0 0% 0%;
         --sidebar-accent: 232 12% 18%;
         --sidebar-accent-foreground: 0 0% 95%;
         --sidebar-border: 232 12% 20%;
@@ -45,11 +45,11 @@
         --background: 34 4% 4%; /* True Black */
         --background-accent: 0 0% 0%; /* Near black for elevation */
         --foreground: 210 20% 98%; /* White text */
-        --primary: 34 100% 47%; /* #f18700 - Brand Orange */
-        --primary-foreground: 0 0% 0%; /* Black text on orange */
-        --secondary-foreground: 34 100% 47%;
-        --secondary: 33.1 74.36% 7.65%;
-        --accent: 34 100% 47%;
+        --primary: 153 100% 33%; /* #00a75d - STUPA-Cloud green */
+        --primary-foreground: 0 0% 0%; /* Black text on green (contrast 6.6:1) */
+        --secondary-foreground: 153 100% 33%;
+        --secondary: 153 74% 8%;
+        --accent: 153 100% 33%;
         --accent-foreground: 0 0% 0%;
         --muted: 240 5% 15%;
         --muted-foreground: 240 5% 65%;
@@ -61,15 +61,15 @@
         --destructive-foreground: 0 0% 98%;
         --input: 240 6% 16%; /* #27272a - Border/Input color */
         --border: 240 6% 16%;
-        --ring: 34 100% 47%;
+        --ring: 153 100% 33%;
         --sidebar-background: 0 0% 4%;
         --sidebar-foreground: 240 5% 65%;
-        --sidebar-primary: 34 100% 47%;
+        --sidebar-primary: 153 100% 33%;
         --sidebar-primary-foreground: 0 0% 0%;
         --sidebar-accent: 240 6% 10%;
         --sidebar-accent-foreground: 210 20% 98%;
         --sidebar-border: 240 6% 16%;
-        --sidebar-ring: 34 100% 47%;
+        --sidebar-ring: 153 100% 33%;
 
         --radius: 0.75rem;
     }
