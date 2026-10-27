@@ -177,14 +177,13 @@ type WebConfig struct {
 }
 
 type LabelMakerConf struct {
-	Width                 int64          `yaml:"width"                 conf:"default:526"`
-	Height                int64          `yaml:"height"                conf:"default:200"`
-	Padding               int64          `yaml:"padding"               conf:"default:32"`
-	Margin                int64          `yaml:"margin"                conf:"default:32"`
-	FontSize              float64        `yaml:"font_size"             conf:"default:32.0"`
+	// TapeWidth and Length are the size of a label in mm: the width of the
+	// continuous tape and the length the printer cuts after.
+	TapeWidth             float64        `yaml:"tape_width"            conf:"default:62"`
+	Length                float64        `yaml:"length"                conf:"default:24"`
+	Dpi                   float64        `yaml:"dpi"                   conf:"default:300"`
 	PrintCommand          *string        `yaml:"string"`
 	AdditionalInformation *string        `yaml:"string"`
-	DynamicLength         bool           `yaml:"bool"                  conf:"default:true"`
 	LabelServiceUrl       *string        `yaml:"label_service_url"`
 	LabelServiceTimeout   *time.Duration `yaml:"label_service_timeout"`
 	RegularFontPath       *string        `yaml:"regular_font_path"`

@@ -1,14 +1,15 @@
 package labelmaker
 
 import (
-	"image"
+	"bytes"
+	"image/png"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
 
-	"github.com/golang/freetype/truetype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sysadminsmedia/homebox/backend/internal/sys/config"
@@ -245,7 +246,7 @@ func TestPrintLabel_ArgumentInjection(t *testing.T) {
 	cfg.LabelMaker.PrintCommand = &printCommand
 
 	const maliciousTitle = "evil title --output /etc/passwd"
-	params := NewGenerateParams(400, 200, 10, 5, 32, maliciousTitle, "desc", "http://localhost/item/1", false, nil)
+	params := NewGenerateParams(62, 24, 300, LabelContent{Title: maliciousTitle, Description: "desc", URL: "http://localhost/item/1"}, nil)
 
 	require.NoError(t, PrintLabel(cfg, &params))
 
@@ -259,22 +260,44 @@ func TestPrintLabel_ArgumentInjection(t *testing.T) {
 	assert.True(t, strings.HasSuffix(got[1], ".png"), "second arg should be the generated label file, got %q", got[1])
 }
 
-func TestWrapText_TrailingEmptyLineAtHeightLimit(t *testing.T) {
-	regularFont, err := loadFont(nil, FontTypeRegular)
+func TestGenerateLabel_MakersLabelSize(t *testing.T) {
+	content := LabelContent{
+		Title:       "Labeldrucker",
+		Description: "62 mm Endlosband (DK-22205)\nEditor-Lite-LED muss aus sein",
+		Maker:       "Brother",
+		Model:       "QL-800",
+		AssetID:     "MK-0023",
+		URL:         "http://localhost/a/MK-0023",
+	}
+	params := NewGenerateParams(62, 24, 300, content, nil)
+
+	var buf bytes.Buffer
+	require.NoError(t, GenerateLabel(&buf, &params, nil))
+
+	img, err := png.Decode(&buf)
 	require.NoError(t, err)
+	// 62 x 24 mm at 300 dpi.
+	assert.Equal(t, 732, img.Bounds().Dx())
+	assert.Equal(t, 283, img.Bounds().Dy())
+	assert.Equal(t, params.Width, img.Bounds().Dx())
+	assert.Equal(t, params.Height, img.Bounds().Dy())
+}
 
-	face := truetype.NewFace(regularFont, &truetype.Options{
-		Size: 12,
-		DPI:  72,
-	})
-	tmpImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
-	ctx := createContext(regularFont, 12, tmpImg, 72)
+func TestGenerateLabel_TooShort(t *testing.T) {
+	params := NewGenerateParams(62, 8, 300, LabelContent{URL: "x"}, nil)
+	require.Error(t, GenerateLabel(io.Discard, &params, nil))
+}
 
-	// The height limit is crossed on the trailing empty line, where
-	// processedChars has already advanced past len(text).
-	text := "Widget A\n"
-	lines, remaining := wrapText(text, face, 200, 12, 12, ctx)
+func TestWrap_BreaksLongWords(t *testing.T) {
+	f, err := loadFont(nil, FontTypeRegular)
+	require.NoError(t, err)
+	c := &canvas{dpi: 300}
+	st := newTextStyle(f, notesSize, c.dpi)
 
-	assert.Equal(t, []string{"Widget A"}, lines)
-	assert.Empty(t, remaining)
+	lines := c.wrap("kurz\nEinSehrLangesWortOhneLeerzeichenDasNichtPasst", st, 20)
+	require.Greater(t, len(lines), 2)
+	assert.Equal(t, "kurz", lines[0])
+	for _, line := range lines {
+		assert.LessOrEqual(t, c.width(line, st), 20.0)
+	}
 }
