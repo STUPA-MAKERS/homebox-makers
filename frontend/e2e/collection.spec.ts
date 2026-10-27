@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures';
+import { createItem, createLocation, expect, test } from './fixtures';
 
 test('entity types and templates', async ({ signedIn: page }) => {
   await page.goto('/collection/templates');
@@ -31,4 +31,21 @@ test('notifiers and backups', async ({ signedIn: page }) => {
   await page.getByRole('button', { name: 'Sicherung erstellen' }).click();
   await expect(page.getByText('Fertig').first()).toBeVisible({ timeout: 20_000 });
   await expect(page.getByRole('link', { name: 'Herunterladen' })).toBeVisible();
+});
+
+test('global search finds items, places and pages', async ({ signedIn: page }) => {
+  const loc = await createLocation(page, 'Dachboden');
+  await createItem(page, 'Christbaumschmuck', loc);
+  await page.goto('/home');
+  await page.getByRole('button', { name: 'Suche' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Suche' });
+  await dialog.getByRole('combobox').fill('christ');
+  await dialog.getByRole('option', { name: /Christbaumschmuck/ }).click();
+  await expect(page).toHaveURL(/\/items\//);
+  await expect(page.getByRole('heading', { name: 'Christbaumschmuck' })).toBeVisible();
+
+  await page.keyboard.press('Control+k');
+  await dialog.getByRole('combobox').fill('werkz');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/collection\/tools/);
 });

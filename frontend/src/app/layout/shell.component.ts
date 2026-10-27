@@ -6,6 +6,7 @@ import { AuthService } from '@core/auth/auth.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { MEDIA, mediaQuery, ToastComponent } from '@stupa-makers/ui-kit';
 import { CreateDialogComponent } from '../features/create/create-dialog.component';
+import { CommandPaletteComponent } from '../features/search/command-palette.component';
 import { BottomBarComponent } from './bottom-bar/bottom-bar.component';
 import { LoadBarComponent } from './load-bar/load-bar.component';
 import { NavRailComponent } from './nav-rail/nav-rail.component';
@@ -37,6 +38,7 @@ export type ShellFrame = 'rail' | 'public' | 'pending';
     NavRailComponent,
     BottomBarComponent,
     CreateDialogComponent,
+    CommandPaletteComponent,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',

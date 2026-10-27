@@ -3,10 +3,15 @@
     <img src="favicon.svg" alt="" width="40" height="40" />
   </a>
 
-  <a class="rail__item rail__search" routerLink="/items" [queryParams]="{ focus: 'search' }">
+  <button
+    type="button"
+    class="rail__item rail__search"
+    [attr.aria-keyshortcuts]="searchKeys"
+    (click)="palette.open()"
+  >
     <span class="rail__ind"><app-icon name="search" [size]="22" /></span>
     <span class="rail__label">{{ 'nav.search' | t }}</span>
-  </a>
+  </button>
 
   <div class="rail__main" appScrollFade="y">
     @for (item of mainItems; track item.key) {

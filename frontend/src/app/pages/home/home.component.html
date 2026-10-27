@@ -87,7 +87,7 @@
               <span class="loc__name ell">{{ loc.name }}</span>
               <span class="loc__sub muted">{{
                 (loc.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
-                  | t: { count: loc.itemCount }
+                  | t: { count: loc.itemCount ?? 0 }
               }}</span>
             </span>
           </a>

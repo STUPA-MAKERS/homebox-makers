@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter } from 'rxjs';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { IconComponent, SideSheetComponent } from '@stupa-makers/ui-kit';
+import { CommandPaletteService } from '../../features/search/command-palette.service';
 import { AccountMenuComponent } from '../account-menu/account-menu.component';
 import { BOTTOM_BAR_KEYS, NavService, type NavItem } from '../nav.service';
 
@@ -30,6 +31,7 @@ export class BottomBarComponent {
   private readonly nav = inject(NavService);
   private readonly router = inject(Router);
 
+  private readonly palette = inject(CommandPaletteService);
   readonly moreOpen = signal(false);
   private readonly url = signal(this.router.url);
 
@@ -56,5 +58,10 @@ export class BottomBarComponent {
         this.url.set(e.urlAfterRedirects);
         this.moreOpen.set(false);
       });
+  }
+
+  search(): void {
+    this.moreOpen.set(false);
+    this.palette.open();
   }
 }

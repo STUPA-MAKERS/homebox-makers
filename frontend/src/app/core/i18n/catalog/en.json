@@ -424,5 +424,17 @@
   "collection.sec.types": "Kinds of items and locations",
   "collection.sec.templates": "Defaults for new items",
   "collection.sec.notifiers": "Alerts for due maintenance",
-  "collection.sec.tools": "Import, export, backups and actions"
+  "collection.sec.tools": "Import, export, backups and actions",
+  "search.title": "Search",
+  "search.placeholder": "Search items, locations, tags and pages",
+  "search.close": "Close search",
+  "search.empty": "Nothing found",
+  "search.truncated": "There are more hits. Narrow the search or open the item list.",
+  "search.keys.select": "select",
+  "search.keys.open": "open",
+  "search.archived": "Archived",
+  "search.group.pages": "Pages",
+  "search.group.items": "Items",
+  "search.group.locations": "Locations",
+  "search.group.tags": "Tags"
 }

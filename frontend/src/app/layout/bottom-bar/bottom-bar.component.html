@@ -26,6 +26,10 @@
 <app-side-sheet side="bottom" [heading]="'shell.nav.more' | t" [(open)]="moreOpen">
   <div class="more">
     <div class="more__group">
+      <button type="button" class="more__item" (click)="search()">
+        <app-icon name="search" [size]="20" />
+        <span class="ell more__label">{{ 'nav.search' | t }}</span>
+      </button>
       @for (item of moreItems; track item.key) {
         <a
           class="more__item"

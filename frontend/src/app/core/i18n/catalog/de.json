@@ -424,5 +424,17 @@
   "collection.sec.types": "Arten von Gegenständen und Orten",
   "collection.sec.templates": "Vorgaben für neue Gegenstände",
   "collection.sec.notifiers": "Hinweise auf fällige Wartung",
-  "collection.sec.tools": "Import, Export, Sicherungen und Aktionen"
+  "collection.sec.tools": "Import, Export, Sicherungen und Aktionen",
+  "search.title": "Suche",
+  "search.placeholder": "Gegenstände, Orte, Tags und Seiten suchen",
+  "search.close": "Suche schließen",
+  "search.empty": "Nichts gefunden",
+  "search.truncated": "Es gibt weitere Treffer. Grenze die Suche ein oder öffne die Gegenstandsliste.",
+  "search.keys.select": "auswählen",
+  "search.keys.open": "öffnen",
+  "search.archived": "Archiviert",
+  "search.group.pages": "Seiten",
+  "search.group.items": "Gegenstände",
+  "search.group.locations": "Orte",
+  "search.group.tags": "Tags"
 }
