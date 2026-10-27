@@ -216,30 +216,32 @@ tasks:
       - npm run typecheck
 
   test:ci:
-    env:
-      UNSAFE_DISABLE_PASSWORD_PROJECTION: "yes_i_am_sure"
-      HBOX_AUTH_RATE_LIMIT_ENABLED: false
     desc: Builds the app and runs the Playwright tests against a live server (only for use in CI)
     cmds:
       - task: ci:serve-and-test
 
   test:ci:postgresql:
+    desc: Builds the app and runs the Playwright tests against a live server with postgresql (only for use in CI)
+    cmds:
+      - task: ci:serve-and-test
+        vars: { DB_DRIVER: postgres }
+
+  # The env sits on this task, not on the callers: Task does not hand the env of a task
+  # on to the tasks it calls, so the server ran with the rate limit on and every
+  # registration after the fifth answered 429.
+  ci:serve-and-test:
+    internal: true
     env:
       UNSAFE_DISABLE_PASSWORD_PROJECTION: "yes_i_am_sure"
-      HBOX_AUTH_RATE_LIMIT_ENABLED: false
-      HBOX_DATABASE_DRIVER: postgres
+      # Every e2e test registers its own account; the limit of 5 per minute would trip.
+      HBOX_AUTH_RATE_LIMIT_ENABLED: "false"
+      HBOX_DATABASE_DRIVER: '{{.DB_DRIVER | default "sqlite3"}}'
       HBOX_DATABASE_USERNAME: homebox
       HBOX_DATABASE_PASSWORD: homebox
       HBOX_DATABASE_DATABASE: homebox
       HBOX_DATABASE_HOST: 127.0.0.1
       HBOX_DATABASE_PORT: 5432
       HBOX_DATABASE_SSL_MODE: disable
-    desc: Builds the app and runs the Playwright tests against a live server with postgresql (only for use in CI)
-    cmds:
-      - task: ci:serve-and-test
-
-  ci:serve-and-test:
-    internal: true
     cmds:
       - cd frontend && npm ci && npx ng build
       - rm -rf backend/app/api/static/public && cp -r frontend/dist/homebox/browser backend/app/api/static/public
