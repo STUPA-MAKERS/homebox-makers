@@ -513,12 +513,6 @@ body {
   overscroll-behavior-y: none;
 }
 
-// Chrome on Android colours the system navigation bar of the installed app with the root
-// background (see base.scss of the kit). While the phone bottom bar is shown, the root takes
-// the colour of the bar, so the system bar continues it; the body keeps the page colour.
-html:has(app-bottom-bar) {
-  background-color: var(--color-surface-3);
-}
 
 // The installed app stops the double-tap zoom; the pinch zoom stops in `lockInstalledAppZoom`.
 @media (display-mode: standalone), (display-mode: fullscreen) {
