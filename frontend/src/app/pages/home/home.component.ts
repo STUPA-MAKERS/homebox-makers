@@ -19,17 +19,23 @@ import { LocalizedDatePipe } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import {
+  AvatarComponent,
   EmptyStateComponent,
   IconComponent,
   type IconName,
   ListItemComponent,
+  MEDIA,
   NoteComponent,
+  SearchPillComponent,
+  SideSheetComponent,
   SkeletonComponent,
+  mediaQuery,
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
+import { CommandPaletteService } from '../../features/search/command-palette.service';
+import { AccountMenuComponent } from '../../layout/account-menu/account-menu.component';
 
 interface StatTile {
   icon: IconName;
@@ -40,8 +46,9 @@ interface StatTile {
 }
 
 /**
- * The start page of a collection: the totals, the items added last, the top-level locations
- * and the tags. "Neu" opens the create dialog for an item or a location.
+ * The start page of a collection: the global search at the top (on a phone with the avatar
+ * for the account sheet), the totals, the items added last, the top-level locations and the
+ * tags. "Neu" opens the create dialog for an item or a location.
  */
 @Component({
   selector: 'app-home',
@@ -53,7 +60,10 @@ interface StatTile {
     TranslatePipe,
     LocalizedDatePipe,
     MoneyPipe,
-    PageHeaderComponent,
+    AvatarComponent,
+    SearchPillComponent,
+    SideSheetComponent,
+    AccountMenuComponent,
     EntityThumbComponent,
     TagChipComponent,
     IconComponent,
@@ -72,6 +82,15 @@ export class HomeComponent {
   readonly auth = inject(AuthService);
   readonly collections = inject(CollectionService);
   readonly ref = inject(RefDataService);
+  readonly palette = inject(CommandPaletteService);
+
+  readonly phone = mediaQuery(MEDIA.phone);
+  /** The account sheet of the phone, opened from the avatar in the search pill. */
+  readonly accountOpen = signal(false);
+  readonly displayName = computed(() => {
+    const user = this.auth.user();
+    return user?.name || user?.email || '';
+  });
 
   readonly loading = signal(true);
   readonly error = signal(false);

@@ -40,7 +40,8 @@ test('global search finds items, places and pages', async ({ signedIn: page }) =
   const loc = await createLocation(page, 'Dachboden');
   await createItem(page, 'Christbaumschmuck', loc);
   await page.goto('/home');
-  await page.getByRole('button', { name: 'Suche' }).click();
+  // The search pill at the top of the start page opens the global search.
+  await page.getByRole('main').getByRole('button', { name: 'Suche' }).click();
   const dialog = page.getByRole('dialog', { name: 'Suche' });
   await dialog.getByRole('combobox').fill('christ');
   await dialog.getByRole('option', { name: /Christbaumschmuck/ }).click();

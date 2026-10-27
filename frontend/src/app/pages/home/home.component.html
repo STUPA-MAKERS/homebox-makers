@@ -1,8 +1,39 @@
 <div class="page page--wide">
-  <app-page-header class="home__ph"
-    [title]="collections.selected()?.name || ('nav.home' | t)"
-    [subtitle]="'home.greeting' | t: { name: auth.user()?.name || '' }"
-  />
+  <!-- The global search at the top, as on the dashboard of STUPA-Workflow; on a phone with
+       the avatar, which opens the account sheet. -->
+  <h1 class="sr-only">{{ 'home.greeting' | t: { name: auth.user()?.name || '' } }}</h1>
+  <div class="home__top">
+    @if (phone()) {
+      <app-search-pill
+        class="home__search"
+        mode="button"
+        [placeholder]="'home.search.short' | t"
+        [label]="'search.title' | t"
+        (activate)="palette.open()"
+      >
+        <button
+          trail
+          type="button"
+          class="home__me"
+          aria-haspopup="dialog"
+          [attr.aria-expanded]="accountOpen()"
+          [attr.aria-label]="'shell.account.open' | t: { name: displayName() }"
+          (click)="accountOpen.set(true)"
+        >
+          <app-avatar [name]="displayName()" size="sm" [decorative]="true" />
+        </button>
+      </app-search-pill>
+    } @else {
+      <app-search-pill
+        class="home__search"
+        mode="button"
+        [shortcut]="true"
+        [placeholder]="'search.placeholder' | t"
+        [label]="'search.title' | t"
+        (activate)="palette.open()"
+      />
+    }
+  </div>
 
   @if (error()) {
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{
@@ -103,3 +134,9 @@
     }
   </section>
 </div>
+
+@if (phone()) {
+  <app-side-sheet side="bottom" [heading]="'shell.account.region' | t" [(open)]="accountOpen">
+    <app-account-menu variant="sheet" (navigated)="accountOpen.set(false)" />
+  </app-side-sheet>
+}

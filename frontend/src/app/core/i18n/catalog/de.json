@@ -79,6 +79,7 @@
   "field.quantity": "Anzahl",
   "field.description": "Beschreibung",
   "home.greeting": "Hallo {name}!",
+  "home.search.short": "Suchen",
   "home.stats": "Kennzahlen",
   "home.stat.items": "Gegenstände",
   "home.stat.locations": "Orte",
