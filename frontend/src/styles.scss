@@ -378,10 +378,21 @@ app-list-detail .page {
   animation-duration: var(--motion-base);
   animation-timing-function: var(--ease-standard);
 }
-::view-transition-group(rail),
+// The rail does not crossfade: its old and new pictures are the same but for the active
+// entry, and a crossfade of the half transparent snapshots showed garbage on some GPUs. The
+// new picture shows at once on an opaque ground.
+:root[data-motion] .frame__rail {
+  background: var(--color-bg);
+}
 ::view-transition-old(rail),
-::view-transition-new(rail) {
-  animation-duration: var(--motion-fast);
+::view-transition-old(bottom-bar) {
+  display: none;
+}
+::view-transition-group(rail),
+::view-transition-new(rail),
+::view-transition-group(bottom-bar),
+::view-transition-new(bottom-bar) {
+  animation: none;
 }
 :root[data-motion='section']::view-transition-old(root) {
   animation: vt-fade-out var(--motion-xs) var(--ease-exit) both;
