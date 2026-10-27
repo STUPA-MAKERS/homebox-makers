@@ -268,7 +268,7 @@ export class CollectionComponent {
     if (this.joinBusy()) return;
     const raw = this.joinCode.trim();
     const code = raw.includes('token=') ? (raw.split('token=')[1]?.split('&')[0] ?? '') : raw;
-    if (code.length !== 26) {
+    if (!/^[\w-]{8,}$/.test(code)) {
       this.joinError.set(this.i18n.translate('collection.join.invalid'));
       return;
     }

@@ -124,7 +124,8 @@
                   <span lead class="ld__icon"><app-icon name="building" [size]="18" /></span>
                   @if (sub.itemCount) {
                     <span trail class="muted num">{{
-                      'locations.itemCount' | t: { count: sub.itemCount }
+                      (sub.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
+                        | t: { count: sub.itemCount }
                     }}</span>
                   }
                 </app-list-item>

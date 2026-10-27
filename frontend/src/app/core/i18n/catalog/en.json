@@ -304,5 +304,6 @@
   "tags.count": "{count} tags",
   "tags.emptyBody": "Tags group across locations, for example “Electronics” or “Warranty”.",
   "tags.noMatch": "No tag matches the search.",
-  "tags.search": "Search tags"
+  "tags.search": "Search tags",
+  "locations.itemCountOne": "1 item"
 }

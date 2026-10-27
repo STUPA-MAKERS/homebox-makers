@@ -304,5 +304,6 @@
   "tags.count": "{count} Tags",
   "tags.emptyBody": "Mit Tags ordnest du quer zu Orten, etwa „Elektronik“ oder „Garantie“.",
   "tags.noMatch": "Kein Tag passt zur Suche.",
-  "tags.search": "Tags durchsuchen"
+  "tags.search": "Tags durchsuchen",
+  "locations.itemCountOne": "1 Gegenstand"
 }

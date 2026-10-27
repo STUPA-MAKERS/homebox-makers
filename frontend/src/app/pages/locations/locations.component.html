@@ -53,7 +53,8 @@
           <span trail class="loc__trail">
             @if (r.loc.itemCount) {
               <span class="muted num">{{
-                'locations.itemCount' | t: { count: r.loc.itemCount }
+                (r.loc.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
+                  | t: { count: r.loc.itemCount }
               }}</span>
             }
             @if (r.hasChildren && !search()) {
