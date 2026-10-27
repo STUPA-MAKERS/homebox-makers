@@ -14,7 +14,6 @@ import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.compo
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import {
-  ButtonComponent,
   ButtonLinkComponent,
   ConfirmDialogComponent,
   EmptyStateComponent,
@@ -52,7 +51,6 @@ import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-
     PageHeaderComponent,
     EntityThumbComponent,
     TagChipComponent,
-    ButtonComponent,
     ButtonLinkComponent,
     IconComponent,
     RowMenuComponent,

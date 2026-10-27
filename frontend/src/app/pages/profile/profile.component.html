@@ -1,0 +1,172 @@
+<div class="page pf">
+  <app-page-header [title]="'nav.profile' | t" [meta]="user()?.email ?? null" />
+
+  <section class="pf__sec" aria-labelledby="pf-account">
+    <h2 class="section-title" id="pf-account">{{ 'profile.account' | t }}</h2>
+    @if (isOidc()) {
+      <app-note kind="neutral" icon="info">{{ 'profile.oidc' | t }}</app-note>
+    }
+    <form class="form-stack pf__form" (ngSubmit)="saveAccount()" novalidate>
+      <div class="form-grid">
+        <app-input name="name" [label]="'auth.field.name' | t" [required]="true" [(ngModel)]="name" />
+        <app-input
+          name="email"
+          type="email"
+          [label]="'auth.field.email' | t"
+          [required]="true"
+          [disabled]="isOidc()"
+          [(ngModel)]="email"
+        />
+      </div>
+      @if (accountError()) {
+        <app-note kind="error" icon="alert">{{ accountError() }}</app-note>
+      }
+      <div class="form-actions">
+        <app-button type="submit" [loading]="accountBusy()">{{ 'common.save' | t }}</app-button>
+      </div>
+    </form>
+  </section>
+
+  @if (!isOidc()) {
+    <section class="pf__sec" aria-labelledby="pf-password">
+      <h2 class="section-title" id="pf-password">{{ 'profile.password.title' | t }}</h2>
+      <form class="form-stack pf__form" (ngSubmit)="changePassword()" novalidate>
+        <app-input
+          name="current"
+          type="password"
+          [label]="'profile.password.current' | t"
+          [(ngModel)]="currentPassword"
+        />
+        <div class="form-grid">
+          <app-input
+            name="new"
+            type="password"
+            [label]="'auth.reset.password' | t"
+            [hint]="'auth.field.passwordHint' | t"
+            [(ngModel)]="newPassword"
+          />
+          <app-input
+            name="confirm"
+            type="password"
+            [label]="'auth.reset.confirm' | t"
+            [(ngModel)]="confirmPassword"
+          />
+        </div>
+        @if (passwordError()) {
+          <app-note kind="error" icon="alert">{{ passwordError() }}</app-note>
+        }
+        <div class="form-actions">
+          <app-button type="submit" variant="tonal" [loading]="passwordBusy()">{{
+            'profile.password.submit' | t
+          }}</app-button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="pf__sec" aria-labelledby="pf-keys">
+    <div class="pf__head">
+      <h2 class="section-title" id="pf-keys">{{ 'profile.keys.title' | t }}</h2>
+      <app-button variant="tonal" size="sm" (click)="openKeyDialog()">
+        <span class="btn-label"><app-icon name="plus" />{{ 'profile.keys.new' | t }}</span>
+      </app-button>
+    </div>
+    <p class="muted pf__lead">{{ 'profile.keys.body' | t }}</p>
+    @if (keysError()) {
+      <app-note kind="error" icon="alert" retryable (retry)="loadKeys()">{{ 'common.loadError' | t }}</app-note>
+    } @else if (!keysLoading() && keys().length === 0) {
+      <p class="muted">{{ 'profile.keys.empty' | t }}</p>
+    } @else {
+      <div class="rowgroup">
+        @for (key of keys(); track key.id) {
+          <div class="pf__row">
+            <app-icon class="pf__icon" name="key" [size]="20" />
+            <div class="pf__text">
+              <span class="pf__name">{{ key.name }}</span>
+              <span class="muted pf__sub">
+                {{ 'profile.keys.created' | t: { date: (key.createdAt | ldate) } }}
+                @if (key.lastUsedAt) {
+                  · {{ 'profile.keys.lastUsed' | t: { date: (key.lastUsedAt | ldate) } }}
+                }
+                @if (key.expiresAt) {
+                  ·
+                  <span [class.pf__expired]="isExpired(key)">{{
+                    (isExpired(key) ? 'profile.keys.expired' : 'profile.keys.expires')
+                      | t: { date: (key.expiresAt | ldate) }
+                  }}</span>
+                }
+              </span>
+            </div>
+            <app-row-menu [label]="'common.actions' | t" [sections]="keyMenu()" (selected)="onKeyMenu(key, $event)" />
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="pf__sec pf__danger" aria-labelledby="pf-danger">
+    <h2 class="section-title" id="pf-danger">{{ 'profile.delete.title' | t }}</h2>
+    <p class="muted pf__lead">{{ 'profile.delete.body' | t }}</p>
+    <div>
+      <app-button variant="danger" (click)="confirmDeleteAccount.set(true)">{{
+        'profile.delete.submit' | t
+      }}</app-button>
+    </div>
+  </section>
+</div>
+
+<app-dialog
+  [open]="keyDialog()"
+  size="form"
+  [title]="'profile.keys.new' | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="closeKeyDialog()"
+>
+  @if (createdKey(); as key) {
+    <div class="form-stack">
+      <app-note kind="warn" icon="alert">{{ 'profile.keys.copyOnce' | t }}</app-note>
+      <code class="pf__token">{{ key.token }}</code>
+      <app-copy-button
+        [text]="key.token"
+        [label]="'profile.keys.copy' | t"
+        [copiedLabel]="'profile.keys.copied' | t"
+      />
+    </div>
+  } @else {
+    <form class="form-stack" (ngSubmit)="createKey()" novalidate>
+      <app-input name="keyName" [label]="'field.name' | t" [required]="true" [(ngModel)]="keyName" />
+      <app-datepicker name="keyExpires" [label]="'profile.keys.expiresAt' | t" [(ngModel)]="keyExpires" />
+      @if (keyError()) {
+        <app-note kind="error" icon="alert">{{ keyError() }}</app-note>
+      }
+    </form>
+  }
+  <div dialog-footer>
+    @if (createdKey()) {
+      <app-button (click)="closeKeyDialog()">{{ 'common.close' | t }}</app-button>
+    } @else {
+      <app-button variant="text" (click)="closeKeyDialog()">{{ 'common.cancel' | t }}</app-button>
+      <app-button [loading]="keyBusy()" (click)="createKey()">{{ 'common.create' | t }}</app-button>
+    }
+  </div>
+</app-dialog>
+
+<app-confirm-dialog
+  [open]="deletingKey() !== null"
+  [title]="'profile.keys.revokeTitle' | t"
+  [body]="'profile.keys.revokeBody' | t: { name: deletingKey()?.name ?? '' }"
+  [confirmLabel]="'profile.keys.revoke' | t"
+  [busy]="keyBusy()"
+  (confirm)="revokeKey()"
+  (cancel)="deletingKey.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="confirmDeleteAccount()"
+  [title]="'profile.delete.title' | t"
+  [body]="'profile.delete.confirm' | t"
+  [confirmLabel]="'profile.delete.submit' | t"
+  [busy]="deleteBusy()"
+  (confirm)="deleteAccount()"
+  (cancel)="confirmDeleteAccount.set(false)"
+/>

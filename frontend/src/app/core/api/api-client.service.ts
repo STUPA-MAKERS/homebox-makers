@@ -32,6 +32,7 @@ import type {
   MaintenanceEntryWithDetails,
   Result,
   TagCreate,
+  TagUpdate,
   TagOut,
   TokenResponse,
   TotalsByOrganizer,
@@ -379,7 +380,7 @@ export class ApiClient {
     return this.http.post<TagOut>(this.url('/tags'), body);
   }
 
-  updateTag(id: string, body: TagCreate): Observable<TagOut> {
+  updateTag(id: string, body: TagUpdate): Observable<TagOut> {
     return this.http.put<TagOut>(this.url(`/tags/${id}`), body);
   }
 

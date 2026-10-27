@@ -8,6 +8,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { apiDate } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
+import { entityLink, isLocation } from '@shared/entity.util';
 import { errorMessage } from '@shared/http-error';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
@@ -124,8 +125,21 @@ export class ItemEditComponent {
   readonly tagIds = signal<readonly string[]>([]);
   readonly fields = signal<EntityFieldData[]>([]);
 
+  /** A location is edited here too, with the item-only sections left out. */
+  readonly isLoc = computed(() => {
+    const item = this.item();
+    return !!item && isLocation(item);
+  });
+  readonly backLink = computed(() => {
+    const item = this.item();
+    return item ? entityLink(item) : ['/items'];
+  });
+
   readonly typeOptions = computed<SelectFieldOption[]>(() =>
-    this.ref.itemTypes().map((t) => ({ value: t.id, label: t.name })),
+    (this.isLoc() ? this.ref.locationTypes() : this.ref.itemTypes()).map((t) => ({
+      value: t.id,
+      label: t.name,
+    })),
   );
   readonly fieldTypeOptions = computed<SelectFieldOption[]>(() => [
     { value: 'text', label: this.i18n.translate('item.field.text') },
@@ -211,7 +225,7 @@ export class ItemEditComponent {
       next: (saved) => {
         this.busy.set(false);
         this.toast.show(this.i18n.translate('common.saved'), 'success');
-        void this.router.navigate(['/items', saved.id]);
+        void this.router.navigate(entityLink(saved));
       },
       error: (err) => {
         this.busy.set(false);

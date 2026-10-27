@@ -1,0 +1,145 @@
+<div class="page">
+  @if (loading() && !location()) {
+    <app-skeleton variant="panel" [label]="'common.loading' | t" />
+  } @else if (notFound()) {
+    <app-empty-state
+      code="404"
+      icon="building"
+      [heading]="'location.notFound' | t"
+      [body]="'item.notFoundBody' | t"
+    >
+      <a appButton="tonal" routerLink="/locations">{{ 'home.allLocations' | t }}</a>
+    </app-empty-state>
+  } @else if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+  } @else if (location(); as loc) {
+    @if (crumbs().length) {
+      <nav class="crumbs" [attr.aria-label]="'item.path' | t">
+        @for (c of crumbs(); track c.id; let last = $last) {
+          <a [routerLink]="crumbLink(c)">{{ c.name }}</a>
+          @if (!last) {
+            <app-icon name="chevron-right" [size]="14" />
+          }
+        }
+      </nav>
+    }
+
+    <app-page-header
+      [title]="loc.name"
+      [meta]="loc.entityType?.name ?? null"
+      [flush]="true"
+    >
+      <ng-container ngProjectAs="[actions]">
+        <a appButton="tonal" size="sm" [routerLink]="['/locations', loc.id, 'edit']">
+          <span class="btn-label"><app-icon name="edit" />{{ 'common.edit' | t }}</span>
+        </a>
+        <app-row-menu [label]="'common.actions' | t" [sections]="menu()" (selected)="onMenu($event)" />
+      </ng-container>
+    </app-page-header>
+
+    @if (loc.description) {
+      <p class="desc">{{ loc.description }}</p>
+    }
+    @if (loc.tags.length) {
+      <div class="ld__tags">
+        @for (tag of loc.tags; track tag.id) {
+          <app-tag-chip [tag]="tag" />
+        }
+      </div>
+    }
+
+    <div class="ld">
+      <div class="ld__col">
+        <section class="ld__block" aria-labelledby="ld-items">
+          <div class="ld__head">
+            <h2 class="section-title" id="ld-items">
+              {{ 'nav.items' | t }}
+              @if (!itemsLoading()) {
+                <span class="muted num">{{ itemsTotal() }}</span>
+              }
+            </h2>
+            @if (itemsTotal() > 0) {
+              <a class="ld__more" routerLink="/items" [queryParams]="{ loc: loc.id }">{{
+                'location.openInList' | t
+              }}</a>
+            }
+          </div>
+          @if (itemsLoading()) {
+            <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
+          } @else if (items().length === 0) {
+            <p class="muted">{{ 'location.noItems' | t }}</p>
+          } @else {
+            <div class="rowgroup">
+              @for (item of items(); track item.id) {
+                <app-list-item [title]="item.name" [sub]="subLine(item)" [link]="['/items', item.id]">
+                  <app-entity-thumb lead [entity]="item" [size]="40" />
+                  <span trail class="ld__trail">
+                    @if (item.quantity > 1) {
+                      <span class="num">{{ item.quantity }}×</span>
+                    }
+                    @if (item.purchasePrice) {
+                      <span class="num muted">{{ item.purchasePrice | money }}</span>
+                    }
+                  </span>
+                </app-list-item>
+              }
+            </div>
+            @if (items().length < itemsTotal()) {
+              <div appInfiniteScroll (scrolledToEnd)="loadItems()" aria-hidden="true"></div>
+              <app-button variant="text" [loading]="itemsMore()" (click)="loadItems()">{{
+                'items.loadMore' | t
+              }}</app-button>
+            }
+            @if (itemsValue()) {
+              <p class="muted ld__sum">{{ 'items.totalValue' | t: { value: (itemsValue() | money) } }}</p>
+            }
+          }
+        </section>
+      </div>
+
+      <div class="ld__col">
+        <section class="ld__block" aria-labelledby="ld-subs">
+          <div class="ld__head">
+            <h2 class="section-title" id="ld-subs">{{ 'location.subLocations' | t }}</h2>
+            <app-button variant="tonal" size="sm" (click)="addSub()">
+              <span class="btn-label"><app-icon name="plus" />{{ 'create.location.short' | t }}</span>
+            </app-button>
+          </div>
+          @if (subLocations().length === 0) {
+            <p class="muted">{{ 'location.noSubs' | t }}</p>
+          } @else {
+            <div class="rowgroup">
+              @for (sub of subLocations(); track sub.id) {
+                <app-list-item [title]="sub.name" [link]="['/locations', sub.id]">
+                  <span lead class="ld__icon"><app-icon name="building" [size]="18" /></span>
+                  @if (sub.itemCount) {
+                    <span trail class="muted num">{{ 'locations.itemCount' | t: { count: sub.itemCount } }}</span>
+                  }
+                </app-list-item>
+              }
+            </div>
+          }
+        </section>
+
+        <app-attachments-panel [entity]="loc" (changed)="location.set($event)" />
+
+        @if (loc.notes) {
+          <section class="ld__block" aria-labelledby="ld-notes">
+            <h2 class="section-title" id="ld-notes">{{ 'item.notes' | t }}</h2>
+            <p class="desc">{{ loc.notes }}</p>
+          </section>
+        }
+      </div>
+    </div>
+
+    <app-confirm-dialog
+      [open]="confirmDelete()"
+      [title]="'location.deleteTitle' | t"
+      [body]="'location.deleteBody' | t: { name: loc.name }"
+      [confirmLabel]="'common.delete' | t"
+      [busy]="busy()"
+      (confirm)="delete()"
+      (cancel)="confirmDelete.set(false)"
+    />
+  }
+</div>

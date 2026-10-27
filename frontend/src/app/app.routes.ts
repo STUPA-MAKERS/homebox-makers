@@ -1,4 +1,6 @@
-import type { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, type Routes } from '@angular/router';
+import { AuthService } from '@core/auth/auth.service';
 import { authGuard, guestGuard } from '@core/auth/auth.guard';
 import { ShellComponent } from './layout/shell.component';
 
@@ -14,7 +16,20 @@ export const routes: Routes = [
     path: '',
     component: ShellComponent,
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'home' },
+      {
+        path: '',
+        pathMatch: 'full',
+        // An invitation link (`/?token=…`, also of the former frontend): a signed-in user
+        // joins on the collection page, a visitor registers with it.
+        redirectTo: ({ queryParams }) => {
+          const token = queryParams['token'];
+          if (!token) return '/home';
+          const router = inject(Router);
+          return inject(AuthService).user()
+            ? router.createUrlTree(['/collection'], { queryParams: { join: token } })
+            : router.createUrlTree(['/login'], { queryParams: { token } });
+        },
+      },
       {
         path: 'login',
         canActivate: [guestGuard],
@@ -74,6 +89,12 @@ export const routes: Routes = [
               import('./pages/locations/location-detail.component').then(
                 (m) => m.LocationDetailComponent,
               ),
+          },
+          {
+            path: 'locations/:id/edit',
+            data: { title: 'location.edit.title' },
+            loadComponent: () =>
+              import('./pages/items/item-edit.component').then((m) => m.ItemEditComponent),
           },
           {
             path: 'tags',

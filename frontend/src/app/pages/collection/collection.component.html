@@ -1,0 +1,189 @@
+<div class="page co">
+  <app-page-header [title]="'nav.collection' | t" [meta]="collections.selected()?.name ?? null">
+    <ng-container ngProjectAs="[actions]">
+      <app-button variant="text" size="sm" (click)="openJoin()">{{ 'collection.join.title' | t }}</app-button>
+      <app-button variant="tonal" size="sm" (click)="openNew()">
+        <span class="btn-label"><app-icon name="plus" />{{ 'collection.new.short' | t }}</span>
+      </app-button>
+    </ng-container>
+  </app-page-header>
+
+  @if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+  } @else if (loading()) {
+    <app-skeleton variant="panel" [label]="'common.loading' | t" />
+  } @else {
+    <section class="co__sec" aria-labelledby="co-settings">
+      <h2 class="section-title" id="co-settings">{{ 'collection.settings' | t }}</h2>
+      <form class="form-stack" (ngSubmit)="saveSettings()" novalidate>
+        <div class="form-grid">
+          <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="name" />
+          <app-select
+            [label]="'collection.currency' | t"
+            [options]="currencyOptions()"
+            [clearable]="false"
+            [value]="currency()"
+            (valueChange)="currency.set($event)"
+          />
+        </div>
+        @if (settingsError()) {
+          <app-note kind="error" icon="alert">{{ settingsError() }}</app-note>
+        }
+        <div class="form-actions">
+          <app-button type="submit" [loading]="settingsBusy()">{{ 'common.save' | t }}</app-button>
+        </div>
+      </form>
+    </section>
+
+    <section class="co__sec" aria-labelledby="co-members">
+      <h2 class="section-title" id="co-members">
+        {{ 'collection.members' | t }} <span class="muted num">{{ members().length }}</span>
+      </h2>
+      <div class="rowgroup">
+        @for (m of members(); track m.id) {
+          <div class="co__row">
+            <app-icon class="co__icon" name="user" [size]="20" />
+            <div class="co__text">
+              <span class="co__name">
+                {{ m.name }}
+                @if (m.id === selfId()) {
+                  <span class="muted">({{ 'collection.you' | t }})</span>
+                }
+              </span>
+              <span class="muted co__sub">{{ m.email }}</span>
+            </div>
+            @if (m.id !== selfId()) {
+              <app-button variant="text" size="sm" (click)="removingMember.set(m)">{{
+                'common.remove' | t
+              }}</app-button>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="co__sec" aria-labelledby="co-invites">
+      <div class="co__head">
+        <h2 class="section-title" id="co-invites">{{ 'collection.invites' | t }}</h2>
+        <app-button variant="tonal" size="sm" (click)="openInviteDialog()">
+          <span class="btn-label"><app-icon name="plus" />{{ 'collection.invite.new' | t }}</span>
+        </app-button>
+      </div>
+      <p class="muted co__lead">{{ 'collection.invite.body' | t }}</p>
+      @if (openInvitations().length === 0) {
+        <p class="muted">{{ 'collection.invite.empty' | t }}</p>
+      } @else {
+        <div class="rowgroup">
+          @for (inv of openInvitations(); track inv.id) {
+            <div class="co__row">
+              <app-icon class="co__icon" name="link" [size]="20" />
+              <div class="co__text">
+                <code class="co__code">{{ inviteLink(inv) }}</code>
+                <span class="muted co__sub">{{
+                  'collection.invite.meta' | t: { uses: inv.uses, date: (inv.expiresAt | ldate) }
+                }}</span>
+              </div>
+              <app-copy-button
+                variant="text"
+                [text]="inviteLink(inv)"
+                [label]="'collection.invite.copy' | t"
+                [copiedLabel]="'profile.keys.copied' | t"
+                [share]="true"
+                [shareTitle]="'collection.invite.shareTitle' | t: { name: collections.selected()?.name ?? '' }"
+              />
+              <app-button
+                variant="text"
+                size="sm"
+                [attr.aria-label]="'collection.invite.delete' | t"
+                (click)="deletingInvite.set(inv)"
+              >
+                <app-icon name="trash" [size]="18" />
+              </app-button>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>
+
+<app-dialog
+  [open]="inviteDialog()"
+  size="form"
+  [title]="'collection.invite.new' | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="inviteDialog.set(false)"
+>
+  <form class="form-stack" (ngSubmit)="createInvite()" novalidate>
+    <div class="form-grid">
+      <app-input name="uses" type="number" [label]="'collection.invite.uses' | t" [(ngModel)]="inviteUses" />
+      <app-datepicker name="expires" [label]="'collection.invite.expires' | t" [(ngModel)]="inviteExpires" />
+    </div>
+    @if (inviteError()) {
+      <app-note kind="error" icon="alert">{{ inviteError() }}</app-note>
+    }
+  </form>
+  <div dialog-footer>
+    <app-button variant="text" (click)="inviteDialog.set(false)">{{ 'common.cancel' | t }}</app-button>
+    <app-button [loading]="inviteBusy()" (click)="createInvite()">{{ 'common.create' | t }}</app-button>
+  </div>
+</app-dialog>
+
+<app-dialog
+  [open]="joinDialog()"
+  size="form"
+  [title]="'collection.join.title' | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="joinDialog.set(false)"
+>
+  <form class="form-stack" (ngSubmit)="acceptJoin()" novalidate>
+    <p class="muted co__lead">{{ 'collection.join.body' | t }}</p>
+    <app-input name="code" [label]="'collection.join.code' | t" [(ngModel)]="joinCode" />
+    @if (joinError()) {
+      <app-note kind="error" icon="alert">{{ joinError() }}</app-note>
+    }
+  </form>
+  <div dialog-footer>
+    <app-button variant="text" (click)="joinDialog.set(false)">{{ 'common.cancel' | t }}</app-button>
+    <app-button [loading]="joinBusy()" (click)="acceptJoin()">{{ 'collection.join.submit' | t }}</app-button>
+  </div>
+</app-dialog>
+
+<app-dialog
+  [open]="newDialog()"
+  size="form"
+  [title]="'collection.new.title' | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="newDialog.set(false)"
+>
+  <form class="form-stack" (ngSubmit)="createCollection()" novalidate>
+    <app-input name="newName" [label]="'field.name' | t" [required]="true" [(ngModel)]="newName" />
+    @if (newError()) {
+      <app-note kind="error" icon="alert">{{ newError() }}</app-note>
+    }
+  </form>
+  <div dialog-footer>
+    <app-button variant="text" (click)="newDialog.set(false)">{{ 'common.cancel' | t }}</app-button>
+    <app-button [loading]="newBusy()" (click)="createCollection()">{{ 'common.create' | t }}</app-button>
+  </div>
+</app-dialog>
+
+<app-confirm-dialog
+  [open]="deletingInvite() !== null"
+  [title]="'collection.invite.delete' | t"
+  [body]="'collection.invite.deleteBody' | t"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="inviteBusy()"
+  (confirm)="deleteInvite()"
+  (cancel)="deletingInvite.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="removingMember() !== null"
+  [title]="'collection.removeMember' | t"
+  [body]="'collection.removeMemberBody' | t: { name: removingMember()?.name ?? '' }"
+  [confirmLabel]="'common.remove' | t"
+  [busy]="memberBusy()"
+  (confirm)="removeMember()"
+  (cancel)="removingMember.set(null)"
+/>
