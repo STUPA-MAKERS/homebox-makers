@@ -23,6 +23,7 @@ import type {
   Group,
   GroupInvitation,
   GroupInvitationCreate,
+  GroupInvitationCreated,
   GroupStatistics,
   GroupUpdate,
   ItemAttachmentUpdate,
@@ -195,8 +196,8 @@ export class ApiClient {
     return this.http.get<GroupInvitation[]>(this.url('/groups/invitations'));
   }
 
-  createInvitation(body: GroupInvitationCreate): Observable<GroupInvitation> {
-    return this.http.post<GroupInvitation>(this.url('/groups/invitations'), body);
+  createInvitation(body: GroupInvitationCreate): Observable<GroupInvitationCreated> {
+    return this.http.post<GroupInvitationCreated>(this.url('/groups/invitations'), body);
   }
 
   deleteInvitation(id: string): Observable<void> {

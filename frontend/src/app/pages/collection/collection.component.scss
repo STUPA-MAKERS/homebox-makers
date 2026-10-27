@@ -50,10 +50,6 @@
   font-size: var(--fs-small);
 }
 
-.co__expired {
-  color: var(--color-danger, #c62828);
-}
-
 .co__token {
   display: block;
   padding: var(--space-3);
@@ -63,12 +59,4 @@
   font-size: var(--fs-small);
   word-break: break-all;
   user-select: all;
-}
-
-.co__code {
-  font-family: var(--font-mono, monospace);
-  font-size: var(--fs-small);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

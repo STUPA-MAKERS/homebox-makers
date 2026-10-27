@@ -42,8 +42,7 @@ import { CreateService } from '../../features/create/create.service';
 const PAGE_SIZE = 30;
 
 /**
- * One location: its path, the sub-locations, the items in it (also those in its
- * sub-locations) and its files. The header offers edit, a new sub-location or item here,
+ * One location: its path, the sub-locations, the items directly in it and its files. The header offers edit, a new sub-location or item here,
  * the label and delete.
  */
 @Component({

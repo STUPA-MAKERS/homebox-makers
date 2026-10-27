@@ -119,7 +119,11 @@ export class LoginComponent {
         }
         void this.router.navigateByUrl(this.safeRedirect());
       },
-      error: (err) => this.fail(err, 'auth.error.login'),
+      // The server's text ("authentication failed") says less than ours.
+      error: () => {
+        this.busy.set(false);
+        this.error.set(this.i18n.translate('auth.error.login'));
+      },
     });
   }
 

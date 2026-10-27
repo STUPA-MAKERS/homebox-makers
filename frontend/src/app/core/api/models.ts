@@ -39,3 +39,11 @@ export interface ApiErrorBody {
   error?: string;
   fields?: Record<string, string>;
 }
+
+/** The answer to a new invitation: the only time the server shows its token. */
+export interface GroupInvitationCreated {
+  id: string;
+  token: string;
+  expiresAt: Date | string;
+  uses: number;
+}

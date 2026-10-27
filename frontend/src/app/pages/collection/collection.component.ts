@@ -12,7 +12,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
-import type { CurrenciesCurrency, GroupInvitation, UserSummary } from '@core/api/models';
+import type {
+  CurrenciesCurrency,
+  GroupInvitation,
+  GroupInvitationCreated,
+  UserSummary,
+} from '@core/api/models';
 import { AuthService } from '@core/auth/auth.service';
 import { CollectionService } from '@core/collection/collection.service';
 import { I18nService } from '@core/i18n/i18n.service';
@@ -100,6 +105,7 @@ export class CollectionComponent {
   readonly inviteBusy = signal(false);
   readonly inviteError = signal<string | null>(null);
   readonly deletingInvite = signal<GroupInvitation | null>(null);
+  readonly createdInvite = signal<GroupInvitationCreated | null>(null);
 
   // Members
   readonly removingMember = signal<UserSummary | null>(null);
@@ -184,15 +190,22 @@ export class CollectionComponent {
     });
   }
 
-  inviteLink(inv: GroupInvitation): string {
-    return `${window.location.origin}/?token=${inv.id}`;
+  /** The link of a new invitation. The server shows the token only once, right after creating. */
+  inviteLink(inv: GroupInvitationCreated): string {
+    return `${window.location.origin}/?token=${inv.token}`;
   }
 
   openInviteDialog(): void {
     this.inviteUses = '1';
     this.inviteExpires = inAWeek();
     this.inviteError.set(null);
+    this.createdInvite.set(null);
     this.inviteDialog.set(true);
+  }
+
+  closeInviteDialog(): void {
+    this.inviteDialog.set(false);
+    this.createdInvite.set(null);
   }
 
   createInvite(): void {
@@ -211,8 +224,8 @@ export class CollectionComponent {
     this.api.createInvitation({ uses, expiresAt: `${this.inviteExpires}T23:59:59Z` }).subscribe({
       next: (inv) => {
         this.inviteBusy.set(false);
-        this.inviteDialog.set(false);
-        this.invitations.update((all) => [inv, ...all]);
+        this.createdInvite.set(inv);
+        this.api.invitations().subscribe((all) => this.invitations.set(all ?? []));
       },
       error: (err) => {
         this.inviteBusy.set(false);

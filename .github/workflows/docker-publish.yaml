@@ -51,6 +51,9 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          # The UI kit is a git submodule (frontend/vendor/ui-kit).
+          submodules: recursive
 
       - name: Prepare
         run: |

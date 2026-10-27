@@ -305,5 +305,7 @@
   "tags.emptyBody": "Tags group across locations, for example “Electronics” or “Warranty”.",
   "tags.noMatch": "No tag matches the search.",
   "tags.search": "Search tags",
-  "locations.itemCountOne": "1 item"
+  "locations.itemCountOne": "1 item",
+  "collection.invite.label": "Invitation link",
+  "collection.invite.copyOnce": "Copy the link now. It is shown only this once."
 }

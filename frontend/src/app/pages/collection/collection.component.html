@@ -82,21 +82,11 @@
             <div class="co__row">
               <app-icon class="co__icon" name="link" [size]="20" />
               <div class="co__text">
-                <code class="co__code">{{ inviteLink(inv) }}</code>
+                <span class="co__name">{{ 'collection.invite.label' | t }}</span>
                 <span class="muted co__sub">{{
                   'collection.invite.meta' | t: { uses: inv.uses, date: (inv.expiresAt | ldate) }
                 }}</span>
               </div>
-              <app-copy-button
-                variant="text"
-                [text]="inviteLink(inv)"
-                [label]="'collection.invite.copy' | t"
-                [copiedLabel]="'profile.keys.copied' | t"
-                [share]="true"
-                [shareTitle]="
-                  'collection.invite.shareTitle' | t: { name: collections.selected()?.name ?? '' }
-                "
-              />
               <app-button
                 variant="text"
                 size="sm"
@@ -118,33 +108,53 @@
   size="form"
   [title]="'collection.invite.new' | t"
   [closeLabel]="'common.close' | t"
-  (closed)="inviteDialog.set(false)"
+  (closed)="closeInviteDialog()"
 >
-  <form class="form-stack" (ngSubmit)="createInvite()" novalidate>
-    <div class="form-grid">
-      <app-input
-        name="uses"
-        type="number"
-        [label]="'collection.invite.uses' | t"
-        [(ngModel)]="inviteUses"
-      />
-      <app-datepicker
-        name="expires"
-        [label]="'collection.invite.expires' | t"
-        [(ngModel)]="inviteExpires"
+  @if (createdInvite(); as inv) {
+    <div class="form-stack">
+      <app-note kind="warn" icon="alert">{{ 'collection.invite.copyOnce' | t }}</app-note>
+      <code class="co__token">{{ inviteLink(inv) }}</code>
+      <app-copy-button
+        [text]="inviteLink(inv)"
+        [label]="'collection.invite.copy' | t"
+        [copiedLabel]="'profile.keys.copied' | t"
+        [share]="true"
+        [shareTitle]="
+          'collection.invite.shareTitle' | t: { name: collections.selected()?.name ?? '' }
+        "
       />
     </div>
-    @if (inviteError()) {
-      <app-note kind="error" icon="alert">{{ inviteError() }}</app-note>
-    }
-  </form>
+  } @else {
+    <form class="form-stack" (ngSubmit)="createInvite()" novalidate>
+      <div class="form-grid">
+        <app-input
+          name="uses"
+          type="number"
+          [label]="'collection.invite.uses' | t"
+          [(ngModel)]="inviteUses"
+        />
+        <app-datepicker
+          name="expires"
+          [label]="'collection.invite.expires' | t"
+          [(ngModel)]="inviteExpires"
+        />
+      </div>
+      @if (inviteError()) {
+        <app-note kind="error" icon="alert">{{ inviteError() }}</app-note>
+      }
+    </form>
+  }
   <div dialog-footer>
-    <app-button variant="text" (click)="inviteDialog.set(false)">{{
-      'common.cancel' | t
-    }}</app-button>
-    <app-button [loading]="inviteBusy()" (click)="createInvite()">{{
-      'common.create' | t
-    }}</app-button>
+    @if (createdInvite()) {
+      <app-button (click)="closeInviteDialog()">{{ 'common.close' | t }}</app-button>
+    } @else {
+      <app-button variant="text" (click)="closeInviteDialog()">{{
+        'common.cancel' | t
+      }}</app-button>
+      <app-button [loading]="inviteBusy()" (click)="createInvite()">{{
+        'common.create' | t
+      }}</app-button>
+    }
   </div>
 </app-dialog>
 

@@ -24,6 +24,8 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
         with:
           fetch-depth: 0
+          # The UI kit is a git submodule (frontend/vendor/ui-kit).
+          submodules: recursive
 
       - name: Install Task
         uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
@@ -40,12 +42,8 @@ jobs:
         with:
           node-version: lts/*
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
-        with:
-          version: 10
-
       - name: Install dependencies
-        run: pnpm install
+        run: npm ci
         working-directory: frontend
 
       - name: Install Go Dependencies

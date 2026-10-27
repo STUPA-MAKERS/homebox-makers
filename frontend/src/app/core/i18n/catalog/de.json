@@ -305,5 +305,7 @@
   "tags.emptyBody": "Mit Tags ordnest du quer zu Orten, etwa „Elektronik“ oder „Garantie“.",
   "tags.noMatch": "Kein Tag passt zur Suche.",
   "tags.search": "Tags durchsuchen",
-  "locations.itemCountOne": "1 Gegenstand"
+  "locations.itemCountOne": "1 Gegenstand",
+  "collection.invite.label": "Einladungslink",
+  "collection.invite.copyOnce": "Kopiere den Link jetzt. Er wird nur dieses eine Mal angezeigt."
 }
