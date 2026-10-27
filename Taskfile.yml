@@ -49,8 +49,8 @@ tasks:
           --no-client \
           --modular \
           --path ./backend/app/api/static/docs/swagger.json \
-          --output ./frontend/lib/api/types
-      - go run ./backend/app/tools/typegen/main.go ./frontend/lib/api/types/data-contracts.ts
+          --output ./frontend/src/app/core/api
+      - go run ./backend/app/tools/typegen/main.go ./frontend/src/app/core/api/data-contracts.ts
     sources:
       - ./backend/app/tools/typegen/main.go
       - ./backend/app/api/static/docs/swagger.json

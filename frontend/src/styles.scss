@@ -1,0 +1,58 @@
+// The design system of the kit: fonts, tokens, base reset, skeletons, row groups and the
+// list/detail geometry (vendor/ui-kit/src/styles/index.scss).
+@use 'index';
+
+.sec {
+  margin: 0;
+  font-size: 0.84375rem;
+  line-height: 1.25rem;
+  font-weight: var(--fw-semibold);
+  color: var(--color-accent-text);
+}
+
+.section-title {
+  margin: 0;
+  font-size: var(--fs-h3);
+  line-height: 1.375rem;
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+}
+
+// A centred page column, capped to the content width of the design system.
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin-inline: auto;
+}
+
+// A form inside a card or a dialog: one field per row, the actions at the end.
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+// A button label with a leading icon.
+.btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}

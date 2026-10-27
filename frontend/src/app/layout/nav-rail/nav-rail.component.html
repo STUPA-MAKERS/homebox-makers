@@ -1,0 +1,41 @@
+<nav class="rail" [attr.aria-label]="'nav.main' | t">
+  <a class="rail__brand" routerLink="/home" [attr.aria-label]="'shell.nav.brand' | t">
+    <img src="favicon.svg" alt="" width="40" height="40" />
+  </a>
+
+  <a class="rail__item rail__search" routerLink="/items" [queryParams]="{ focus: 'search' }">
+    <span class="rail__ind"><app-icon name="search" [size]="22" /></span>
+    <span class="rail__label">{{ 'nav.search' | t }}</span>
+  </a>
+
+  <div class="rail__main" appScrollFade="y">
+    @for (item of mainItems; track item.key) {
+      <a
+        class="rail__item"
+        [routerLink]="item.path"
+        routerLinkActive="is-active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+      >
+        <span class="rail__ind"><app-icon [name]="item.icon" [size]="22" /></span>
+        <span class="rail__label">{{ item.labelKey | t }}</span>
+      </a>
+    }
+  </div>
+
+  <div class="rail__spacer"></div>
+
+  @for (item of endItems; track item.key) {
+    <a
+      class="rail__item"
+      [routerLink]="item.path"
+      routerLinkActive="is-active"
+      ariaCurrentWhenActive="page"
+    >
+      <span class="rail__ind"><app-icon [name]="item.icon" [size]="22" /></span>
+      <span class="rail__label">{{ item.labelKey | t }}</span>
+    </a>
+  }
+
+  <app-account-menu class="rail__account" variant="popover" />
+</nav>
