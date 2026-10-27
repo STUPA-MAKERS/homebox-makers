@@ -267,7 +267,7 @@ app-list-detail .page {
 }
 
 /* Stat tiles: the icon at the top start, the big number at the top end, the label below
-   (home, maintenance). */
+   it, also at the end (home, maintenance). */
 .stat {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -319,6 +319,8 @@ app-list-detail .page {
 }
 .stat__label {
   grid-area: label;
+  justify-self: end;
+  text-align: end;
   font-size: var(--fs-body);
   color: var(--color-text-muted);
 }
