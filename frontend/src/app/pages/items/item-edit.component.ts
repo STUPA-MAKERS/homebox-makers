@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiClient } from '@core/api/api-client.service';
-import type { EntityFieldData, EntityOut, EntityUpdate } from '@core/api/models';
+import type { EntityFieldData, EntityOut, EntitySummary, EntityUpdate } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
 import { apiDate } from '@core/i18n/localized-date.pipe';
@@ -18,6 +18,7 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { isLocation } from '@shared/entity.util';
 import { CustomFieldsEditorComponent } from '../../features/fields/custom-fields-editor.component';
 import { errorMessage } from '@shared/http-error';
+import { ItemPickerComponent } from '@shared/ui/item-picker/item-picker.component';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
 import { FabComponent } from '@shared/ui/fab/fab.component';
 import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
@@ -96,6 +97,7 @@ function money(value: number | null | undefined): string {
     SheetBarComponent,
     SheetBarTitleDirective,
     IconComponent,
+    ItemPickerComponent,
     LocationSelectComponent,
     TagPickerComponent,
     ButtonComponent,
@@ -129,7 +131,15 @@ export class ItemEditComponent {
 
   form: ItemForm = this.emptyForm();
   readonly typeId = signal('');
+  /** A location: its parent location. An item: the location it is shown in. */
   readonly parentId = signal('');
+  /** An item inside another item (a sub-item): that item, its real parent. */
+  readonly parentItem = signal<EntitySummary | null>(null);
+  /**
+   * A sub-item has a location of its own (`locationId`), not the one of its parent item.
+   * It turns true when the user picks a location while a parent item is set.
+   */
+  private locationExplicit = false;
   readonly tagIds = signal<readonly string[]>([]);
   readonly fields = signal<EntityFieldData[]>([]);
 
@@ -161,6 +171,25 @@ export class ItemEditComponent {
       error: (err) => {
         this.loading.set(false);
         this.error.set(errorMessage(err, this.i18n.translate('common.loadError')));
+      },
+    });
+  }
+
+  /** The user picks a location: for a sub-item it is now a location of its own. */
+  setLocation(id: string): void {
+    this.parentId.set(id);
+    if (this.parentItem()) this.locationExplicit = true;
+  }
+
+  /** A new parent item: the sub-item shows, and follows, the location of that item. */
+  setParentItem(parent: EntitySummary | null): void {
+    this.parentItem.set(parent);
+    this.locationExplicit = false;
+    if (!parent) return;
+    this.api.entity(parent.id).subscribe({
+      next: (p) => {
+        if (this.parentItem()?.id !== p.id) return;
+        this.parentId.set(p.location?.id ?? (p.parent && isLocation(p.parent) ? p.parent.id : ''));
       },
     });
   }
@@ -197,7 +226,11 @@ export class ItemEditComponent {
       soldNotes: f.soldNotes,
       syncChildEntityLocations: f.syncChildEntityLocations,
       entityTypeId: this.typeId() || item.entityType?.id || '',
-      parentId: this.parentId() || null,
+      // A parent item is the real parent; the location then only goes along when the
+      // user chose one of its own, else the sub-item follows its parent item (#1688).
+      parentId: this.parentItem()?.id || this.parentId() || null,
+      locationId:
+        this.parentItem() && this.locationExplicit ? this.parentId() || null : null,
       tagIds: [...this.tagIds()],
       fields: this.fields().filter((x) => x.name.trim()),
     };
@@ -241,7 +274,12 @@ export class ItemEditComponent {
       syncChildEntityLocations: item.syncChildEntityLocations,
     };
     this.typeId.set(item.entityType?.id ?? '');
-    this.parentId.set(item.parent?.id ?? '');
+    const parentIsItem = !!item.parent && !isLocation(item.parent);
+    this.parentItem.set(parentIsItem ? item.parent! : null);
+    this.parentId.set(
+      parentIsItem ? (item.location?.id ?? '') : (item.parent?.id ?? ''),
+    );
+    this.locationExplicit = !!item.locationId;
     this.tagIds.set(item.tags.map((t) => t.id));
     this.fields.set(item.fields ?? []);
     this.pristine = this.snapshot();
@@ -250,7 +288,14 @@ export class ItemEditComponent {
   /** The loaded state, to show the save button only after a change. */
   private pristine = '';
   private snapshot(): string {
-    return JSON.stringify([this.form, this.typeId(), this.parentId(), this.tagIds(), this.fields()]);
+    return JSON.stringify([
+      this.form,
+      this.typeId(),
+      this.parentId(),
+      this.parentItem()?.id ?? '',
+      this.tagIds(),
+      this.fields(),
+    ]);
   }
   dirty(): boolean {
     return !!this.pristine && this.snapshot() !== this.pristine;

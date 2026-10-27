@@ -34,6 +34,10 @@
   .#{$b}__chips {
     @include lp.chips;
   }
+  // The pane title starts on the edge of the filter line and the rows below it.
+  .#{$b}__pane {
+    --ph-inset: 0;
+  }
 
   .#{$b}__scroll {
     @include lp.scroll(--#{$b}-fade);

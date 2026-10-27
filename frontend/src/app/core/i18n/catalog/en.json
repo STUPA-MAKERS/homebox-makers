@@ -524,5 +524,6 @@
   "maint.notFound": "Entry not found",
   "maint.allEntries": "All entries",
   "common.clear": "Clear",
-  "maint.dateRequired": "Please choose a date."
+  "maint.dateRequired": "Please choose a date.",
+  "item.parentItem": "Parent item"
 }

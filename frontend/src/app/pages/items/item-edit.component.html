@@ -53,8 +53,16 @@
           [label]="(isLoc() ? 'location.parent' : 'location.label') | t"
           [exclude]="isLoc() ? it.id : null"
           [value]="parentId()"
-          (valueChange)="parentId.set($event)"
+          (valueChange)="setLocation($event)"
         />
+        @if (!isLoc()) {
+          <app-item-picker
+            [label]="'item.parentItem' | t"
+            [exclude]="it.id"
+            [value]="parentItem()"
+            (valueChange)="setParentItem($event)"
+          />
+        }
         <app-textarea [label]="'field.description' | t">
           <textarea name="description" rows="3" [(ngModel)]="form.description"></textarea>
         </app-textarea>

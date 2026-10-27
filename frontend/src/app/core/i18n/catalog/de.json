@@ -524,5 +524,6 @@
   "maint.notFound": "Eintrag nicht gefunden",
   "maint.allEntries": "Alle Einträge",
   "common.clear": "Leeren",
-  "maint.dateRequired": "Bitte ein Datum wählen."
+  "maint.dateRequired": "Bitte ein Datum wählen.",
+  "item.parentItem": "Übergeordneter Gegenstand"
 }

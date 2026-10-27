@@ -106,3 +106,24 @@ test('the trailing area of a list row opens the item', async ({ signedIn: page }
   await page.mouse.click(box.x - 30, box.y + box.height / 2);
   await expect(page).toHaveURL(/\/items\/[0-9a-f-]+/);
 });
+
+test('a sub-item shows under its parent item and keeps both in its editor', async ({
+  signedIn: page,
+}) => {
+  const home = await createLocation(page, 'Downstairs');
+  const parent = await createItem(page, 'Ecolink Sensor', home);
+  const child = await createItem(page, 'Batterie', parent);
+
+  await page.goto(`/items/${parent}`);
+  const subs = page.getByRole('region', { name: 'Enthaltene Gegenstände' });
+  await expect(subs.getByRole('link', { name: /Batterie/ })).toBeVisible();
+
+  await page.goto(`/items/${child}`);
+  const facts = page.locator('app-item-detail app-field-group').first();
+  await expect(facts).toContainText('Downstairs');
+  await expect(facts).toContainText('Übergeordneter Gegenstand');
+  await page.getByRole('button', { name: 'Bearbeiten' }).first().click();
+  const editor = page.locator('app-item-edit');
+  await expect(editor.getByRole('combobox', { name: /^Ort/ })).toContainText('Downstairs');
+  await expect(editor).toContainText('Ecolink Sensor');
+});

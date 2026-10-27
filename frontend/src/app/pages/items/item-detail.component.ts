@@ -12,12 +12,12 @@ import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiClient } from '@core/api/api-client.service';
 import { CollectionService } from '@core/collection/collection.service';
-import type { EntityOut, EntityPath } from '@core/api/models';
+import type { EntityOut, EntityPath, EntitySummary } from '@core/api/models';
 import { I18nService } from '@core/i18n/i18n.service';
 import { LocalizedDatePipe, apiDate } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
-import { entityLink, injectAttachmentUrl, photos } from '@shared/entity.util';
+import { entityLink, isLocation, injectAttachmentUrl, photos } from '@shared/entity.util';
 import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
@@ -109,6 +109,14 @@ export class ItemDetailComponent {
 
   readonly item = signal<EntityOut | null>(null);
   readonly path = signal<EntityPath[]>([]);
+  /** The items inside this one (its sub-items); `children` of the entity holds only locations. */
+  readonly subItems = signal<EntitySummary[]>([]);
+  /** The item this one sits inside, when its parent is an item and not a location. */
+  readonly parentItem = computed(() => {
+    const parent = this.item()?.parent;
+    return parent && !isLocation(parent) ? parent : null;
+  });
+  readonly children = computed(() => [...(this.item()?.children ?? []), ...this.subItems()]);
   readonly loading = signal(true);
   readonly notFound = signal(false);
   readonly error = signal(false);
@@ -186,10 +194,15 @@ export class ItemDetailComponent {
     this.loading.set(true);
     this.error.set(false);
     this.notFound.set(false);
-    forkJoin({ item: this.api.entity(id), path: this.api.entityPath(id) }).subscribe({
-      next: ({ item, path }) => {
+    forkJoin({
+      item: this.api.entity(id),
+      path: this.api.entityPath(id),
+      subs: this.api.entities({ parentIds: [id], pageSize: 200 }),
+    }).subscribe({
+      next: ({ item, path, subs }) => {
         this.item.set(item);
         this.path.set(path ?? []);
+        this.subItems.set((subs.items ?? []).filter((e) => e.parent?.id === id));
         this.loading.set(false);
         this.title.setPageTitle(item.name);
       },

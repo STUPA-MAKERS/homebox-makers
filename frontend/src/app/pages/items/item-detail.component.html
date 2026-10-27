@@ -91,9 +91,14 @@
                 [value]="(it.insured ? 'common.yes' : 'common.no') | t"
               />
             </div>
-            @if (it.parent) {
+            @if (it.location; as loc) {
               <app-field-row [label]="'location.label' | t">
-                <a class="sheet-link" [routerLink]="childLink(it.parent)">{{ it.parent.name }}</a>
+                <a class="sheet-link" [routerLink]="childLink(loc)">{{ loc.name }}</a>
+              </app-field-row>
+            }
+            @if (parentItem(); as p) {
+              <app-field-row [label]="'item.parentItem' | t">
+                <a class="sheet-link" [routerLink]="childLink(p)">{{ p.name }}</a>
               </app-field-row>
             }
             @if (it.manufacturer) {
@@ -220,11 +225,11 @@
           </section>
         }
 
-        @if (it.children.length) {
+        @if (children().length) {
           <section class="sheet-sec" aria-labelledby="children-title">
             <h3 class="sec" id="children-title">{{ 'item.children' | t }}</h3>
             <div class="rowgroup">
-              @for (child of it.children; track child.id) {
+              @for (child of children(); track child.id) {
                 <app-list-item [title]="child.name" [link]="childLink(child)">
                   <app-entity-thumb lead [entity]="child" [size]="36" />
                   @if (child.quantity > 1) {
