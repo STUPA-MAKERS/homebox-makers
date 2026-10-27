@@ -16,10 +16,13 @@ export interface EntityQuery {
   page?: number;
   pageSize?: number;
   orderBy?: string;
+  orderDirection?: 'asc' | 'desc';
   includeArchived?: boolean;
   parentIds?: string[];
   tags?: string[];
   negateTags?: boolean;
+  matchAllTags?: boolean;
+  entityTypeIds?: string[];
   onlyWithoutPhoto?: boolean;
   onlyWithPhoto?: boolean;
   /** `true` lists locations only, `false` items only; absent means items only. */

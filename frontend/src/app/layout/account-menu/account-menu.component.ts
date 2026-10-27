@@ -23,7 +23,7 @@ import {
   IconComponent,
   SegmentedComponent,
   type SegmentedOption,
-  SelectComponent,
+  SelectFieldComponent,
   type SelectFieldOption,
   SwitchComponent,
 } from '@stupa-makers/ui-kit';
@@ -52,7 +52,7 @@ let nextId = 0;
     SwitchComponent,
     AvatarComponent,
     SegmentedComponent,
-    SelectComponent,
+    SelectFieldComponent,
   ],
   templateUrl: './account-menu.component.html',
   styleUrl: './account-menu.component.scss',

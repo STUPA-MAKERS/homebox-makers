@@ -1,0 +1,73 @@
+<app-dialog
+  [open]="!!request()"
+  size="form"
+  [title]="(isLocation() ? 'create.location.title' : 'create.item.title') | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="close()"
+>
+  <form class="form-stack" id="create-form" (ngSubmit)="save()" novalidate>
+    <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="name" />
+    <div class="form-grid">
+      @if (typeOptions().length > 1) {
+        <app-select
+          [label]="'field.type' | t"
+          [options]="typeOptions()"
+          [clearable]="false"
+          [value]="typeId()"
+          (valueChange)="typeId.set($event)"
+        />
+      }
+      @if (!isLocation()) {
+        <app-input
+          name="quantity"
+          type="number"
+          [label]="'field.quantity' | t"
+          [(ngModel)]="quantity"
+        />
+      }
+    </div>
+    <app-location-select
+      [label]="(isLocation() ? 'location.parent' : 'location.label') | t"
+      [placeholder]="isLocation() ? ('location.top' | t) : null"
+      [required]="!isLocation()"
+      [value]="parentId()"
+      (valueChange)="parentId.set($event)"
+    />
+    <app-textarea [label]="'field.description' | t">
+      <textarea name="description" rows="3" [(ngModel)]="description"></textarea>
+    </app-textarea>
+    <app-tag-picker [value]="tagIds()" (valueChange)="tagIds.set($event)" />
+
+    <div class="cd__photos">
+      <app-file-picker #picker accept="image/*" [multiple]="true" (picked)="addPhotos($event)" />
+      <app-button variant="tonal" size="sm" (click)="picker.open()">
+        <span class="btn-label"><app-icon name="image" />{{ 'create.addPhotos' | t }}</span>
+      </app-button>
+      @for (file of photos(); track $index) {
+        <span class="cd__file">
+          <span class="ell">{{ file.name }}</span>
+          <button
+            type="button"
+            class="cd__fileX"
+            [attr.aria-label]="'common.remove' | t"
+            (click)="removePhoto($index)"
+          >
+            <app-icon name="x" [size]="14" />
+          </button>
+        </span>
+      }
+    </div>
+
+    @if (error()) {
+      <app-note kind="error" icon="alert">{{ error() }}</app-note>
+    }
+  </form>
+
+  <div dialog-footer>
+    <app-button variant="text" (click)="close()">{{ 'common.cancel' | t }}</app-button>
+    <app-button variant="tonal" [disabled]="busy()" (click)="save(true)">{{
+      'create.saveNext' | t
+    }}</app-button>
+    <app-button [loading]="busy()" (click)="save()">{{ 'common.create' | t }}</app-button>
+  </div>
+</app-dialog>

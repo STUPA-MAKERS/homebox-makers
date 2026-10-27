@@ -25,9 +25,9 @@ import { ButtonComponent, InputComponent, NoteComponent } from '@stupa-makers/ui
   template: `
     <app-public-card [title]="'auth.reset.title' | t">
       @if (done()) {
-        <app-note kind="success" icon="check">{{ 'auth.reset.done' | t }}</app-note>
+        <app-note kind="ok" icon="check">{{ 'auth.reset.done' | t }}</app-note>
       } @else if (!token()) {
-        <app-note kind="danger" icon="alert">{{ 'auth.reset.noToken' | t }}</app-note>
+        <app-note kind="error" icon="alert">{{ 'auth.reset.noToken' | t }}</app-note>
       } @else {
         <form class="form-stack" (ngSubmit)="submit()" novalidate>
           <app-input
@@ -46,7 +46,7 @@ import { ButtonComponent, InputComponent, NoteComponent } from '@stupa-makers/ui
             [(ngModel)]="confirm"
           />
           @if (error()) {
-            <app-note kind="danger" icon="alert">{{ error() }}</app-note>
+            <app-note kind="error" icon="alert">{{ error() }}</app-note>
           }
           <app-button type="submit" [block]="true" [loading]="busy()">
             {{ 'auth.reset.submit' | t }}

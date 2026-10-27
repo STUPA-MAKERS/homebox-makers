@@ -3,7 +3,7 @@
   [subtitle]="status()?.message || ('auth.tagline' | t)"
 >
   @if (status()?.demo) {
-    <app-note class="auth__note" kind="info">{{ 'auth.demo' | t }}</app-note>
+    <app-note class="auth__note" kind="neutral">{{ 'auth.demo' | t }}</app-note>
   }
 
   @if (localLogin() || mode() === 'register') {
@@ -40,7 +40,7 @@
         </div>
       }
       @if (error()) {
-        <app-note kind="danger" icon="alert">{{ error() }}</app-note>
+        <app-note kind="error" icon="alert">{{ error() }}</app-note>
       }
       <app-button type="submit" [block]="true" [loading]="busy()">
         {{ (mode() === 'login' ? 'auth.login.submit' : 'auth.register.submit') | t }}

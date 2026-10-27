@@ -25,7 +25,7 @@ import { ButtonComponent, InputComponent, NoteComponent } from '@stupa-makers/ui
   template: `
     <app-public-card [title]="'auth.forgot.title' | t" [subtitle]="'auth.forgot.body' | t">
       @if (sent()) {
-        <app-note kind="success" icon="check">{{ 'auth.forgot.sent' | t }}</app-note>
+        <app-note kind="ok" icon="check">{{ 'auth.forgot.sent' | t }}</app-note>
       } @else {
         <form class="form-stack" (ngSubmit)="submit()" novalidate>
           <app-input
@@ -36,7 +36,7 @@ import { ButtonComponent, InputComponent, NoteComponent } from '@stupa-makers/ui
             [(ngModel)]="email"
           />
           @if (error()) {
-            <app-note kind="danger" icon="alert">{{ error() }}</app-note>
+            <app-note kind="error" icon="alert">{{ error() }}</app-note>
           }
           <app-button type="submit" [block]="true" [loading]="busy()">
             {{ 'auth.forgot.submit' | t }}
