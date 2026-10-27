@@ -11,12 +11,14 @@ import {
   provideRouter,
   withComponentInputBinding,
   withInMemoryScrolling,
+  withViewTransitions,
 } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { authInterceptor } from '@core/auth/auth.interceptor';
 import { AuthService } from '@core/auth/auth.service';
 import { tenantInterceptor } from '@core/collection/tenant.interceptor';
 import { I18nService } from '@core/i18n/i18n.service';
+import { onRouteViewTransition, watchUAVisualTransitions } from '@core/motion/motion';
 import { loadingInterceptor } from '@core/loading/loading.interceptor';
 import { LoadingService } from '@core/loading/loading.service';
 import { ThemeService } from '@core/theme/theme.service';
@@ -40,6 +42,10 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
+      withViewTransitions({
+        skipInitialTransition: true,
+        onViewTransitionCreated: onRouteViewTransition,
+      }),
     ),
     { provide: TitleStrategy, useExisting: AppTitleStrategy },
     provideHttpClient(withInterceptors([loadingInterceptor, tenantInterceptor, authInterceptor])),
@@ -53,6 +59,7 @@ export const appConfig: ApplicationConfig = {
     { provide: UI_KIT_LOADING, useFactory: () => ({ visible: inject(LoadingService).visible }) },
     provideAppInitializer(() => {
       inject(ThemeService).init();
+      watchUAVisualTransitions();
       const session = firstValueFrom(inject(AuthService).ensureLoaded());
       return Promise.all([inject(I18nService).ready(), session]).then(() => undefined);
     }),

@@ -341,3 +341,75 @@
     opacity: 0;
   }
 }
+
+// Route transitions (STUPA-Workflow, `core/motion/motion.ts`): a fade between the sections of
+// the rail, a slide one level deeper or back on a phone.
+// The page moves as the root snapshot, not as a group of `.main`, because `.main` moves with the
+// document scroll and its own group would morph from the old box to the new one. The frame gets
+// groups of its own, so it stays still.
+:root[data-motion] .frame__rail {
+  view-transition-name: rail;
+}
+// A group of its own, so the moving page never paints over the bottom bar.
+:root[data-motion] .bb {
+  view-transition-name: bottom-bar;
+}
+:root[data-motion]::view-transition {
+  background: var(--color-bg);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-base);
+  animation-timing-function: var(--ease-standard);
+}
+::view-transition-group(rail),
+::view-transition-old(rail),
+::view-transition-new(rail) {
+  animation-duration: var(--motion-fast);
+}
+:root[data-motion='section']::view-transition-old(root) {
+  animation: vt-fade-out var(--motion-xs) var(--ease-exit) both;
+}
+:root[data-motion='section']::view-transition-new(root) {
+  animation: vt-rise-in var(--motion-base) var(--ease-enter) var(--motion-xs) both;
+}
+:root[data-motion='push']::view-transition-old(root) {
+  animation: vt-recede var(--motion-slow) var(--ease-standard) both;
+}
+:root[data-motion='push']::view-transition-new(root) {
+  animation: vt-from-end var(--motion-slow) var(--ease-standard) both;
+}
+:root[data-motion='pop']::view-transition-old(root) {
+  z-index: 1;
+  animation: vt-to-end var(--motion-base) var(--ease-exit) both;
+}
+:root[data-motion='pop']::view-transition-new(root) {
+  animation: vt-recede var(--motion-base) var(--ease-standard) reverse both;
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-shift-sm));
+  }
+}
+@keyframes vt-recede {
+  to {
+    opacity: 0.6;
+    transform: translateX(-25%);
+  }
+}
+@keyframes vt-from-end {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes vt-to-end {
+  to {
+    transform: translateX(100%);
+  }
+}
