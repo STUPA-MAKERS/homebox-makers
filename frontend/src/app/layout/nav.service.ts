@@ -8,16 +8,15 @@ export interface NavItem {
   path: string;
   icon: IconName;
   labelKey: TranslationKey;
-  /** `main` sits in the upper group of the rail, `end` above the account, `bar` only in the
-   *  phone bottom bar (the scanner, which needs a camera). */
-  place: 'main' | 'end' | 'bar';
+  /** `main` sits in the upper group of the rail, `end` above the account. */
+  place: 'main' | 'end';
   exact?: boolean;
 }
 
 const ITEMS: readonly NavItem[] = [
   { key: 'home', path: '/home', icon: 'home', labelKey: 'nav.home', place: 'main' },
   { key: 'items', path: '/items', icon: 'package', labelKey: 'nav.items', place: 'main' },
-  { key: 'scan', path: '/scan', icon: 'scan', labelKey: 'nav.scan', place: 'bar' },
+  { key: 'scan', path: '/scan', icon: 'scan', labelKey: 'nav.scan', place: 'main' },
   {
     key: 'locations',
     path: '/locations',
