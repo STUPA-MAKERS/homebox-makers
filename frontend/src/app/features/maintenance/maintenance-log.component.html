@@ -1,0 +1,88 @@
+<section class="ml" aria-labelledby="ml-title">
+  <div class="ml__head">
+    <h2 class="section-title" id="ml-title">{{ 'maint.title' | t }}</h2>
+    @if (totalCost()) {
+      <span class="muted ml__sum">{{ 'maint.total' | t: { value: (totalCost() | money) } }}</span>
+    }
+    <app-button variant="tonal" size="sm" (click)="openNew()">
+      <span class="btn-label"><app-icon name="plus" />{{ 'maint.add' | t }}</span>
+    </app-button>
+  </div>
+
+  @if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+  } @else if (!loading() && entries().length === 0) {
+    <p class="muted ml__empty">{{ 'maint.empty' | t }}</p>
+  } @else {
+    @for (group of [scheduled(), done()]; track $index) {
+      @if (group.length) {
+        <h3 class="sec">{{ ($index === 0 ? 'maint.scheduled' : 'maint.done') | t }}</h3>
+        <div class="rowgroup">
+          @for (entry of group; track entry.id) {
+            <div class="ml__row">
+              <app-icon
+                class="ml__icon"
+                [name]="$index === 0 ? 'clock' : 'circleok'"
+                [size]="20"
+              />
+              <div class="ml__text">
+                <span class="ml__name">{{ entry.name }}</span>
+                <span class="ml__sub muted">
+                  {{ (entry.completedDate | ldate) || (entry.scheduledDate | ldate) }}
+                  @if (costOf(entry)) {
+                    · {{ costOf(entry) | money }}
+                  }
+                </span>
+                @if (entry.description) {
+                  <span class="ml__desc">{{ entry.description }}</span>
+                }
+              </div>
+              <app-row-menu
+                [label]="'common.actions' | t"
+                [sections]="menu()"
+                (selected)="onMenu(entry, $event)"
+              />
+            </div>
+          }
+        </div>
+      }
+    }
+  }
+</section>
+
+<app-dialog
+  [open]="editing() !== null"
+  size="form"
+  [title]="(editing() === 'new' ? 'maint.add' : 'maint.edit') | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="editing.set(null)"
+>
+  <form class="form-stack" (ngSubmit)="save()" novalidate>
+    <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="name" />
+    <div class="form-grid">
+      <app-datepicker name="scheduled" [label]="'maint.scheduledDate' | t" [(ngModel)]="scheduledDate" />
+      <app-datepicker name="completed" [label]="'maint.completedDate' | t" [(ngModel)]="completedDate" />
+    </div>
+    <app-input name="cost" type="number" [label]="'maint.cost' | t" [(ngModel)]="cost" />
+    <app-textarea [label]="'field.description' | t">
+      <textarea name="description" rows="3" [(ngModel)]="description"></textarea>
+    </app-textarea>
+    @if (formError()) {
+      <app-note kind="error" icon="alert">{{ formError() }}</app-note>
+    }
+  </form>
+  <div dialog-footer>
+    <app-button variant="text" (click)="editing.set(null)">{{ 'common.cancel' | t }}</app-button>
+    <app-button [loading]="busy()" (click)="save()">{{ 'common.save' | t }}</app-button>
+  </div>
+</app-dialog>
+
+<app-confirm-dialog
+  [open]="deleting() !== null"
+  [title]="'maint.deleteTitle' | t"
+  [body]="'maint.deleteBody' | t: { name: deleting()?.name ?? '' }"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy()"
+  (confirm)="confirmDelete()"
+  (cancel)="deleting.set(null)"
+/>

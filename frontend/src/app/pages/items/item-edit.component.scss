@@ -1,0 +1,44 @@
+@use 'breakpoints' as bp;
+
+.ie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 56rem;
+}
+.ie__sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.ie__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.ie__checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+}
+.ie__field {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+@include bp.phone {
+  .ie__field {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+.ie__bar {
+  position: sticky;
+  bottom: var(--app-bottom-inset, 0px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+  background: var(--color-bg);
+}

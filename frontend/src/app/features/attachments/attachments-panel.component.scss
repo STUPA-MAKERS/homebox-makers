@@ -1,0 +1,40 @@
+.ap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.ap__empty {
+  margin: 0;
+}
+.ap__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+}
+.ap__icon {
+  flex: none;
+  color: var(--color-accent-text);
+}
+.ap__name {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--color-text);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+}
+.ap__name:hover .ell {
+  text-decoration: underline;
+}
+.ap__sub {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-regular);
+}
+.ap__upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-x: auto;
+}

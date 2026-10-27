@@ -1,0 +1,168 @@
+<div class="page">
+  @if (loading()) {
+    <app-skeleton variant="panel" [label]="'common.loading' | t" />
+  } @else if (item(); as it) {
+    <app-page-header [title]="'item.edit.title' | t" [subtitle]="it.name" [flush]="true" />
+
+    <form class="ie" (ngSubmit)="save()" novalidate>
+      <section class="ie__sec" aria-labelledby="ie-basic">
+        <h2 class="section-title" id="ie-basic">{{ 'item.details' | t }}</h2>
+        <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="form.name" />
+        <div class="form-grid">
+          <app-input name="quantity" type="number" [label]="'field.quantity' | t" [(ngModel)]="form.quantity" />
+          <app-input name="assetId" [label]="'items.sort.assetId' | t" [(ngModel)]="form.assetId" />
+          @if (typeOptions().length > 1) {
+            <app-select
+              [label]="'field.type' | t"
+              [options]="typeOptions()"
+              [clearable]="false"
+              [value]="typeId()"
+              (valueChange)="typeId.set($event)"
+            />
+          }
+        </div>
+        <app-location-select
+          [label]="'location.label' | t"
+          [value]="parentId()"
+          (valueChange)="parentId.set($event)"
+        />
+        <app-textarea [label]="'field.description' | t">
+          <textarea name="description" rows="3" [(ngModel)]="form.description"></textarea>
+        </app-textarea>
+        <app-tag-picker [value]="tagIds()" (valueChange)="tagIds.set($event)" />
+        <div class="ie__checks">
+          <app-checkbox name="insured" [(ngModel)]="form.insured">{{ 'item.insured' | t }}</app-checkbox>
+          <app-checkbox name="archived" [(ngModel)]="form.archived">{{ 'items.archived' | t }}</app-checkbox>
+          <app-checkbox name="sync" [(ngModel)]="form.syncChildEntityLocations">{{
+            'item.syncChildren' | t
+          }}</app-checkbox>
+        </div>
+      </section>
+
+      <section class="ie__sec" aria-labelledby="ie-ident">
+        <h2 class="section-title" id="ie-ident">{{ 'item.identification' | t }}</h2>
+        <div class="form-grid">
+          <app-input name="manufacturer" [label]="'item.manufacturer' | t" [(ngModel)]="form.manufacturer" />
+          <app-input name="modelNumber" [label]="'item.modelNumber' | t" [(ngModel)]="form.modelNumber" />
+          <app-input name="serialNumber" [label]="'item.serialNumber' | t" [(ngModel)]="form.serialNumber" />
+        </div>
+      </section>
+
+      <section class="ie__sec" aria-labelledby="ie-purchase">
+        <h2 class="section-title" id="ie-purchase">{{ 'item.purchase' | t }}</h2>
+        <div class="form-grid">
+          <app-input name="purchaseFrom" [label]="'item.purchaseFrom' | t" [(ngModel)]="form.purchaseFrom" />
+          <app-currency-input name="purchasePrice" [label]="'item.purchasePrice' | t" [(ngModel)]="form.purchasePrice" />
+          <app-datepicker name="purchaseDate" [label]="'item.purchaseDate' | t" [(ngModel)]="form.purchaseDate" />
+        </div>
+      </section>
+
+      <section class="ie__sec" aria-labelledby="ie-warranty">
+        <h2 class="section-title" id="ie-warranty">{{ 'item.warranty' | t }}</h2>
+        <app-checkbox name="lifetime" [(ngModel)]="form.lifetimeWarranty">{{
+          'item.lifetimeWarranty' | t
+        }}</app-checkbox>
+        <div class="form-grid">
+          @if (!form.lifetimeWarranty) {
+            <app-datepicker name="warrantyExpires" [label]="'item.warrantyExpires' | t" [(ngModel)]="form.warrantyExpires" />
+          }
+        </div>
+        <app-textarea [label]="'item.warrantyDetails' | t">
+          <textarea name="warrantyDetails" rows="2" [(ngModel)]="form.warrantyDetails"></textarea>
+        </app-textarea>
+      </section>
+
+      <section class="ie__sec" aria-labelledby="ie-sold">
+        <h2 class="section-title" id="ie-sold">{{ 'item.sold' | t }}</h2>
+        <div class="form-grid">
+          <app-input name="soldTo" [label]="'item.soldTo' | t" [(ngModel)]="form.soldTo" />
+          <app-currency-input name="soldPrice" [label]="'item.soldPrice' | t" [(ngModel)]="form.soldPrice" />
+          <app-datepicker name="soldDate" [label]="'item.soldDate' | t" [(ngModel)]="form.soldDate" />
+        </div>
+        <app-textarea [label]="'item.soldNotes' | t">
+          <textarea name="soldNotes" rows="2" [(ngModel)]="form.soldNotes"></textarea>
+        </app-textarea>
+      </section>
+
+      <section class="ie__sec" aria-labelledby="ie-fields">
+        <div class="ie__head">
+          <h2 class="section-title" id="ie-fields">{{ 'item.customFields' | t }}</h2>
+          <app-button variant="tonal" size="sm" (click)="addField()">
+            <span class="btn-label"><app-icon name="plus" />{{ 'item.addField' | t }}</span>
+          </app-button>
+        </div>
+        @for (f of fields(); track $index; let i = $index) {
+          <div class="ie__field">
+            <app-input
+              [name]="'fname' + i"
+              [label]="'field.name' | t"
+              [ngModel]="f.name"
+              (ngModelChange)="updateField(i, { name: $event })"
+            />
+            <app-select
+              [label]="'field.type' | t"
+              [options]="fieldTypeOptions()"
+              [clearable]="false"
+              [value]="f.type"
+              (valueChange)="updateField(i, { type: $event })"
+            />
+            @switch (f.type) {
+              @case ('boolean') {
+                <app-checkbox
+                  [name]="'fbool' + i"
+                  [ngModel]="f.booleanValue"
+                  (ngModelChange)="updateField(i, { booleanValue: $event })"
+                  >{{ 'item.field.value' | t }}</app-checkbox
+                >
+              }
+              @case ('number') {
+                <app-input
+                  [name]="'fnum' + i"
+                  type="number"
+                  [label]="'item.field.value' | t"
+                  [ngModel]="'' + f.numberValue"
+                  (ngModelChange)="updateField(i, { numberValue: +$event })"
+                />
+              }
+              @default {
+                <app-input
+                  [name]="'ftext' + i"
+                  [label]="'item.field.value' | t"
+                  [ngModel]="f.textValue"
+                  (ngModelChange)="updateField(i, { textValue: $event })"
+                />
+              }
+            }
+            <app-button
+              variant="text"
+              [iconOnly]="true"
+              [ariaLabel]="'common.remove' | t"
+              (click)="removeField(i)"
+            >
+              <app-icon name="trash" />
+            </app-button>
+          </div>
+        }
+      </section>
+
+      <section class="ie__sec" aria-labelledby="ie-notes">
+        <h2 class="section-title" id="ie-notes">{{ 'item.notes' | t }}</h2>
+        <app-textarea [label]="'item.notes' | t" [grow]="true">
+          <textarea name="notes" rows="4" [(ngModel)]="form.notes"></textarea>
+        </app-textarea>
+      </section>
+
+      <app-sticky-bar class="ie__bar">
+        @if (error()) {
+          <app-note kind="error" icon="alert">{{ error() }}</app-note>
+        }
+        <div class="form-actions">
+          <a appButton="text" [routerLink]="['/items', it.id]">{{ 'common.cancel' | t }}</a>
+          <app-button type="submit" [loading]="busy()">{{ 'common.save' | t }}</app-button>
+        </div>
+      </app-sticky-bar>
+    </form>
+  } @else if (error()) {
+    <app-note kind="error" icon="alert">{{ error() }}</app-note>
+  }
+</div>
