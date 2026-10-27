@@ -17,6 +17,7 @@
           "/favicon.svg",
           "/index.html",
           "/manifest.webmanifest",
+          "/manifest-dark.webmanifest",
           "/*.css",
           "/*.js"
         ]
