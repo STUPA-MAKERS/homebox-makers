@@ -76,6 +76,9 @@ export class MaintenanceComponent {
 
   readonly entries = signal<MaintenanceEntryWithDetails[]>([]);
   readonly loading = signal(true);
+  /** The first answer has come: a new filter then keeps the old rows until its answer. */
+  readonly loaded = signal(false);
+  private seq = 0;
   readonly error = signal(false);
   readonly deleting = signal<MaintenanceEntryWithDetails | null>(null);
   readonly busy = signal(false);
@@ -113,14 +116,18 @@ export class MaintenanceComponent {
   }
 
   load(status = this.filter()): void {
+    const seq = ++this.seq;
     this.loading.set(true);
     this.error.set(false);
     this.api.maintenanceAll(status).subscribe({
       next: (entries) => {
+        if (seq !== this.seq) return;
         this.entries.set(entries ?? []);
         this.loading.set(false);
+        this.loaded.set(true);
       },
       error: () => {
+        if (seq !== this.seq) return;
         this.loading.set(false);
         this.error.set(true);
       },

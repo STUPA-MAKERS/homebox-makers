@@ -5,6 +5,7 @@ import type { NotifierOut } from '@core/api/models';
 import { I18nService } from '@core/i18n/i18n.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { errorMessage } from '@shared/http-error';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
@@ -34,6 +35,7 @@ import {
     FormsModule,
     TranslatePipe,
     PageHeaderComponent,
+    FabComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     DialogComponent,
@@ -47,13 +49,8 @@ import {
   ],
   template: `
     <div class="page co">
-      <app-page-header [title]="'collection.tab.notifiers' | t">
-        <ng-container ngProjectAs="[actions]">
-          <app-button size="sm" (click)="openNew()">
-            <span class="btn-label"><app-icon name="plus" />{{ 'notifiers.new' | t }}</span>
-          </app-button>
-        </ng-container>
-      </app-page-header>
+      <app-page-header [title]="'collection.tab.notifiers' | t" />
+      <app-fab [label]="'fab.notifier' | t" (activate)="openNew()" />
 
       @if (error()) {
         <app-note kind="error" icon="alert" retryable (retry)="load()">{{

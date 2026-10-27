@@ -1,10 +1,10 @@
 <section class="ml" aria-labelledby="ml-title">
   <div class="ml__head">
-    <h2 class="section-title" id="ml-title">{{ 'maint.title' | t }}</h2>
+    <h3 class="sec ml__title" id="ml-title">{{ 'maint.title' | t }}</h3>
     @if (totalCost()) {
       <span class="muted ml__sum">{{ 'maint.total' | t: { value: (totalCost() | money) } }}</span>
     }
-    <app-button variant="tonal" size="sm" (click)="openNew()">
+    <app-button variant="text" size="sm" (click)="openNew()">
       <span class="btn-label"><app-icon name="plus" />{{ 'maint.add' | t }}</span>
     </app-button>
   </div>

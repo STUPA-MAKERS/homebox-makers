@@ -13,8 +13,12 @@ import { ApiClient } from '@core/api/api-client.service';
 import type { EntitySummary } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
+import { I18nService } from '@core/i18n/i18n.service';
+import { errorMessage } from '@shared/http-error';
+
 import { injectListDetailPage } from '@shared/list-detail-page';
 import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
@@ -27,6 +31,11 @@ import {
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
+  ConfirmDialogComponent,
+  RowMenuComponent,
+  type RowMenuItem,
+  type RowMenuSection,
+  ToastService,
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
 
@@ -49,6 +58,7 @@ interface TreeRow {
   imports: [
     TranslatePipe,
     PageHeaderComponent,
+    FabComponent,
     ButtonComponent,
     EmptyStateComponent,
     IconComponent,
@@ -57,6 +67,8 @@ interface TreeRow {
     SearchPillComponent,
     SkeletonComponent,
     StickyBarComponent,
+    RowMenuComponent,
+    ConfirmDialogComponent,
     ListDetailLayoutComponent,
     RouterOutlet,
     ScrollFadeDirective,
@@ -70,6 +82,28 @@ export class LocationsComponent {
   private readonly createSvc = inject(CreateService);
   private readonly router = inject(Router);
   readonly ref = inject(RefDataService);
+  private readonly api = inject(ApiClient);
+  private readonly i18n = inject(I18nService);
+  private readonly toast = inject(ToastService);
+
+  /** The row whose deletion waits for the confirmation. */
+  readonly deleting = signal<EntitySummary | null>(null);
+  readonly busy = signal(false);
+
+  readonly rowMenu = computed<RowMenuSection[]>(() => [
+    {
+      items: [
+        { id: 'edit', label: this.i18n.translate('common.edit'), icon: 'edit' },
+        { id: 'sub', label: this.i18n.translate('location.addSub'), icon: 'mappin' },
+        { id: 'item', label: this.i18n.translate('location.addItem'), icon: 'plus' },
+      ],
+    },
+    {
+      items: [
+        { id: 'delete', label: this.i18n.translate('common.delete'), icon: 'trash', danger: true },
+      ],
+    },
+  ]);
 
   private readonly layout = viewChild(ListDetailLayoutComponent);
   private readonly panes = injectListDetailPage(this.layout);
@@ -166,6 +200,43 @@ export class LocationsComponent {
               .map((r) => r.loc.id),
           ),
     );
+  }
+
+  onRowMenu(action: RowMenuItem, loc: EntitySummary): void {
+    switch (action.id) {
+      case 'edit':
+        void this.router.navigate(['/locations', loc.id, 'edit']);
+        break;
+      case 'sub':
+        this.createSvc.open({ kind: 'location', parentId: loc.id });
+        break;
+      case 'item':
+        this.createSvc.open({ kind: 'item', parentId: loc.id });
+        break;
+      case 'delete':
+        this.deleting.set(loc);
+        break;
+    }
+  }
+
+  confirmDelete(): void {
+    const loc = this.deleting();
+    if (!loc) return;
+    this.busy.set(true);
+    this.api.deleteEntity(loc.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.deleting.set(null);
+        this.toast.show(this.i18n.translate('location.deleted', { name: loc.name }), 'success');
+        this.ref.reload().subscribe();
+        if (this.selectedId() === loc.id) void this.router.navigate(['/locations']);
+      },
+      error: (err) => {
+        this.busy.set(false);
+        this.deleting.set(null);
+        this.toast.show(errorMessage(err, this.i18n.translate('common.error')), 'danger');
+      },
+    });
   }
 
   newLocation(): void {

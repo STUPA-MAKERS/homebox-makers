@@ -1,30 +1,14 @@
-@use 'breakpoints' as bp;
-
-.grid {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: var(--space-6);
-  align-items: start;
-}
-// The detail sits beside the list on a wide screen, so the columns follow its own width.
 :host {
-  container-type: inline-size;
-}
-@container (max-width: 960px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.col {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--space-6);
   min-width: 0;
 }
-.block {
+.detail {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--space-3);
+  min-width: 0;
 }
 
 .gallery {
@@ -56,26 +40,8 @@
   outline-offset: 2px;
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.link {
-  color: var(--color-accent-text);
-  text-decoration: none;
-}
-.link:hover {
-  text-decoration: underline;
-}
-
 .notes {
   margin: 0;
+  padding: 0 var(--space-1);
   white-space: pre-line;
-}
-
-.meta {
-  margin: 0;
-  font-size: var(--fs-small);
 }

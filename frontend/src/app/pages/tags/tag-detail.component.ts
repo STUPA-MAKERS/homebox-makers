@@ -18,8 +18,10 @@ import { AppTitleStrategy } from '@core/title/title.strategy';
 import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
+import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
+import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
+import { TagItemsDialogComponent } from '../../features/tags/tag-items-dialog.component';
 import {
   ButtonComponent,
   ButtonLinkComponent,
@@ -32,6 +34,8 @@ import {
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
+  SheetBarComponent,
+  SheetBarTitleDirective,
   SkeletonComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
@@ -49,9 +53,12 @@ const PAGE_SIZE = 30;
     RouterLink,
     TranslatePipe,
     MoneyPipe,
-    PageHeaderComponent,
+    SheetBarComponent,
+    SheetBarTitleDirective,
     EntityThumbComponent,
     TagChipComponent,
+    TagStripComponent,
+    TagItemsDialogComponent,
     ButtonComponent,
     ButtonLinkComponent,
     ConfirmDialogComponent,
@@ -75,6 +82,10 @@ export class TagDetailComponent {
   private readonly title = inject(AppTitleStrategy);
   private readonly createSvc = inject(CreateService);
   private readonly ref = inject(RefDataService);
+  private readonly page = inject(LIST_PAGE_STATE, { optional: true });
+
+  /** The detail sits beside the list, so the sheet bar reaches into its padding. */
+  readonly split = computed(() => this.page?.split() ?? false);
 
   readonly id = input.required<string>();
 
@@ -93,6 +104,7 @@ export class TagDetailComponent {
   readonly itemsLoading = signal(true);
   readonly itemsMore = signal(false);
   private itemsPage = 1;
+  readonly assigning = signal(false);
 
   readonly children = computed(() =>
     this.ref
@@ -137,6 +149,11 @@ export class TagDetailComponent {
         else this.error.set(true);
       },
     });
+    this.loadItems(true);
+  }
+
+  onAssigned(): void {
+    this.assigning.set(false);
     this.loadItems(true);
   }
 

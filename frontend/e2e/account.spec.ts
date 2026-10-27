@@ -9,7 +9,7 @@ test('create and revoke an API key', async ({ signedIn: page }) => {
   await page.getByRole('dialog').getByRole('button', { name: 'Schließen' }).last().click();
 
   await expect(page.getByText('Backup-Skript')).toBeVisible();
-  await page.getByRole('button', { name: 'Aktionen' }).click();
+  await page.getByRole('button', { name: 'Aktionen', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Widerrufen' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Widerrufen' }).click();
   await expect(page.getByText('Backup-Skript')).toHaveCount(0);

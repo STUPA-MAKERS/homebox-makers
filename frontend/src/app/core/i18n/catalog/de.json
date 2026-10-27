@@ -436,5 +436,17 @@
   "search.group.pages": "Seiten",
   "search.group.items": "Gegenstände",
   "search.group.locations": "Orte",
-  "search.group.tags": "Tags"
+  "search.group.tags": "Tags",
+  "create.template": "Vorlage",
+  "tag.noChildren": "Keine Untertags",
+  "fab.item": "Gegenstand anlegen",
+  "fab.location": "Ort anlegen",
+  "fab.tag": "Tag anlegen",
+  "fab.template": "Vorlage anlegen",
+  "fab.notifier": "Benachrichtigung anlegen",
+  "tags.assign": "Tags zuweisen",
+  "tags.edit": "Tags ändern",
+  "common.done": "Fertig",
+  "tag.assignItems": "Gegenstände mit „{name}“",
+  "tag.assign": "Zuweisen"
 }

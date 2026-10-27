@@ -8,9 +8,6 @@
               (allCollapsed() ? 'locations.expandAll' : 'locations.collapseAll') | t
             }}</app-button>
           }
-          <app-button size="sm" (click)="newLocation()">
-            <span class="btn-label"><app-icon name="plus" />{{ 'create.location.short' | t }}</span>
-          </app-button>
         </ng-container>
       </app-page-header>
 
@@ -76,11 +73,18 @@
                     </button>
                   }
                 </span>
+                <app-row-menu
+                  trail
+                  [label]="('common.actions' | t) + ': ' + r.loc.name"
+                  [sections]="rowMenu()"
+                  (selected)="onRowMenu($event, r.loc)"
+                />
               </app-list-item>
             }
           </div>
         }
       </div>
+      <app-fab [label]="'fab.location' | t" [contained]="split()" (activate)="newLocation()" />
     </section>
 
     <div detail class="loc__detail">
@@ -88,3 +92,13 @@
     </div>
   </app-list-detail>
 </div>
+
+<app-confirm-dialog
+  [open]="deleting() !== null"
+  [title]="'location.deleteTitle' | t"
+  [body]="'location.deleteBody' | t: { name: deleting()?.name ?? '' }"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy()"
+  (confirm)="confirmDelete()"
+  (cancel)="deleting.set(null)"
+/>

@@ -20,9 +20,10 @@ import { entityLink, injectAttachmentUrl, photos } from '@shared/entity.util';
 import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
+import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import {
+  ButtonComponent,
   ButtonLinkComponent,
   ConfirmDialogComponent,
   EmptyStateComponent,
@@ -36,10 +37,14 @@ import {
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
+  SheetBarComponent,
+  SheetBarTitleDirective,
   SkeletonComponent,
+  StatusTextComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
 import { AttachmentsPanelComponent } from '../../features/attachments/attachments-panel.component';
+import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';
 import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-log.component';
 
@@ -57,7 +62,10 @@ import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-
     TranslatePipe,
     LocalizedDatePipe,
     MoneyPipe,
-    PageHeaderComponent,
+    SheetBarComponent,
+    SheetBarTitleDirective,
+    ButtonComponent,
+    StatusTextComponent,
     EntityThumbComponent,
     TagChipComponent,
     ButtonLinkComponent,
@@ -72,6 +80,7 @@ import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-
     NoteComponent,
     SkeletonComponent,
     AttachmentsPanelComponent,
+    TagAssignComponent,
     MaintenanceLogComponent,
   ],
   templateUrl: './item-detail.component.html',
@@ -86,6 +95,10 @@ export class ItemDetailComponent {
   private readonly createSvc = inject(CreateService);
   private readonly collections = inject(CollectionService);
   private readonly url = injectAttachmentUrl();
+  private readonly page = inject(LIST_PAGE_STATE, { optional: true });
+
+  /** The detail sits beside the list, so the sheet bar reaches into its padding. */
+  readonly split = computed(() => this.page?.split() ?? false);
 
   readonly id = input.required<string>();
 
@@ -185,6 +198,10 @@ export class ItemDetailComponent {
   }
 
   childLink = entityLink;
+
+  edit(): void {
+    void this.router.navigate(['/items', this.id(), 'edit']);
+  }
 
   openPhoto(index: number): void {
     this.viewerIndex.set(index);

@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   effect,
@@ -11,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { type Observable, concatMap, from, last, of, switchMap } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
-import type { EntityOut } from '@core/api/models';
+import type { EntityOut, EntityTemplateSummary } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
@@ -34,7 +35,9 @@ import { CreateService } from './create.service';
 
 /**
  * The create dialog of the app: a new item or location with name, type, place, tags,
- * description and optional photos. An item needs a location; a location may sit at the top.
+ * description and optional photos. A new item can start from a template: the type's
+ * default template is preselected, a chosen template fills in its defaults, and the server
+ * creates the item from it (custom fields, manufacturer, warranty and so on). An item needs a location; a location may sit at the top.
  * After the save the dialog opens the new entity, or stays open for the next one
  * ("Speichern & weiter").
  */
@@ -66,6 +69,7 @@ export class CreateDialogComponent {
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(I18nService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly request = this.create.request;
   readonly isLocation = computed(() => this.request()?.kind === 'location');
@@ -77,6 +81,8 @@ export class CreateDialogComponent {
   readonly parentId = signal('');
   readonly tagIds = signal<readonly string[]>([]);
   readonly photos = signal<File[]>([]);
+  readonly templates = signal<EntityTemplateSummary[]>([]);
+  readonly templateId = signal('');
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -85,6 +91,12 @@ export class CreateDialogComponent {
       value: t.id,
       label: t.name,
     })),
+  );
+
+  readonly templateOptions = computed<SelectFieldOption[]>(() =>
+    [...this.templates()]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((t) => ({ value: t.id, label: t.name })),
   );
 
   constructor() {
@@ -97,8 +109,41 @@ export class CreateDialogComponent {
         this.tagIds.set(req.tagId ? [req.tagId] : []);
         this.ref
           .ensureLoaded()
-          .subscribe(() => this.typeId.set(this.typeOptions()[0]?.value ?? ''));
+          .subscribe(() => this.setType(this.typeOptions()[0]?.value ?? ''));
+        if (req.kind === 'item') {
+          this.api.templates().subscribe({
+            next: (all) => this.templates.set(all ?? []),
+            error: () => this.templates.set([]),
+          });
+        }
       });
+    });
+  }
+
+  /** A new item type preselects its default template. */
+  setType(id: string): void {
+    this.typeId.set(id);
+    if (this.isLocation()) return;
+    const type = this.ref.itemTypes().find((t) => t.id === id);
+    if (type?.defaultTemplateId) this.setTemplate(type.defaultTemplateId);
+  }
+
+  /** A chosen template fills in its defaults; what the user already typed stays. */
+  setTemplate(id: string): void {
+    this.templateId.set(id);
+    if (!id) return;
+    this.api.template(id).subscribe((tpl) => {
+      if (this.templateId() !== id) return;
+      if (!this.name.trim() && tpl.defaultName) this.name = tpl.defaultName;
+      if (!this.description.trim() && tpl.defaultDescription) {
+        this.description = tpl.defaultDescription;
+      }
+      if (tpl.defaultQuantity > 0) this.quantity = String(tpl.defaultQuantity);
+      if (!this.parentId() && tpl.defaultLocation?.id) this.parentId.set(tpl.defaultLocation.id);
+      const tags = (tpl.defaultTags ?? []).map((t) => t.id);
+      if (tags.length) this.tagIds.update((cur) => [...new Set([...cur, ...tags])]);
+      // The text fields are plain ngModel fields, not signals.
+      this.cdr.markForCheck();
     });
   }
 
@@ -131,15 +176,18 @@ export class CreateDialogComponent {
     }
     this.error.set(null);
     this.busy.set(true);
-    this.api
-      .createEntity({
-        name: this.name.trim(),
-        description: this.description,
-        entityTypeId: this.typeId(),
-        parentId: this.parentId() || null,
-        quantity: location ? 1 : Math.max(1, Number(this.quantity) || 1),
-        tagIds: [...this.tagIds()],
-      })
+    const body = {
+      name: this.name.trim(),
+      description: this.description,
+      entityTypeId: this.typeId(),
+      quantity: location ? 1 : Math.max(1, Number(this.quantity) || 1),
+      tagIds: [...this.tagIds()],
+    };
+    const templateId = location ? '' : this.templateId();
+    const created = templateId
+      ? this.api.createFromTemplate(templateId, { ...body, parentId: this.parentId() })
+      : this.api.createEntity({ ...body, parentId: this.parentId() || null });
+    created
       .pipe(switchMap((entity) => this.uploadPhotos(entity)))
       .subscribe({
         next: (entity) => {
@@ -179,6 +227,7 @@ export class CreateDialogComponent {
     this.quantity = '1';
     this.description = '';
     this.photos.set([]);
+    this.templateId.set('');
     this.error.set(null);
     this.busy.set(false);
   }

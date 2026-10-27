@@ -436,5 +436,17 @@
   "search.group.pages": "Pages",
   "search.group.items": "Items",
   "search.group.locations": "Locations",
-  "search.group.tags": "Tags"
+  "search.group.tags": "Tags",
+  "create.template": "Template",
+  "tag.noChildren": "No sub-tags",
+  "fab.item": "Create item",
+  "fab.location": "Create location",
+  "fab.tag": "Create tag",
+  "fab.template": "Create template",
+  "fab.notifier": "Create notifier",
+  "tags.assign": "Assign tags",
+  "tags.edit": "Change tags",
+  "common.done": "Done",
+  "tag.assignItems": "Items with “{name}”",
+  "tag.assign": "Assign"
 }

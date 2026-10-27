@@ -15,6 +15,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterOutlet } from '@angular/router';
+import { CollectionService } from '@core/collection/collection.service';
+import { errorMessage } from '@shared/http-error';
 import { Subject, debounceTime, switchMap, catchError, of, tap } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
 import type { EntityListResult, EntityQuery, EntitySummary } from '@core/api/models';
@@ -26,13 +28,15 @@ import { injectListDetailPage } from '@shared/list-detail-page';
 import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
+import { FabComponent } from '@shared/ui/fab/fab.component';
+import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
+  ConfirmDialogComponent,
   EmptyStateComponent,
   FilterSelectComponent,
   type FilterSelectOption,
-  IconComponent,
   InfiniteScrollDirective,
   ListDetailLayoutComponent,
   ListItemComponent,
@@ -44,6 +48,7 @@ import {
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
+  ToastService,
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
 
@@ -73,9 +78,10 @@ const SORTS: readonly { value: string; key: TranslationKey }[] = [
     TranslatePipe,
     MoneyPipe,
     PageHeaderComponent,
+    FabComponent,
+    TagStripComponent,
     EntityThumbComponent,
     ButtonComponent,
-    IconComponent,
     ListItemComponent,
     EmptyStateComponent,
     NoteComponent,
@@ -84,6 +90,7 @@ const SORTS: readonly { value: string; key: TranslationKey }[] = [
     StickyBarComponent,
     FilterSelectComponent,
     RowMenuComponent,
+    ConfirmDialogComponent,
     InfiniteScrollDirective,
     ListDetailLayoutComponent,
     RouterOutlet,
@@ -99,6 +106,8 @@ export class ItemsListComponent {
   private readonly router = inject(Router);
   private readonly i18n = inject(I18nService);
   private readonly createSvc = inject(CreateService);
+  private readonly toast = inject(ToastService);
+  private readonly collections = inject(CollectionService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly ref = inject(RefDataService);
@@ -125,6 +134,11 @@ export class ItemsListComponent {
   readonly totalPrice = signal(0);
   readonly page = signal(1);
   readonly loading = signal(true);
+  /** The row whose deletion waits for the confirmation. */
+  readonly deleting = signal<EntitySummary | null>(null);
+  readonly busy = signal(false);
+  /** The first answer has come: a new filter then keeps the old rows until its answer. */
+  readonly loaded = signal(false);
   readonly loadingMore = signal(false);
   readonly error = signal(false);
   private readonly query$ = new Subject<EntityQuery>();
@@ -211,6 +225,7 @@ export class ItemsListComponent {
         this.loading.set(false);
         this.loadingMore.set(false);
         if (!res) return;
+        this.loaded.set(true);
         this.total.set(res.total);
         this.totalPrice.set(res.totalPrice);
         this.items.update((cur) => (first ? (res.items ?? []) : [...cur, ...(res.items ?? [])]));
@@ -308,11 +323,99 @@ export class ItemsListComponent {
     });
   }
 
-  /** Location path and tags of a row, as its second line. */
+  /** The actions of a row, the same as in the menu of the item itself. */
+  rowMenu(item: EntitySummary): RowMenuSection[] {
+    return [
+      {
+        items: [
+          { id: 'edit', label: this.i18n.translate('common.edit'), icon: 'edit' },
+          { id: 'duplicate', label: this.i18n.translate('item.duplicate'), icon: 'copy' },
+          { id: 'label', label: this.i18n.translate('item.label'), icon: 'printer' },
+          {
+            id: 'archive',
+            label: this.i18n.translate(item.archived ? 'item.unarchive' : 'item.archive'),
+            icon: 'archive',
+          },
+        ],
+      },
+      {
+        items: [
+          { id: 'delete', label: this.i18n.translate('common.delete'), icon: 'trash', danger: true },
+        ],
+      },
+    ];
+  }
+
+  onRowMenu(action: RowMenuItem, item: EntitySummary): void {
+    switch (action.id) {
+      case 'edit':
+        void this.router.navigate(['/items', item.id, 'edit']);
+        break;
+      case 'duplicate':
+        this.api
+          .duplicateEntity(item.id, {
+            copyAttachments: true,
+            copyCustomFields: true,
+            copyMaintenance: false,
+            copyPrefix: this.i18n.translate('item.copyPrefix'),
+          })
+          .subscribe({
+            next: (copy) => {
+              this.toast.show(this.i18n.translate('item.duplicated'), 'success');
+              void this.router.navigate(['/items', copy.id], { queryParamsHandling: 'preserve' });
+            },
+            error: (err) => this.fail(err),
+          });
+        break;
+      case 'label':
+        window.open(this.api.labelUrl(item.id, this.collections.selectedId()), '_blank', 'noopener');
+        break;
+      case 'archive':
+        this.api.entity(item.id).pipe(
+          switchMap((full) =>
+            this.api.updateEntity(full.id, {
+              ...full,
+              archived: !full.archived,
+              entityTypeId: full.entityType?.id ?? '',
+              parentId: full.parent?.id ?? null,
+              tagIds: full.tags.map((t) => t.id),
+            }),
+          ),
+        ).subscribe({ error: (err) => this.fail(err) });
+        break;
+      case 'delete':
+        this.deleting.set(item);
+        break;
+    }
+  }
+
+  confirmDelete(): void {
+    const item = this.deleting();
+    if (!item) return;
+    this.busy.set(true);
+    this.api.deleteEntity(item.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.deleting.set(null);
+        this.toast.show(this.i18n.translate('item.deleted', { name: item.name }), 'success');
+        if (this.selectedId() === item.id) this.closeDetail();
+      },
+      error: (err) => {
+        this.busy.set(false);
+        this.deleting.set(null);
+        this.fail(err);
+      },
+    });
+  }
+
+  private fail(err: unknown): void {
+    this.toast.show(errorMessage(err, this.i18n.translate('common.error')), 'danger');
+  }
+
+  /** The location of a row, as its second line; the tags show at its end. */
   subLine(item: EntitySummary): string {
     const parts: string[] = [];
     if (item.parent) parts.push(item.parent.name);
-    if (item.tags?.length) parts.push(item.tags.map((t) => t.name).join(', '));
     return parts.join(' · ');
   }
 

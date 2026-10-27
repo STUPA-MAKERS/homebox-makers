@@ -21,7 +21,7 @@ test('main pages load cleanly', async ({ signedIn: page }) => {
   ]) {
     await page.goto(path);
     // A list page beside its detail has two headings; on a phone one of them is hidden.
-    await expect(page.locator('h1').filter({ visible: true }).first()).toBeAttached();
+    await expect(page.locator('h1, h2').filter({ visible: true }).first()).toBeAttached();
   }
   expect(errors).toEqual([]);
 });

@@ -38,6 +38,8 @@
   .#{$b}__scroll {
     @include lp.scroll(--#{$b}-fade);
     gap: var(--space-3);
+    // The rows end above the floating button (`app-fab`).
+    padding-bottom: calc(56px + var(--space-6));
   }
   .#{$b}:not(.#{$b}--split) .#{$b}__scroll {
     flex: 1 0 auto;
@@ -57,7 +59,8 @@
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: var(--space-5) var(--space-6) var(--space-6);
+    // The sheet bar of the detail opens the sheet, so the sheet has no top padding.
+    padding: 0 var(--space-6) var(--space-6);
     border-radius: var(--radius-2xl);
     background: var(--color-surface-1);
   }

@@ -1,6 +1,7 @@
 // The design system of the kit: fonts, tokens, base reset, skeletons, row groups and the
 // list/detail geometry (vendor/ui-kit/src/styles/index.scss).
 @use 'index';
+@use 'breakpoints' as bp;
 
 // The utilities the kit's templates use (tailwind.config.js); preflight is off.
 @tailwind utilities;
@@ -38,6 +39,162 @@
   width: 100%;
   max-width: var(--layout-max-width);
   margin-inline: auto;
+}
+// The head of a detail sheet (STUPA-Workflow): the bar with the title and the actions
+// (`app-sheet-bar`), a muted line with the context, a rule below.
+.sheet-title {
+  margin: 0;
+  font-size: var(--fs-d2);
+  line-height: var(--lh-d2);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  overflow-wrap: anywhere;
+}
+.sheet-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  margin: 0;
+  min-width: 0;
+  color: var(--color-text-muted);
+  font-size: var(--fs-md);
+  line-height: var(--lh-h3);
+}
+.sheet-line a {
+  color: inherit;
+  text-decoration: none;
+}
+.sheet-line a:hover {
+  color: var(--color-accent-text);
+}
+.sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 22px;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+@include bp.phone {
+  .sheet-title {
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+  }
+}
+
+// The two columns of a detail sheet: they sit side by side while the sheet is wide enough
+// and wrap below each other otherwise, whatever the viewport.
+.sheet-cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  align-items: flex-start;
+}
+.sheet-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.sheet-col:first-child {
+  flex: 1.4 1 0;
+  min-width: min(100%, 22.5rem);
+}
+.sheet-col:last-child {
+  flex: 1 1 0;
+  min-width: min(100%, 20rem);
+}
+
+// The sheet itself, its sections and the pairs of field rows (`td__*` in STUPA-Workflow).
+.sheet {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+.sheet-dot {
+  color: var(--color-text-subtle);
+}
+.sheet-crumbs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  min-width: 0;
+}
+.sheet-crumbs app-icon {
+  color: var(--color-text-subtle);
+}
+.sheet-desc {
+  margin: 0;
+  color: var(--color-text);
+  white-space: pre-line;
+}
+.sheet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.sheet-sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.sheet-sec > .sec,
+.sheet-sec__head > .sec {
+  padding: 0 var(--space-1);
+}
+.sheet-sec__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+}
+.sheet-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+}
+.sheet-pair > * {
+  border-radius: 4px;
+  background: var(--color-surface-2);
+}
+.sheet-pair:first-child > :first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+.sheet-pair:first-child > :last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+.sheet-pair:last-child > :first-child {
+  border-bottom-left-radius: var(--radius-lg);
+}
+.sheet-pair:last-child > :last-child {
+  border-bottom-right-radius: var(--radius-lg);
+}
+.sheet-link {
+  color: var(--color-accent-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+@media (hover: hover) {
+  .sheet-link:hover {
+    text-decoration: underline;
+  }
+}
+.sheet-foot {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+// A page on a `wide` route that uses the whole width beside the rail (the start page).
+.page--wide {
+  max-width: none;
 }
 
 // A form inside a card or a dialog: one field per row, the actions at the end.
@@ -146,4 +303,41 @@
 .stat__label {
   font-size: var(--fs-sm);
   color: var(--color-text-muted);
+}
+
+// The motion utilities of STUPA-Workflow, for `animate.enter` / `animate.leave`.
+.motion-pop-in {
+  animation: motion-pop-in var(--motion-fast) var(--ease-enter);
+}
+.motion-rise-in {
+  animation: motion-rise-in var(--motion-base) var(--ease-enter);
+}
+.motion-fade-in {
+  animation: motion-fade-in var(--motion-base) var(--ease-standard);
+}
+.motion-fade-out {
+  pointer-events: none;
+  animation: motion-fade-out var(--motion-xs) var(--ease-exit) forwards;
+}
+@keyframes motion-pop-in {
+  from {
+    opacity: 0;
+    scale: var(--motion-scale-in);
+  }
+}
+@keyframes motion-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-shift-sm));
+  }
+}
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes motion-fade-out {
+  to {
+    opacity: 0;
+  }
 }

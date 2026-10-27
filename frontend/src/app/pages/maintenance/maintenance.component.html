@@ -13,18 +13,18 @@
   <section class="mt__stats" [attr.aria-label]="'home.stats' | t">
     <div class="stat">
       <span class="stat__icon"><app-icon name="wrench" [size]="20" /></span>
-      <span class="stat__value num">{{ loading() ? '–' : entries().length }}</span>
+      <span class="stat__value num">{{ !loaded() ? '–' : entries().length }}</span>
       <span class="stat__label">{{ 'maint.count' | t }}</span>
     </div>
     <div class="stat">
       <span class="stat__icon"><app-icon name="euro" [size]="20" /></span>
-      <span class="stat__value num">{{ loading() ? '–' : (totalCost() | money) }}</span>
+      <span class="stat__value num">{{ !loaded() ? '–' : (totalCost() | money) }}</span>
       <span class="stat__label">{{ 'maint.totalCost' | t }}</span>
     </div>
     @if (filter() !== 'completed') {
       <div class="stat">
         <span class="stat__icon"><app-icon name="alert" [size]="20" /></span>
-        <span class="stat__value num">{{ loading() ? '–' : overdueCount() }}</span>
+        <span class="stat__value num">{{ !loaded() ? '–' : overdueCount() }}</span>
         <span class="stat__label">{{ 'maint.overdue' | t }}</span>
       </div>
     }
@@ -34,7 +34,7 @@
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{
       'common.loadError' | t
     }}</app-note>
-  } @else if (loading()) {
+  } @else if (!loaded()) {
     <app-skeleton variant="rows" [count]="5" [lead]="true" [label]="'common.loading' | t" />
   } @else if (sorted().length === 0) {
     <app-empty-state

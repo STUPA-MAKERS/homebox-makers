@@ -1,4 +1,22 @@
-.td__dot {
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+.detail {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tg__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.tg__dot {
   flex: none;
   width: 14px;
   height: 14px;
@@ -6,28 +24,15 @@
   background: var(--color-accent);
 }
 
-.td__block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+.tg__title {
+  display: inline-flex;
+  gap: var(--space-2);
 }
 
-.td__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-
-  .section-title {
-    display: inline-flex;
-    gap: var(--space-2);
-    margin: 0;
-  }
-}
-
-.td__more {
+.tg__more {
+  margin-inline-start: auto;
   font-size: var(--fs-small);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   text-decoration: none;
 
   &:hover {
@@ -35,18 +40,19 @@
   }
 }
 
-.td__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+.tg__chips {
+  padding: 0 var(--space-1);
 }
 
-.td__trail {
+.tg__trail {
   display: inline-flex;
   gap: var(--space-2);
 }
 
-.td__sum {
+.tg__empty,
+.tg__sum {
   margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-text-muted);
   font-size: var(--fs-small);
 }

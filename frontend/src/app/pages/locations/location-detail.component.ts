@@ -20,8 +20,9 @@ import { AppTitleStrategy } from '@core/title/title.strategy';
 import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
+import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
+import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
 import {
   ButtonComponent,
   ButtonLinkComponent,
@@ -34,10 +35,13 @@ import {
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
+  SheetBarComponent,
+  SheetBarTitleDirective,
   SkeletonComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
 import { AttachmentsPanelComponent } from '../../features/attachments/attachments-panel.component';
+import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';
 
 const PAGE_SIZE = 30;
@@ -54,9 +58,11 @@ const PAGE_SIZE = 30;
     RouterLink,
     TranslatePipe,
     MoneyPipe,
-    PageHeaderComponent,
+    SheetBarComponent,
+    SheetBarTitleDirective,
     EntityThumbComponent,
     TagChipComponent,
+    TagStripComponent,
     ButtonComponent,
     ButtonLinkComponent,
     ConfirmDialogComponent,
@@ -68,6 +74,7 @@ const PAGE_SIZE = 30;
     RowMenuComponent,
     SkeletonComponent,
     AttachmentsPanelComponent,
+    TagAssignComponent,
   ],
   templateUrl: './location-detail.component.html',
   styleUrl: './location-detail.component.scss',
@@ -81,6 +88,10 @@ export class LocationDetailComponent {
   private readonly createSvc = inject(CreateService);
   private readonly collections = inject(CollectionService);
   private readonly ref = inject(RefDataService);
+  private readonly page = inject(LIST_PAGE_STATE, { optional: true });
+
+  /** The detail sits beside the list, so the sheet bar reaches into its padding. */
+  readonly split = computed(() => this.page?.split() ?? false);
 
   readonly id = input.required<string>();
 
@@ -186,6 +197,11 @@ export class LocationDetailComponent {
   /** The location of an item when it is in a sub-location, as its second line. */
   subLine(item: EntitySummary): string | null {
     return item.parent && item.parent.id !== this.id() ? item.parent.name : null;
+  }
+
+  edit(): void {
+    const loc = this.location();
+    if (loc) void this.router.navigate(['/locations', loc.id, 'edit']);
   }
 
   addSub(): void {

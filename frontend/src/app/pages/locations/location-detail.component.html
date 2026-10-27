@@ -1,4 +1,4 @@
-<div class="page">
+<div class="detail">
   @if (loading() && !location()) {
     <app-skeleton variant="panel" [label]="'common.loading' | t" />
   } @else if (notFound()) {
@@ -15,51 +15,63 @@
       'common.loadError' | t
     }}</app-note>
   } @else if (location(); as loc) {
-    @if (crumbs().length) {
-      <nav class="crumbs" [attr.aria-label]="'item.path' | t">
-        @for (c of crumbs(); track c.id; let last = $last) {
-          <a [routerLink]="crumbLink(c)">{{ c.name }}</a>
-          @if (!last) {
-            <app-icon name="chevron-right" [size]="14" />
+    <article class="sheet" animate.enter="motion-fade-in" aria-labelledby="ld-title">
+      <header class="sheet-head">
+        <app-sheet-bar [bleed]="split()">
+          <h2 appSheetBarTitle id="ld-title" class="sheet-title">{{ loc.name }}</h2>
+          <app-button
+            variant="text"
+            [iconOnly]="true"
+            [ariaLabel]="'common.edit' | t"
+            (click)="edit()"
+          ><app-icon name="edit" /></app-button>
+          <app-row-menu
+            [label]="'common.actions' | t"
+            [sections]="menu()"
+            (selected)="onMenu($event)"
+          />
+        </app-sheet-bar>
+        @if (crumbs().length || loc.entityType) {
+          <p class="sheet-line">
+            @if (crumbs().length) {
+              <span class="sheet-crumbs" role="navigation" [attr.aria-label]="'item.path' | t">
+                @for (c of crumbs(); track c.id; let last = $last) {
+                  <a [routerLink]="crumbLink(c)">{{ c.name }}</a>
+                  @if (!last) {
+                    <app-icon name="chevron-right" [size]="14" />
+                  }
+                }
+              </span>
+            }
+            @if (loc.entityType) {
+              @if (crumbs().length) {
+                <span class="sheet-dot" aria-hidden="true">·</span>
+              }
+              <span>{{ loc.entityType.name }}</span>
+            }
+          </p>
+        }
+        @if (loc.description) {
+          <p class="sheet-desc">{{ loc.description }}</p>
+        }
+        <div class="sheet-chips">
+          @for (tag of loc.tags; track tag.id) {
+            <app-tag-chip [tag]="tag" />
           }
-        }
-      </nav>
-    }
+          <app-tag-assign [entity]="loc" (changed)="location.set($event)" />
+        </div>
+      </header>
 
-    <app-page-header [title]="loc.name" [meta]="loc.entityType?.name ?? null" [flush]="true">
-      <ng-container ngProjectAs="[actions]">
-        <a appButton="tonal" size="sm" [routerLink]="['/locations', loc.id, 'edit']">
-          <span class="btn-label"><app-icon name="edit" />{{ 'common.edit' | t }}</span>
-        </a>
-        <app-row-menu
-          [label]="'common.actions' | t"
-          [sections]="menu()"
-          (selected)="onMenu($event)"
-        />
-      </ng-container>
-    </app-page-header>
-
-    @if (loc.description) {
-      <p class="desc">{{ loc.description }}</p>
-    }
-    @if (loc.tags.length) {
-      <div class="ld__tags">
-        @for (tag of loc.tags; track tag.id) {
-          <app-tag-chip [tag]="tag" />
-        }
-      </div>
-    }
-
-    <div class="ld">
-      <div class="ld__col">
-        <section class="ld__block" aria-labelledby="ld-items">
-          <div class="ld__head">
-            <h2 class="section-title" id="ld-items">
+      <div class="sheet-cols">
+      <div class="sheet-col">
+        <section class="sheet-sec" aria-labelledby="ld-items">
+          <div class="sheet-sec__head">
+            <h3 class="sec ld__title" id="ld-items">
               {{ 'nav.items' | t }}
               @if (!itemsLoading()) {
                 <span class="muted num">{{ itemsTotal() }}</span>
               }
-            </h2>
+            </h3>
             @if (itemsTotal() > 0) {
               <a class="ld__more" routerLink="/items" [queryParams]="{ loc: loc.id }">{{
                 'location.openInList' | t
@@ -69,7 +81,7 @@
           @if (itemsLoading()) {
             <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
           } @else if (items().length === 0) {
-            <p class="muted">{{ 'location.noItems' | t }}</p>
+            <p class="ld__empty">{{ 'location.noItems' | t }}</p>
           } @else {
             <div class="rowgroup">
               @for (item of items(); track item.id) {
@@ -83,9 +95,7 @@
                     @if (item.quantity > 1) {
                       <span class="num">{{ item.quantity }}×</span>
                     }
-                    @if (item.purchasePrice) {
-                      <span class="num muted">{{ item.purchasePrice | money }}</span>
-                    }
+                    <app-tag-strip [tags]="item.tags" />
                   </span>
                 </app-list-item>
               }
@@ -105,18 +115,18 @@
         </section>
       </div>
 
-      <div class="ld__col">
-        <section class="ld__block" aria-labelledby="ld-subs">
-          <div class="ld__head">
-            <h2 class="section-title" id="ld-subs">{{ 'location.subLocations' | t }}</h2>
-            <app-button variant="tonal" size="sm" (click)="addSub()">
+      <div class="sheet-col">
+        <section class="sheet-sec" aria-labelledby="ld-subs">
+          <div class="sheet-sec__head">
+            <h3 class="sec ld__title" id="ld-subs">{{ 'location.subLocations' | t }}</h3>
+            <app-button variant="text" size="sm" (click)="addSub()">
               <span class="btn-label"
                 ><app-icon name="plus" />{{ 'create.location.short' | t }}</span
               >
             </app-button>
           </div>
           @if (subLocations().length === 0) {
-            <p class="muted">{{ 'location.noSubs' | t }}</p>
+            <p class="ld__empty">{{ 'location.noSubs' | t }}</p>
           } @else {
             <div class="rowgroup">
               @for (sub of subLocations(); track sub.id) {
@@ -137,13 +147,14 @@
         <app-attachments-panel [entity]="loc" (changed)="location.set($event)" />
 
         @if (loc.notes) {
-          <section class="ld__block" aria-labelledby="ld-notes">
-            <h2 class="section-title" id="ld-notes">{{ 'item.notes' | t }}</h2>
-            <p class="desc">{{ loc.notes }}</p>
+          <section class="sheet-sec" aria-labelledby="ld-notes">
+            <h3 class="sec ld__title" id="ld-notes">{{ 'item.notes' | t }}</h3>
+            <p class="ld__notes">{{ loc.notes }}</p>
           </section>
         }
       </div>
-    </div>
+      </div>
+    </article>
 
     <app-confirm-dialog
       [open]="confirmDelete()"

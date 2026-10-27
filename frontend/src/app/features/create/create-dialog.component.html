@@ -6,6 +6,15 @@
   (closed)="close()"
 >
   <form class="form-stack" id="create-form" (ngSubmit)="save()" novalidate>
+    @if (!isLocation() && templateOptions().length) {
+      <app-select
+        [label]="'create.template' | t"
+        [placeholder]="'types.noTemplate' | t"
+        [options]="templateOptions()"
+        [value]="templateId()"
+        (valueChange)="setTemplate($event)"
+      />
+    }
     <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="name" />
     <div class="form-grid">
       @if (typeOptions().length > 1) {
@@ -14,7 +23,7 @@
           [options]="typeOptions()"
           [clearable]="false"
           [value]="typeId()"
-          (valueChange)="typeId.set($event)"
+          (valueChange)="setType($event)"
         />
       }
       @if (!isLocation()) {

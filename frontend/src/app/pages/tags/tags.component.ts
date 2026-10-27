@@ -13,13 +13,14 @@ import { ApiClient } from '@core/api/api-client.service';
 import type { TagOut } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
+import { I18nService } from '@core/i18n/i18n.service';
+import { errorMessage } from '@shared/http-error';
 import { injectListDetailPage } from '@shared/list-detail-page';
 import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
-  ButtonComponent,
   EmptyStateComponent,
-  IconComponent,
   ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
@@ -27,6 +28,11 @@ import {
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
+  ConfirmDialogComponent,
+  RowMenuComponent,
+  type RowMenuItem,
+  type RowMenuSection,
+  ToastService,
 } from '@stupa-makers/ui-kit';
 import { TagDialogComponent } from '../../features/tags/tag-dialog.component';
 
@@ -43,14 +49,15 @@ interface TagRow {
   imports: [
     TranslatePipe,
     PageHeaderComponent,
-    ButtonComponent,
+    FabComponent,
     EmptyStateComponent,
-    IconComponent,
     ListItemComponent,
     NoteComponent,
     SearchPillComponent,
     SkeletonComponent,
     StickyBarComponent,
+    RowMenuComponent,
+    ConfirmDialogComponent,
     TagDialogComponent,
     ListDetailLayoutComponent,
     RouterOutlet,
@@ -62,13 +69,7 @@ interface TagRow {
     <div class="tg" [class.tg--split]="split()">
       <app-list-detail [detailOpen]="selectedId() !== null" (back)="closeDetail()">
         <section list class="ld-pane tg__pane" aria-labelledby="tg-title">
-          <app-page-header [pane]="true" titleId="tg-title" [title]="'nav.tags' | t">
-            <ng-container ngProjectAs="[actions]">
-              <app-button size="sm" (click)="creating.set(true)">
-                <span class="btn-label"><app-icon name="plus" />{{ 'tag.short' | t }}</span>
-              </app-button>
-            </ng-container>
-          </app-page-header>
+          <app-page-header [pane]="true" titleId="tg-title" [title]="'nav.tags' | t" />
 
           @if (ref.tags().length > 8) {
             <app-sticky-bar class="ld-pane__filters">
@@ -113,11 +114,18 @@ interface TagRow {
                     <span lead class="tg__lead" [style.margin-left.px]="r.depth * 20">
                       <span class="tg__dot" [style.background]="r.tag.color || null"></span>
                     </span>
+                    <app-row-menu
+                      trail
+                      [label]="('common.actions' | t) + ': ' + r.tag.name"
+                      [sections]="rowMenu()"
+                      (selected)="onRowMenu($event, r.tag)"
+                    />
                   </app-list-item>
                 }
               </div>
             }
           </div>
+          <app-fab [label]="'fab.tag' | t" [contained]="split()" (activate)="creating.set(true)" />
         </section>
         <div detail class="tg__detail">
           <router-outlet />
@@ -129,6 +137,27 @@ interface TagRow {
       [open]="creating()"
       (closed)="creating.set(false)"
       (saved)="onCreated($event)"
+    />
+    <app-tag-dialog
+      [open]="editing() !== null"
+      [tag]="editing()"
+      (closed)="editing.set(null)"
+      (saved)="editing.set(null); ref.reload().subscribe()"
+    />
+    <app-tag-dialog
+      [open]="subOf() !== null"
+      [parent]="subOf()?.id ?? null"
+      (closed)="subOf.set(null)"
+      (saved)="subOf.set(null); onCreated($event)"
+    />
+    <app-confirm-dialog
+      [open]="deleting() !== null"
+      [title]="'tag.deleteTitle' | t"
+      [body]="'tag.deleteBody' | t: { name: deleting()?.name ?? '' }"
+      [confirmLabel]="'common.delete' | t"
+      [busy]="busy()"
+      (confirm)="confirmDelete()"
+      (cancel)="deleting.set(null)"
     />
   `,
   styleUrl: './tags.component.scss',
@@ -147,6 +176,55 @@ export class TagsComponent {
   readonly error = signal(false);
   readonly search = signal('');
   readonly creating = signal(false);
+  readonly editing = signal<TagOut | null>(null);
+  readonly subOf = signal<TagOut | null>(null);
+  /** The row whose deletion waits for the confirmation. */
+  readonly deleting = signal<TagOut | null>(null);
+  readonly busy = signal(false);
+
+  private readonly api = inject(ApiClient);
+  private readonly i18n = inject(I18nService);
+  private readonly toast = inject(ToastService);
+
+  readonly rowMenu = computed<RowMenuSection[]>(() => [
+    {
+      items: [
+        { id: 'edit', label: this.i18n.translate('common.edit'), icon: 'edit' },
+        { id: 'sub', label: this.i18n.translate('tag.addSub'), icon: 'plus' },
+      ],
+    },
+    {
+      items: [
+        { id: 'delete', label: this.i18n.translate('common.delete'), icon: 'trash', danger: true },
+      ],
+    },
+  ]);
+
+  onRowMenu(action: RowMenuItem, tag: TagOut): void {
+    if (action.id === 'edit') this.editing.set(tag);
+    if (action.id === 'sub') this.subOf.set(tag);
+    if (action.id === 'delete') this.deleting.set(tag);
+  }
+
+  confirmDelete(): void {
+    const tag = this.deleting();
+    if (!tag) return;
+    this.busy.set(true);
+    this.api.deleteTag(tag.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.deleting.set(null);
+        this.toast.show(this.i18n.translate('tag.deleted', { name: tag.name }), 'success');
+        this.ref.reload().subscribe();
+        if (this.selectedId() === tag.id) void this.router.navigate(['/tags']);
+      },
+      error: (err) => {
+        this.busy.set(false);
+        this.deleting.set(null);
+        this.toast.show(errorMessage(err, this.i18n.translate('common.error')), 'danger');
+      },
+    });
+  }
 
   readonly rows = computed<TagRow[]>(() => {
     const all = this.ref.tags();

@@ -18,6 +18,8 @@ export interface ListPageState {
   readonly loading: Signal<boolean>;
   readonly error: Signal<boolean>;
   readonly hasRows: Signal<boolean>;
+  /** The list and the detail sit side by side (the detail is a sheet beside the list). */
+  readonly split: Signal<boolean>;
 }
 
 /** Provided by a list page with a detail outlet (`useExisting` the page). */

@@ -24,7 +24,7 @@ test('create a tag, give it to an item and find the item under the tag', async (
   const item = await createItem(page, 'Lötstation', loc);
 
   await page.goto('/tags');
-  await page.getByRole('button', { name: 'Tag' }).click();
+  await page.getByRole('button', { name: 'Tag anlegen' }).click();
   await page.getByRole('dialog').getByLabel('Name').fill('Elektronik');
   await page.getByRole('dialog').getByRole('button', { name: 'Anlegen' }).click();
   await page.waitForURL('**/tags/*');

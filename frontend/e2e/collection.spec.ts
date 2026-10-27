@@ -1,8 +1,8 @@
-import { createItem, createLocation, expect, test } from './fixtures';
+import { api, createItem, createLocation, expect, test } from './fixtures';
 
 test('entity types and templates', async ({ signedIn: page }) => {
   await page.goto('/collection/templates');
-  await page.getByRole('button', { name: 'Neue Vorlage' }).click();
+  await page.getByRole('button', { name: 'Vorlage anlegen' }).click();
   await page.getByRole('dialog').getByLabel('Name').fill('Werkzeug-Vorlage');
   await page.getByRole('dialog').getByRole('button', { name: 'Anlegen' }).click();
   await page.waitForURL('**/collection/templates/*');
@@ -19,7 +19,7 @@ test('entity types and templates', async ({ signedIn: page }) => {
 
 test('notifiers and backups', async ({ signedIn: page }) => {
   await page.goto('/collection/notifiers');
-  await page.getByRole('button', { name: 'Neue Benachrichtigung' }).click();
+  await page.getByRole('button', { name: 'Benachrichtigung anlegen' }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Name').fill('Telefon');
   // The server resolves the host of a notifier URL; an address needs no DNS in CI.
@@ -48,4 +48,36 @@ test('global search finds items, places and pages', async ({ signedIn: page }) =
   await dialog.getByRole('combobox').fill('werkz');
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/collection\/tools/);
+});
+
+test('create an item from a template', async ({ signedIn: page }) => {
+  await createLocation(page, 'Werkstatt');
+  await api(page, 'post', '/templates', {
+    name: 'Bosch-Werkzeug',
+    description: '',
+    notes: '',
+    fields: [],
+    defaultName: 'Bosch ',
+    defaultManufacturer: 'Bosch',
+    defaultInsured: false,
+    defaultLifetimeWarranty: false,
+    defaultQuantity: 1,
+    includePurchaseFields: false,
+    includeSoldFields: false,
+    includeWarrantyFields: false,
+  });
+
+  await page.goto('/items');
+  await page.getByRole('button', { name: 'Gegenstand anlegen' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('combobox', { name: 'Vorlage' }).click();
+  await page.getByRole('option', { name: 'Bosch-Werkzeug' }).click();
+  await expect(dialog.getByLabel('Name')).toHaveValue('Bosch ');
+  await dialog.getByLabel('Name').fill('Bosch Stichsäge');
+  await dialog.getByRole('combobox', { name: /Ort/ }).click();
+  await page.getByRole('option', { name: 'Werkstatt' }).click();
+  await dialog.getByRole('button', { name: 'Anlegen' }).click();
+  await page.waitForURL('**/items/*');
+  await expect(page.locator('app-item-detail')).toContainText('Bosch');
+  await expect(page.getByRole('heading', { name: 'Bosch Stichsäge' })).toBeVisible();
 });

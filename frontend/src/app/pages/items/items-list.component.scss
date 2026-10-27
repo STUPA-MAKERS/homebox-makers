@@ -37,3 +37,13 @@
   text-align: end;
   font-size: var(--fs-small);
 }
+
+// A new filter keeps the old rows, a little faded, until its answer replaces them.
+.il__rows {
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+.il__rows--busy {
+  opacity: 0.6;
+  // A quick answer replaces the rows before they fade.
+  transition-delay: 150ms;
+}
