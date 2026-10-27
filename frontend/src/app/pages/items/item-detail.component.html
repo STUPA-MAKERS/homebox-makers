@@ -252,7 +252,21 @@
     </div>
     </article>
 
-    <app-file-viewer [items]="viewerItems()" [(index)]="viewerIndex" [(open)]="viewerOpen" />
+    <app-file-viewer [items]="viewerItems()" [(index)]="viewerIndex" [(open)]="viewerOpen">
+      @if (viewerItems()[viewerIndex()]; as photo) {
+        <a
+          viewerActions
+          class="fv__btn"
+          [href]="photo.url"
+          [attr.download]="photo.name"
+          [attr.aria-label]="'item.downloadPhoto' | t"
+          [title]="'item.downloadPhoto' | t"
+        >
+          <app-icon name="download" [size]="20" />
+        </a>
+      }
+    </app-file-viewer>
+    <app-label-viewer [target]="it" [(open)]="labelOpen" />
 
     <app-confirm-dialog
       [open]="confirmDelete()"

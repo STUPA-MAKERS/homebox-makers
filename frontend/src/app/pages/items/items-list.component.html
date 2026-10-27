@@ -136,4 +136,6 @@
     (confirm)="confirmDelete()"
     (cancel)="deleting.set(null)"
   />
+
+  <app-label-viewer [target]="labelTarget()" [(open)]="labelOpen" />
 </div>

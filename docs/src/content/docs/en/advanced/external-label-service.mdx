@@ -23,21 +23,20 @@ The service is called using an **HTTP `GET` request**.  All parameters are passe
 
 ### Parameters
 
-| Parameter             | Type   | Description                                  | Value                                                                 |
-|-----------------------|--------|----------------------------------------------|-----------------------------------------------------------------------|
-| AdditionalInformation | string | Extra free text to include on the label.     | `HBOX_LABEL_MAKER_ADDITIONAL_INFORMATION`                             |
-| ComponentPadding      | int    | Padding around label components (pixels).    | `HBOX_LABEL_MAKER_PADDING`                                            |
-| DescriptionFontSize   | float  | Font size for the description text.          |                                                                       |
-| DescriptionText       | string | Descriptive text, can be multi-line.         | Item name or "Homebox Location"                                       |
-| Dpi                   | float  | Rendering resolution (dots per inch).        |                                                                       |
-| DynamicLength         | bool   | Whether the label length should auto-adjust. | `HBOX_LABEL_MAKER_DYNAMIC_LENGTH`                                     |
-| Height                | int    | Label height in pixels.                      | `HBOX_LABEL_MAKER_HEIGHT`                                             |
-| Margin                | int    | Margin around the label in pixels.           | `HBOX_LABEL_MAKER_MARGIN`                                             |
-| QrSize                | int    | Size of the QR code element in pixels.       |                                                                       |
-| TitleFontSize         | float  | Font size for the title text.                |                                                                       |
-| TitleText             | string | Main label title (e.g. product code).        | Asset ID or Location Name                                             |
-| URL                   | string | URL to be encoded into the QR code.          | Generated based on the configured homebox URL and Asset / Location ID |
-| Width                 | int    | Label width in pixels.                       | `HBOX_LABEL_MAKER_WIDTH`                                              |
+| Parameter             | Type   | Description                                         | Value                                                                 |
+|-----------------------|--------|-----------------------------------------------------|-----------------------------------------------------------------------|
+| AdditionalInformation | string | Extra free text to include on the label.            | `HBOX_LABEL_MAKER_ADDITIONAL_INFORMATION`                             |
+| AssetID               | string | Asset ID of the item or location (e.g. `MK-0023`).  | Empty if the entity has none                                          |
+| DescriptionText       | string | Description, can be multi-line.                     | Description of the item or location                                   |
+| Dpi                   | float  | Rendering resolution (dots per inch).               | `HBOX_LABEL_MAKER_DPI`                                                |
+| Height                | int    | Label length in pixels at `Dpi`.                    | Derived from `HBOX_LABEL_MAKER_LENGTH`                                |
+| Length                | float  | Label length in mm.                                 | `HBOX_LABEL_MAKER_LENGTH`                                             |
+| Maker                 | string | Manufacturer of the item.                           |                                                                       |
+| Model                 | string | Model number of the item.                           |                                                                       |
+| TapeWidth             | float  | Tape width in mm.                                   | `HBOX_LABEL_MAKER_TAPE_WIDTH`                                         |
+| TitleText             | string | Main label title.                                   | Item or location name                                                 |
+| URL                   | string | URL to be encoded into the QR code.                 | Generated based on the configured homebox URL and item / asset ID     |
+| Width                 | int    | Tape width in pixels at `Dpi`.                      | Derived from `HBOX_LABEL_MAKER_TAPE_WIDTH`                            |
 
 ## Response
 

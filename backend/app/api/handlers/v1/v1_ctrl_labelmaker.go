@@ -13,8 +13,21 @@ import (
 	"github.com/sysadminsmedia/homebox/backend/pkgs/labelmaker"
 )
 
-func generateOrPrint(ctrl *V1Controller, w http.ResponseWriter, r *http.Request, title string, description string, url string) error {
-	params := labelmaker.NewGenerateParams(int(ctrl.config.LabelMaker.Width), int(ctrl.config.LabelMaker.Height), int(ctrl.config.LabelMaker.Margin), int(ctrl.config.LabelMaker.Padding), ctrl.config.LabelMaker.FontSize, title, description, url, ctrl.config.LabelMaker.DynamicLength, ctrl.config.LabelMaker.AdditionalInformation)
+// entityLabel is the label content of an item or a location.
+func entityLabel(e repo.EntityOut, url string) labelmaker.LabelContent {
+	return labelmaker.LabelContent{
+		Title:       e.Name,
+		Description: e.Description,
+		Maker:       e.Manufacturer,
+		Model:       e.ModelNumber,
+		AssetID:     e.AssetID.String(),
+		URL:         url,
+	}
+}
+
+func generateOrPrint(ctrl *V1Controller, w http.ResponseWriter, r *http.Request, content labelmaker.LabelContent) error {
+	conf := ctrl.config.LabelMaker
+	params := labelmaker.NewGenerateParams(conf.TapeWidth, conf.Length, conf.Dpi, content, conf.AdditionalInformation)
 
 	print := queryBool(r.URL.Query().Get("print"))
 
@@ -55,7 +68,7 @@ func (ctrl *V1Controller) HandleGetLocationLabel() errchain.HandlerFunc {
 		}
 
 		hbURL := GetHBURL(r, &ctrl.config.Options, ctrl.url)
-		return generateOrPrint(ctrl, w, r, location.Name, "Homebox Location", fmt.Sprintf("%s/location/%s", hbURL, location.ID))
+		return generateOrPrint(ctrl, w, r, entityLabel(location, fmt.Sprintf("%s/location/%s", hbURL, location.ID)))
 	}
 }
 
@@ -82,14 +95,8 @@ func (ctrl *V1Controller) HandleGetItemLabel() errchain.HandlerFunc {
 			return err
 		}
 
-		description := ""
-
-		if item.Parent != nil {
-			description += fmt.Sprintf("\nLocation: %s", item.Parent.Name)
-		}
-
 		hbURL := GetHBURL(r, &ctrl.config.Options, ctrl.url)
-		return generateOrPrint(ctrl, w, r, item.Name, description, fmt.Sprintf("%s/item/%s", hbURL, item.ID))
+		return generateOrPrint(ctrl, w, r, entityLabel(item, fmt.Sprintf("%s/item/%s", hbURL, item.ID)))
 	}
 }
 
@@ -121,13 +128,13 @@ func (ctrl *V1Controller) HandleGetAssetLabel() errchain.HandlerFunc {
 			return validate.NewRequestError(fmt.Errorf("failed to find asset id"), http.StatusNotFound)
 		}
 
-		description := item.Items[0].Name
-
-		if item.Items[0].Parent != nil {
-			description += fmt.Sprintf("\nLocation: %s", item.Items[0].Parent.Name)
+		// The search result is a summary; the label needs maker and model.
+		entity, err := ctrl.repo.Entities.GetOneByGroup(auth, auth.GID, item.Items[0].ID)
+		if err != nil {
+			return err
 		}
 
 		hbURL := GetHBURL(r, &ctrl.config.Options, ctrl.url)
-		return generateOrPrint(ctrl, w, r, item.Items[0].AssetID.String(), description, fmt.Sprintf("%s/a/%s", hbURL, item.Items[0].AssetID.String()))
+		return generateOrPrint(ctrl, w, r, entityLabel(entity, fmt.Sprintf("%s/a/%s", hbURL, entity.AssetID.String())))
 	}
 }
