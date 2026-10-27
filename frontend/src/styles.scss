@@ -196,6 +196,11 @@
 .page--wide {
   max-width: none;
 }
+// A page in the detail of a list/detail layout fills the sheet.
+app-list-detail .page {
+  max-width: none;
+  margin-inline: 0;
+}
 
 // A form inside a card or a dialog: one field per row, the actions at the end.
 .form-stack {

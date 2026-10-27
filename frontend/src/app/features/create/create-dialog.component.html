@@ -48,23 +48,29 @@
     <app-tag-picker [value]="tagIds()" (valueChange)="tagIds.set($event)" />
 
     <div class="cd__photos">
-      <app-file-picker #picker accept="image/*" [multiple]="true" (picked)="addPhotos($event)" />
-      <app-button variant="tonal" size="sm" (click)="picker.open()">
-        <span class="btn-label"><app-icon name="image" />{{ 'create.addPhotos' | t }}</span>
-      </app-button>
-      @for (file of photos(); track $index) {
-        <span class="cd__file">
-          <span class="ell">{{ file.name }}</span>
-          <button
-            type="button"
-            class="cd__fileX"
-            [attr.aria-label]="'common.remove' | t"
-            (click)="removePhoto($index)"
-          >
-            <app-icon name="x" [size]="14" />
-          </button>
-        </span>
+      @if (photos().length) {
+        <div class="rowgroup">
+          @for (file of photos(); track $index) {
+            <div class="cd__file">
+              <app-icon class="cd__fileIcon" name="image" [size]="20" />
+              <span class="ell cd__fileName">{{ file.name }}</span>
+              <app-button
+                variant="text"
+                [iconOnly]="true"
+                [ariaLabel]="('common.remove' | t) + ': ' + file.name"
+                (click)="removePhoto($index)"
+                ><app-icon name="x"
+              /></app-button>
+            </div>
+          }
+        </div>
       }
+      <app-file-drop-zone
+        accept="image/*"
+        [label]="'create.dropPhotos' | t"
+        [buttonLabel]="'attach.pick' | t"
+        (files)="addPhotos($event)"
+      />
     </div>
 
     @if (error()) {

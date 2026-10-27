@@ -448,5 +448,8 @@
   "tags.edit": "Tags ändern",
   "common.done": "Fertig",
   "tag.assignItems": "Gegenstände mit „{name}“",
-  "tag.assign": "Zuweisen"
+  "tag.assign": "Zuweisen",
+  "attach.markAs": "Als {kind} ablegen",
+  "attach.dropHint": "Bilder werden als Foto abgelegt, alles andere als Datei. Den Typ änderst du im Menü der Datei.",
+  "create.dropPhotos": "Fotos hierher ziehen"
 }

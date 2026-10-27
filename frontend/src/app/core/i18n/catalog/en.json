@@ -448,5 +448,8 @@
   "tags.edit": "Change tags",
   "common.done": "Done",
   "tag.assignItems": "Items with “{name}”",
-  "tag.assign": "Assign"
+  "tag.assign": "Assign",
+  "attach.markAs": "File as {kind}",
+  "attach.dropHint": "Images are filed as photos, everything else as files. Change the kind in the file's menu.",
+  "create.dropPhotos": "Drop photos here"
 }

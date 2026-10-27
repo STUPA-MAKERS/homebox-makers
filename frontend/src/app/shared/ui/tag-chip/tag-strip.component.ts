@@ -28,6 +28,8 @@ import { TagChipComponent } from './tag-chip.component';
       min-width: 0;
       max-width: 16rem;
       overflow: hidden;
+      // Only text: a click goes through to the row link below.
+      pointer-events: none;
     }
     :host ::ng-deep .tc {
       height: 22px;

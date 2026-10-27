@@ -75,7 +75,7 @@
       </div>
       <p class="muted co__lead">{{ 'collection.invite.body' | t }}</p>
       @if (openInvitations().length === 0) {
-        <p class="muted">{{ 'collection.invite.empty' | t }}</p>
+        <app-empty-state rows="1" [heading]="'collection.invite.empty' | t" />
       } @else {
         <div class="rowgroup">
           @for (inv of openInvitations(); track inv.id) {

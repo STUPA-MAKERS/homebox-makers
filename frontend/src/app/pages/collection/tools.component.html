@@ -49,7 +49,7 @@
         'common.loadError' | t
       }}</app-note>
     } @else if (exports().length === 0) {
-      <p class="muted">{{ 'tools.backup.empty' | t }}</p>
+      <app-empty-state shape="file" rows="2" [heading]="'tools.backup.empty' | t" />
     } @else {
       <div class="rowgroup">
         @for (exp of exports(); track exp.id) {

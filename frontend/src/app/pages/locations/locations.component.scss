@@ -46,3 +46,8 @@
     outline-offset: 2px;
   }
 }
+
+// The item count is text: a click goes through to the row link below.
+.loc__trail > .muted {
+  pointer-events: none;
+}

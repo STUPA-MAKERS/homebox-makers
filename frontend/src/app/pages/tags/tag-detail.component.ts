@@ -19,7 +19,6 @@ import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
 import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
-import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
 import { TagItemsDialogComponent } from '../../features/tags/tag-items-dialog.component';
 import {
@@ -56,7 +55,6 @@ const PAGE_SIZE = 30;
     SheetBarComponent,
     SheetBarTitleDirective,
     EntityThumbComponent,
-    TagChipComponent,
     TagStripComponent,
     TagItemsDialogComponent,
     ButtonComponent,

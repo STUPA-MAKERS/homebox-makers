@@ -23,8 +23,7 @@ import {
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
-  SegmentedComponent,
-  type SegmentedOption,
+  EmptyStateComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
 
@@ -38,8 +37,9 @@ const KINDS: readonly { value: AttachmentKind; key: TranslationKey; icon: IconNa
 
 /**
  * The files of an entity: photos, manuals, warranty papers, receipts and other files. A
- * drop or a pick uploads with the chosen kind; a row opens the file, its menu makes a photo
- * the primary one or deletes the file. Emits the entity after each change.
+ * drop or a pick uploads at once: an image as a photo, anything else as a file. A row opens
+ * the file; its menu changes the kind, makes a photo the primary one or deletes the file.
+ * Emits the entity after each change.
  */
 @Component({
   selector: 'app-attachments-panel',
@@ -50,7 +50,7 @@ const KINDS: readonly { value: AttachmentKind; key: TranslationKey; icon: IconNa
     LocalizedDatePipe,
     IconComponent,
     FileDropZoneComponent,
-    SegmentedComponent,
+    EmptyStateComponent,
     RowMenuComponent,
     ConfirmDialogComponent,
   ],
@@ -66,14 +66,9 @@ export class AttachmentsPanelComponent {
   readonly entity = input.required<EntityOut>();
   readonly changed = output<EntityOut>();
 
-  readonly kind = signal<AttachmentKind>('attachment');
   readonly uploading = signal(0);
   readonly deleting = signal<ItemAttachment | null>(null);
   readonly busy = signal(false);
-
-  readonly kindOptions = computed<SegmentedOption[]>(() =>
-    KINDS.map((k) => ({ value: k.value, label: this.i18n.translate(k.key) })),
-  );
 
   readonly files = computed(() =>
     [...(this.entity().attachments ?? [])]
@@ -95,26 +90,29 @@ export class AttachmentsPanelComponent {
   }
 
   menu(att: ItemAttachment): RowMenuSection[] {
-    const items: RowMenuItem[] = [];
+    const top: RowMenuItem[] = [];
     if (att.type === 'photo' && !att.primary) {
-      items.push({ id: 'primary', label: this.i18n.translate('attach.makePrimary'), icon: 'pin' });
+      top.push({ id: 'primary', label: this.i18n.translate('attach.makePrimary'), icon: 'pin' });
     }
-    items.push({
-      id: 'delete',
-      label: this.i18n.translate('common.delete'),
-      icon: 'trash',
-      danger: true,
+    const kinds: RowMenuItem[] = KINDS.filter((k) => k.value !== att.type).map((k) => ({
+      id: `kind:${k.value}`,
+      label: this.i18n.translate('attach.markAs', { kind: this.i18n.translate(k.key) }),
+      icon: k.icon,
+    }));
+    const sections: RowMenuSection[] = [];
+    if (top.length) sections.push({ items: top });
+    sections.push({ items: kinds });
+    sections.push({
+      items: [
+        { id: 'delete', label: this.i18n.translate('common.delete'), icon: 'trash', danger: true },
+      ],
     });
-    return [{ items }];
-  }
-
-  setKind(value: string | null): void {
-    if (value) this.kind.set(value as AttachmentKind);
+    return sections;
   }
 
   upload(files: File[]): void {
-    const kind = this.kind();
     for (const file of files) {
+      const kind: AttachmentKind = file.type.startsWith('image/') ? 'photo' : 'attachment';
       this.uploading.update((n) => n + 1);
       this.api.addAttachment(this.entity().id, file, file.name, kind).subscribe({
         next: (entity) => {
@@ -137,11 +135,12 @@ export class AttachmentsPanelComponent {
       this.deleting.set(att);
       return;
     }
+    const kind = item.id.startsWith('kind:') ? (item.id.slice(5) as AttachmentKind) : null;
     this.api
       .updateAttachment(this.entity().id, att.id, {
-        primary: true,
+        primary: kind ? att.primary && kind === 'photo' : true,
         title: att.title,
-        type: att.type,
+        type: kind ?? att.type,
       })
       .subscribe({
         next: (entity) => this.changed.emit(entity),

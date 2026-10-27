@@ -22,7 +22,6 @@ import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.compo
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import {
-  ButtonComponent,
   EmptyStateComponent,
   IconComponent,
   type IconName,
@@ -57,7 +56,6 @@ interface StatTile {
     PageHeaderComponent,
     EntityThumbComponent,
     TagChipComponent,
-    ButtonComponent,
     IconComponent,
     ListItemComponent,
     EmptyStateComponent,
@@ -123,14 +121,6 @@ export class HomeComponent {
         this.stats.set(res.stats);
         this.recent.set(res.recent.items ?? []);
       });
-  }
-
-  newItem(): void {
-    this.createSvc.open({ kind: 'item' });
-  }
-
-  newLocation(): void {
-    this.createSvc.open({ kind: 'location' });
   }
 
   locationOf(item: EntitySummary): string {

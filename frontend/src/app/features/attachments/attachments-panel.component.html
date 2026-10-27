@@ -25,23 +25,15 @@
       }
     </div>
   } @else {
-    <p class="muted ap__empty">{{ 'attach.empty' | t }}</p>
+    <app-empty-state shape="file" rows="2" [heading]="'attach.empty' | t" />
   }
 
-  <div class="ap__upload">
-    <app-segmented
-      [options]="kindOptions()"
-      [value]="kind()"
-      [ariaLabel]="'attach.kindLabel' | t"
-      (valueChange)="setKind($event)"
-    />
-    <app-file-drop-zone
-      [label]="'attach.drop' | t"
-      [hint]="uploading() ? ('attach.uploading' | t: { count: uploading() }) : null"
-      [buttonLabel]="'attach.pick' | t"
-      (files)="upload($event)"
-    />
-  </div>
+  <app-file-drop-zone
+    [label]="'attach.drop' | t"
+    [hint]="uploading() ? ('attach.uploading' | t: { count: uploading() }) : ('attach.dropHint' | t)"
+    [buttonLabel]="'attach.pick' | t"
+    (files)="upload($event)"
+  />
 </section>
 
 <app-confirm-dialog

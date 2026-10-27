@@ -1,34 +1,19 @@
 .cd__photos {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: var(--space-2);
 }
-
 .cd__file {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--space-1);
-  max-width: 14rem;
-  height: 28px;
-  padding: 0 4px 0 10px;
-  border-radius: 14px;
-  background: var(--color-surface-3);
-  font-size: var(--fs-small);
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4);
 }
-
-.cd__fileX {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
+.cd__fileIcon {
+  flex: none;
   color: var(--color-text-muted);
-  cursor: pointer;
 }
-.cd__fileX:hover {
-  background: var(--color-surface-4);
+.cd__fileName {
+  flex: 1 1 auto;
+  min-width: 0;
 }

@@ -23,6 +23,7 @@
   font-size: var(--fs-small);
 }
 .ml__row {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -41,7 +42,31 @@
   min-width: 0;
 }
 .ml__name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
   font-weight: var(--fw-semibold);
+  text-align: start;
+  cursor: pointer;
+}
+// The name opens the entry; its ::after covers the row, so the whole row is the target.
+.ml__name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.ml__name:focus-visible {
+  outline: none;
+}
+.ml__row:has(.ml__name:focus-visible) {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+.ml__row app-row-menu {
+  position: relative;
+  z-index: 1;
 }
 .ml__sub {
   font-size: var(--fs-small);

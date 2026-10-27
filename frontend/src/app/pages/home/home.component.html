@@ -2,16 +2,7 @@
   <app-page-header
     [title]="collections.selected()?.name || ('nav.home' | t)"
     [subtitle]="'home.greeting' | t: { name: auth.user()?.name || '' }"
-  >
-    <ng-container ngProjectAs="[actions]">
-      <app-button variant="tonal" size="sm" (click)="newLocation()">
-        <span class="btn-label"><app-icon name="mappin" />{{ 'create.location.short' | t }}</span>
-      </app-button>
-      <app-button size="sm" (click)="newItem()">
-        <span class="btn-label"><app-icon name="plus" />{{ 'create.item.short' | t }}</span>
-      </app-button>
-    </ng-container>
-  </app-page-header>
+  />
 
   @if (error()) {
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{

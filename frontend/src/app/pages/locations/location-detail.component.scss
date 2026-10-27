@@ -27,6 +27,8 @@
 }
 
 .ld__trail {
+  // Only text: a click goes through to the row link below.
+  pointer-events: none;
   display: inline-flex;
   gap: var(--space-2);
 }

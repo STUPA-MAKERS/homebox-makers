@@ -13,8 +13,10 @@
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{
       'common.loadError' | t
     }}</app-note>
-  } @else if (!loading() && entries().length === 0) {
-    <p class="muted ml__empty">{{ 'maint.empty' | t }}</p>
+  } @else if (loading()) {
+    <app-skeleton variant="rows" [count]="2" [lead]="true" [label]="'common.loading' | t" />
+  } @else if (entries().length === 0) {
+    <app-empty-state rows="2" [heading]="'maint.empty' | t" />
   } @else {
     @for (group of [scheduled(), done()]; track $index) {
       @if (group.length) {
@@ -24,7 +26,9 @@
             <div class="ml__row">
               <app-icon class="ml__icon" [name]="$index === 0 ? 'clock' : 'circleok'" [size]="20" />
               <div class="ml__text">
-                <span class="ml__name">{{ entry.name }}</span>
+                <button type="button" class="ml__name" (click)="edit(entry)">
+                  {{ entry.name }}
+                </button>
                 <span class="ml__sub muted">
                   {{ (entry.completedDate | ldate) || (entry.scheduledDate | ldate) }}
                   @if (costOf(entry)) {

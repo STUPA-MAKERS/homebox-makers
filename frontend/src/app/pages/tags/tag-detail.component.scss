@@ -45,6 +45,8 @@
 }
 
 .tg__trail {
+  // Only text: a click goes through to the row link below.
+  pointer-events: none;
   display: inline-flex;
   gap: var(--space-2);
 }
@@ -55,4 +57,18 @@
   padding: 0 var(--space-1);
   color: var(--color-text-muted);
   font-size: var(--fs-small);
+}
+
+.tg__lead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface-3);
+}
+.tg__lead .tg__dot {
+  width: 12px;
+  height: 12px;
 }

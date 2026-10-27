@@ -22,7 +22,7 @@
           </app-button>
         </div>
         @if (g.types.length === 0) {
-          <p class="muted">{{ 'types.empty' | t }}</p>
+          <app-empty-state rows="1" [heading]="'types.empty' | t" />
         } @else {
           <div class="rowgroup">
             @for (type of g.types; track type.id) {

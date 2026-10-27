@@ -17,6 +17,8 @@ import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import {
   ButtonComponent,
+  EmptyStateComponent,
+  SkeletonComponent,
   ConfirmDialogComponent,
   DatepickerComponent,
   DialogComponent,
@@ -61,6 +63,8 @@ function toIsoDay(value: string | Date | null | undefined): string {
     TextareaComponent,
     NoteComponent,
     RowMenuComponent,
+    EmptyStateComponent,
+    SkeletonComponent,
   ],
   templateUrl: './maintenance-log.component.html',
   styleUrl: './maintenance-log.component.scss',
@@ -131,10 +135,11 @@ export class MaintenanceLogComponent {
   }
 
   onMenu(entry: MaintenanceEntryWithDetails, item: RowMenuItem): void {
-    if (item.id === 'delete') {
-      this.deleting.set(entry);
-      return;
-    }
+    if (item.id === 'delete') this.deleting.set(entry);
+    else this.edit(entry);
+  }
+
+  edit(entry: MaintenanceEntryWithDetails): void {
     this.name = entry.name;
     this.cost = entry.cost === '0' ? '' : entry.cost;
     this.description = entry.description;

@@ -8,6 +8,8 @@
 }
 
 .il__trail {
+  // Only text: a click goes through to the row link below.
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

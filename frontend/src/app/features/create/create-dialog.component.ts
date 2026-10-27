@@ -22,7 +22,7 @@ import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
 import {
   ButtonComponent,
   DialogComponent,
-  FilePickerComponent,
+  FileDropZoneComponent,
   IconComponent,
   InputComponent,
   NoteComponent,
@@ -55,7 +55,7 @@ import { CreateService } from './create.service';
     ButtonComponent,
     IconComponent,
     NoteComponent,
-    FilePickerComponent,
+    FileDropZoneComponent,
     LocationSelectComponent,
     TagPickerComponent,
   ],

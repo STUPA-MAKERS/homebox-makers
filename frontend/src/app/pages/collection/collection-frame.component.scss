@@ -2,6 +2,23 @@
 
 @include lp.frame(cf);
 
+// The section pages are admin pages (STUPA-Workflow `af__pageBody`): a page header, not a
+// sheet bar, so the sheet keeps its top padding, and the page uses the whole sheet.
+.cf--split .cf__detail {
+  padding: var(--space-6) var(--space-6) var(--space-7);
+  --fab-inset: var(--space-6);
+}
+.cf__detail ::ng-deep .page {
+  max-width: none;
+  margin-inline: 0;
+}
+.cf__detail ::ng-deep .page > app-page-header {
+  margin-bottom: 0;
+}
+.cf__detail:has(app-fab) {
+  padding-bottom: calc(56px + var(--space-6) + var(--space-4));
+}
+
 .cf__rows {
   display: flex;
   flex-direction: column;

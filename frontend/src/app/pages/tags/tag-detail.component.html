@@ -73,7 +73,7 @@
           @if (itemsLoading() && !items().length) {
             <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
           } @else if (items().length === 0) {
-            <p class="tg__empty">{{ 'tag.noItems' | t }}</p>
+            <app-empty-state rows="2" [heading]="'tag.noItems' | t" />
           } @else {
             <div class="rowgroup">
               @for (item of items(); track item.id) {
@@ -116,13 +116,21 @@
               </app-button>
             </div>
             @if (children().length) {
-              <div class="sheet-chips tg__chips">
+              <div class="rowgroup">
                 @for (c of children(); track c.id) {
-                  <app-tag-chip [tag]="c" />
+                  <app-list-item
+                    [title]="c.name"
+                    [sub]="c.description || null"
+                    [link]="['/tags', c.id]"
+                  >
+                    <span lead class="tg__lead">
+                      <span class="tg__dot" [style.background]="c.color || null"></span>
+                    </span>
+                  </app-list-item>
                 }
               </div>
             } @else {
-              <p class="tg__empty">{{ 'tag.noChildren' | t }}</p>
+              <app-empty-state rows="1" [heading]="'tag.noChildren' | t" />
             }
           </section>
         </div>

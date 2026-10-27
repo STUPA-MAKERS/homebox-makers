@@ -31,7 +31,7 @@
             (selected)="onMenu($event)"
           />
         </app-sheet-bar>
-        @if (crumbs().length || loc.entityType) {
+        @if (crumbs().length) {
           <p class="sheet-line">
             @if (crumbs().length) {
               <span class="sheet-crumbs" role="navigation" [attr.aria-label]="'item.path' | t">
@@ -43,22 +43,16 @@
                 }
               </span>
             }
-            @if (loc.entityType) {
-              @if (crumbs().length) {
-                <span class="sheet-dot" aria-hidden="true">·</span>
-              }
-              <span>{{ loc.entityType.name }}</span>
-            }
           </p>
         }
         @if (loc.description) {
           <p class="sheet-desc">{{ loc.description }}</p>
         }
         <div class="sheet-chips">
+          <app-tag-assign [entity]="loc" (changed)="location.set($event)" />
           @for (tag of loc.tags; track tag.id) {
             <app-tag-chip [tag]="tag" />
           }
-          <app-tag-assign [entity]="loc" (changed)="location.set($event)" />
         </div>
       </header>
 
@@ -81,7 +75,7 @@
           @if (itemsLoading()) {
             <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
           } @else if (items().length === 0) {
-            <p class="ld__empty">{{ 'location.noItems' | t }}</p>
+            <app-empty-state rows="2" [heading]="'location.noItems' | t" />
           } @else {
             <div class="rowgroup">
               @for (item of items(); track item.id) {
@@ -126,7 +120,7 @@
             </app-button>
           </div>
           @if (subLocations().length === 0) {
-            <p class="ld__empty">{{ 'location.noSubs' | t }}</p>
+            <app-empty-state rows="2" [heading]="'location.noSubs' | t" />
           } @else {
             <div class="rowgroup">
               @for (sub of subLocations(); track sub.id) {

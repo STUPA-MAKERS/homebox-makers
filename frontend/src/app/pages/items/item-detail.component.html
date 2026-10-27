@@ -60,10 +60,10 @@
           <p class="sheet-desc">{{ it.description }}</p>
         }
         <div class="sheet-chips">
+          <app-tag-assign [entity]="it" (changed)="item.set($event)" />
           @for (tag of it.tags; track tag.id) {
             <app-tag-chip [tag]="tag" />
           }
-          <app-tag-assign [entity]="it" (changed)="item.set($event)" />
         </div>
       </header>
 
