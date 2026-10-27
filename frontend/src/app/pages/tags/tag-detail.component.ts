@@ -16,7 +16,6 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
 import { errorMessage } from '@shared/http-error';
-import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
 import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
@@ -51,7 +50,6 @@ const PAGE_SIZE = 30;
   imports: [
     RouterLink,
     TranslatePipe,
-    MoneyPipe,
     SheetBarComponent,
     SheetBarTitleDirective,
     EntityThumbComponent,
@@ -98,7 +96,6 @@ export class TagDetailComponent {
 
   readonly items = signal<EntitySummary[]>([]);
   readonly itemsTotal = signal(0);
-  readonly itemsValue = signal(0);
   readonly itemsLoading = signal(true);
   readonly itemsMore = signal(false);
   private itemsPage = 1;
@@ -167,7 +164,6 @@ export class TagDetailComponent {
     this.api.entities({ tags: [this.id()], page: this.itemsPage, pageSize: PAGE_SIZE }).subscribe({
       next: (res) => {
         this.itemsTotal.set(res.total);
-        this.itemsValue.set(res.totalPrice);
         this.items.update((cur) => (reset ? (res.items ?? []) : [...cur, ...(res.items ?? [])]));
         this.itemsLoading.set(false);
         this.itemsMore.set(false);

@@ -43,8 +43,7 @@ function toIsoDay(value: string | Date | null | undefined): string {
 }
 
 /**
- * The maintenance log of one entity: the planned and the done entries, with the total
- * cost, and a dialog to add or edit an entry (name, planned date, done date, cost,
+ * The maintenance log of one entity: the planned and the done entries, and a dialog to add or edit an entry (name, planned date, done date, cost,
  * description).
  */
 @Component({
@@ -85,9 +84,6 @@ export class MaintenanceLogComponent {
   readonly loading = signal(true);
   readonly error = signal(false);
 
-  readonly totalCost = computed(() =>
-    this.entries().reduce((sum, e) => sum + (Number.parseFloat(e.cost) || 0), 0),
-  );
   readonly scheduled = computed(() => this.entries().filter((e) => !apiDate(e.completedDate)));
   readonly done = computed(() => this.entries().filter((e) => !!apiDate(e.completedDate)));
 

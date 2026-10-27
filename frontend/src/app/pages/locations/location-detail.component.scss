@@ -45,13 +45,11 @@
 }
 
 .ld__empty,
-.ld__sum,
 .ld__notes {
   margin: 0;
   padding: 0 var(--space-1);
 }
-.ld__empty,
-.ld__sum {
+.ld__empty {
   color: var(--color-text-muted);
   font-size: var(--fs-small);
 }

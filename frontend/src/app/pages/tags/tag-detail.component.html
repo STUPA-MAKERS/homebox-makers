@@ -92,11 +92,6 @@
                 'items.loadMore' | t
               }}</app-button>
             }
-            @if (itemsValue()) {
-              <p class="tg__sum">
-                {{ 'items.totalValue' | t: { value: (itemsValue() | money) } }}
-              </p>
-            }
           }
         </section>
         </div>
