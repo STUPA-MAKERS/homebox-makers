@@ -79,6 +79,7 @@
   "field.quantity": "Quantity",
   "field.description": "Description",
   "home.greeting": "Hello {name}!",
+  "home.search.short": "Search",
   "home.stats": "Statistics",
   "home.stat.items": "Items",
   "home.stat.locations": "Locations",

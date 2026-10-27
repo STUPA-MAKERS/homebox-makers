@@ -79,9 +79,25 @@
   gap: var(--space-2);
 }
 
-// The greeting under the name of the collection reads as a line of its own, not a caption.
-.home__ph ::ng-deep .ph__subtitle {
-  margin-top: var(--space-2);
-  font-size: var(--fs-h3);
-  line-height: 1.35;
+.home__top {
+  display: flex;
+  align-items: center;
+}
+.home__search {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 600px;
+}
+.home__me {
+  display: inline-flex;
+  margin-inline-end: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  cursor: pointer;
+}
+.home__me:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
