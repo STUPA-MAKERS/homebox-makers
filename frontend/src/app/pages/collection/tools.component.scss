@@ -67,4 +67,5 @@
 }
 .tl__danger {
   border: 1px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  border-radius: var(--radius-lg);
 }
