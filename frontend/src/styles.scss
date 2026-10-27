@@ -471,3 +471,10 @@ app-checkbox {
 .sheet-chips .tag-add .fs__chip {
   height: 28px;
 }
+
+// The page does not bounce: an overscroll at the top or bottom moved the whole frame, the
+// sticky rail with it, so the rail seemed to scroll away with the page.
+html,
+body {
+  overscroll-behavior-y: none;
+}
