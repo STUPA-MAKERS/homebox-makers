@@ -13,7 +13,9 @@
     <meta name="theme-color" content="#101211" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Homebox — Inventar für Zuhause, Werkstatt und Verein." />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="manifest" href="manifest.webmanifest" />
+    <!-- use-credentials: behind a login proxy (basic auth, SSO) Chrome otherwise fetches the
+         manifest without cookies, gets the login page and offers no install. -->
+    <link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials" />
     <!-- iOS and iPadOS do not read the icons of the manifest. "Add to Home Screen" takes
          this 180 px icon. It is opaque, because iOS fills a transparent area with black.
          black-translucent lets the page colour reach under the status bar, edge to edge;

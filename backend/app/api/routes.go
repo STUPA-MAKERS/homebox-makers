@@ -294,6 +294,13 @@ func registerMimes() {
 	if err != nil {
 		panic(err)
 	}
+
+	// Go's built-in table does not know the web app manifest, and the alpine image has no
+	// /etc/mime.types, so it was served with an empty Content-Type next to nosniff.
+	err = mime.AddExtensionType(".webmanifest", "application/manifest+json")
+	if err != nil {
+		panic(err)
+	}
 }
 
 // notFoundHandler perform the main logic around handling the internal SPA embed and ensuring that
@@ -311,8 +318,11 @@ func notFoundHandler() errchain.HandlerFunc {
 			return ErrDir
 		}
 
-		contentType := mime.TypeByExtension(filepath.Ext(requestedPath))
-		w.Header().Set("Content-Type", contentType)
+		// An unknown extension leaves the header unset, so net/http sniffs the type
+		// instead of sending an empty Content-Type.
+		if contentType := mime.TypeByExtension(filepath.Ext(requestedPath)); contentType != "" {
+			w.Header().Set("Content-Type", contentType)
+		}
 		_, err = io.Copy(w, f)
 		return err
 	}
