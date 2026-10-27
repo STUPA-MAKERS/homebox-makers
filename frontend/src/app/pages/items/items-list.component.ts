@@ -36,6 +36,7 @@ import {
   EmptyStateComponent,
   FilterSelectComponent,
   type FilterSelectOption,
+  IconComponent,
   InfiniteScrollDirective,
   ListDetailLayoutComponent,
   ListItemComponent,
@@ -76,6 +77,7 @@ const SORTS: readonly { value: string; key: TranslationKey }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     TranslatePipe,
+    IconComponent,
     PageHeaderComponent,
     FabComponent,
     TagStripComponent,

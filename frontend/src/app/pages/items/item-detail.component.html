@@ -65,9 +65,6 @@
             >{{ 'item.updated' | t: { date: (it.updatedAt | ldate: 'mediumDate') } }}</span
           >
         </p>
-        @if (it.description) {
-          <p class="sheet-desc">{{ it.description }}</p>
-        }
         <div class="sheet-chips">
           @for (tag of it.tags; track tag.id) {
             <app-tag-chip [tag]="tag" />
@@ -78,6 +75,12 @@
 
       <div class="sheet-cols">
         <div class="sheet-col">
+        @if (it.description) {
+          <section class="sheet-sec" aria-labelledby="desc-title">
+            <h3 class="sec" id="desc-title">{{ 'field.description' | t }}</h3>
+            <p class="sheet-note">{{ it.description }}</p>
+          </section>
+        }
         <section class="sheet-sec" aria-labelledby="facts-title">
           <h3 class="sec" id="facts-title">{{ 'item.details' | t }}</h3>
           <app-field-group>

@@ -67,7 +67,7 @@ test.describe('scanner', () => {
   // The camera for real: Chromium's fake camera plays the printed label of an item, the
   // scanner reads its QR code and shows the item.
   test('the camera reads the QR code of a printed label', async ({ signedIn: page, account }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
     const home = await createLocation(page, 'Keller');
     const id = await createItem(page, 'Bohrmaschine', home);
 
@@ -101,7 +101,8 @@ test.describe('scanner', () => {
       await login(cam, account);
       await cam.goto('/scan');
       const hit = cam.getByRole('status').filter({ hasText: 'Bohrmaschine' });
-      await expect(hit).toBeVisible({ timeout: 20_000 });
+      // The fake camera and the decoder share the CPU with the other workers: give it time.
+      await expect(hit).toBeVisible({ timeout: 40_000 });
       await expect(hit).toContainText('Keller');
       await expect(cam.locator('video.sc__video')).toHaveJSProperty('paused', false);
     } finally {

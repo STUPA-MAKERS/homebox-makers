@@ -126,11 +126,6 @@
 .sheet-crumbs app-icon {
   color: var(--color-text-subtle);
 }
-.sheet-desc {
-  margin: 0;
-  color: var(--color-text);
-  white-space: pre-line;
-}
 .sheet-chips {
   display: flex;
   flex-wrap: wrap;
@@ -459,18 +454,31 @@ app-checkbox {
 
 // "+ Tag": the dashed chip after a row of tags that opens the tag list (tag picker, tag
 // assign). The kit chip shows a check once tags are chosen; here it always reads "+ Tag".
-// The "+ Tag" chip: the shape of a tag chip (`app-chip`: pill, 32px), dashed. The plus is
-// a drawn glyph, so it sits on the centre line of the text; the select's own icon turns
-// into a check once a value is set and stays hidden.
+// A text on a sheet (a description, the note of a maintenance entry): a block on the row surface of a
+// field group, its text inset like the value of a field row.
+.sheet-note {
+  margin: 0;
+  padding: 12px var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+// The "+ Tag" chip: the size of a tag chip (`app-tag-chip`: 26px pill, small text),
+// dashed. The plus is a drawn glyph at the size of the tag dot's line, so it sits on the
+// centre line of the text; the select's own icon turns into a check once a value is set
+// and stays hidden.
 .tag-add .fs__chip,
 .tag-add .fs__chip.on {
-  height: var(--chip-min-height, 32px);
-  padding: 0 var(--space-3) 0 10px;
+  height: 26px;
+  padding: 0 10px 0 8px;
   gap: 4px;
   border: 1.5px dashed var(--color-border-strong, var(--color-border));
-  border-radius: var(--radius-pill);
-  background: transparent;
+  border-radius: 13px;
+  background-color: transparent;
   color: var(--color-text-muted);
+  font-size: var(--fs-small);
 }
 .tag-add .fs__chip:hover {
   border-color: var(--color-accent);
@@ -482,15 +490,11 @@ app-checkbox {
 .tag-add .fs__chip::before {
   content: '';
   flex: none;
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   background: currentColor;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M7 2v10M2 7h10' stroke='%23000' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 1v8M1 5h8' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")
     center / contain no-repeat;
-}
-// Beside the small tag chips of a sheet head the "+ Tag" chip takes their height.
-.sheet-chips .tag-add .fs__chip {
-  height: 28px;
 }
 
 // The page does not bounce: an overscroll at the top or bottom moved the whole frame, the

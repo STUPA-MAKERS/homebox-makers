@@ -120,14 +120,14 @@ import { MAINTENANCE_PAGE, cost, daysOverdue, isDone } from './maintenance-page'
               @if (e.description) {
                 <section class="sheet-sec" aria-labelledby="md-note">
                   <h3 class="sec" id="md-note">{{ 'maint.note' | t }}</h3>
-                  <p class="md__note">{{ e.description }}</p>
+                  <p class="sheet-note">{{ e.description }}</p>
                 </section>
               }
             </div>
             <div class="sheet-col">
               <section class="sheet-sec" aria-labelledby="md-hist">
                 <h3 class="sec" id="md-hist">
-                  {{ 'maint.history' | t }} <span class="muted num">{{ history().length }}</span>
+                  {{ 'maint.history' | t }}
                 </h3>
                 @if (history().length === 0) {
                   <app-empty-state rows="2" [heading]="'maint.historyEmpty' | t" />
@@ -184,10 +184,6 @@ import { MAINTENANCE_PAGE, cost, daysOverdue, isDone } from './maintenance-page'
     }
     .md {
       padding-bottom: calc(56px + var(--space-6));
-    }
-    .md__note {
-      margin: 0;
-      white-space: pre-wrap;
     }
     .md__icon {
       display: inline-flex;

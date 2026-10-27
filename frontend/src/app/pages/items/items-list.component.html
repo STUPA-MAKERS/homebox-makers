@@ -52,9 +52,15 @@
             filled
           />
           @if (filterCount() > 0) {
-            <app-button variant="text" size="sm" (click)="resetFilters()">{{
-              'items.filter.reset' | t
-            }}</app-button>
+            <button
+              type="button"
+              class="chip il__reset"
+              [attr.aria-label]="'items.filter.reset' | t"
+              [title]="'items.filter.reset' | t"
+              (click)="resetFilters()"
+            >
+              <app-icon name="reset" [size]="15" />
+            </button>
           }
         </div>
       </app-sticky-bar>

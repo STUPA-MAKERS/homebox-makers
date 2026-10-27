@@ -54,9 +54,6 @@
           <div class="sheet-sec__head">
             <h3 class="sec tg__title" id="td-items">
               {{ 'nav.items' | t }}
-              @if (!itemsLoading()) {
-                <span class="muted num">{{ itemsTotal() }}</span>
-              }
             </h3>
             @if (itemsTotal() > 0) {
               <a class="tg__more" routerLink="/items" [queryParams]="{ tags: tg.id }">{{
