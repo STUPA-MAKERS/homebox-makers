@@ -1,0 +1,58 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+.detail {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ld__title {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.ld__more {
+  font-size: var(--fs-small);
+  color: var(--color-accent-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.ld__trail {
+  // Only text: a click goes through to the row link below.
+  pointer-events: none;
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.ld__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface-3);
+  color: var(--color-text-muted);
+}
+
+.ld__empty,
+.ld__notes {
+  margin: 0;
+  padding: 0 var(--space-1);
+}
+.ld__empty {
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+.ld__notes {
+  white-space: pre-line;
+}

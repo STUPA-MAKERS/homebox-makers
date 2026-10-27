@@ -1,0 +1,47 @@
+<section class="ap" aria-labelledby="ap-title">
+  <h3 class="sec ap__title" id="ap-title">{{ 'attach.title' | t }}</h3>
+
+  @if (files().length) {
+    <div class="rowgroup">
+      @for (att of files(); track att.id) {
+        <div class="ap__row">
+          <app-icon class="ap__icon" [name]="icon(att)" [size]="20" />
+          <a class="ap__name" [href]="href(att)" target="_blank" rel="noopener">
+            <span class="ell">{{ att.title }}</span>
+            <span class="ap__sub muted"
+              >{{ kindLabel(att) }}
+              @if (att.primary) {
+                · {{ 'attach.primary' | t }}
+              }
+              · {{ att.createdAt | ldate }}</span
+            >
+          </a>
+          <app-row-menu
+            [label]="'common.actions' | t"
+            [sections]="menu(att)"
+            (selected)="onMenu(att, $event)"
+          />
+        </div>
+      }
+    </div>
+  } @else {
+    <app-empty-state shape="file" rows="2" [heading]="'attach.empty' | t" />
+  }
+
+  <app-file-drop-zone
+    [label]="'attach.drop' | t"
+    [hint]="uploading() ? ('attach.uploading' | t: { count: uploading() }) : ('attach.dropHint' | t)"
+    [buttonLabel]="'attach.pick' | t"
+    (files)="upload($event)"
+  />
+</section>
+
+<app-confirm-dialog
+  [open]="deleting() !== null"
+  [title]="'attach.deleteTitle' | t"
+  [body]="'attach.deleteBody' | t: { name: deleting()?.title ?? '' }"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy()"
+  (confirm)="confirmDelete()"
+  (cancel)="deleting.set(null)"
+/>

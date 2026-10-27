@@ -1,0 +1,53 @@
+@use '../../shared/ui/list-page' as lp;
+
+@include lp.frame(loc);
+
+.loc__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.loc__lead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-left: calc(var(--loc-depth, 0) * 20px);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface-3);
+  color: var(--color-text-muted);
+}
+
+.loc__trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+}
+
+.loc__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-surface-3);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+// The item count is text: a click goes through to the row link below.
+.loc__trail > .muted {
+  pointer-events: none;
+}

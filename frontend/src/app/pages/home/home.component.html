@@ -1,0 +1,105 @@
+<div class="page page--wide">
+  <app-page-header class="home__ph"
+    [title]="collections.selected()?.name || ('nav.home' | t)"
+    [subtitle]="'home.greeting' | t: { name: auth.user()?.name || '' }"
+  />
+
+  @if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
+  }
+
+  <section class="home__stats" [attr.aria-label]="'home.stats' | t">
+    @if (loading()) {
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="stat stat--skel"><span class="skel skel--line"></span></div>
+      }
+    } @else {
+      @for (tile of tiles(); track tile.labelKey) {
+        @if (tile.link) {
+          <a class="stat stat--link" [routerLink]="tile.link">
+            <ng-container *ngTemplateOutlet="statBody; context: { $implicit: tile }" />
+          </a>
+        } @else {
+          <div class="stat">
+            <ng-container *ngTemplateOutlet="statBody; context: { $implicit: tile }" />
+          </div>
+        }
+      }
+    }
+  </section>
+
+  <ng-template #statBody let-tile>
+    <span class="stat__icon"><app-icon [name]="tile.icon" [size]="20" /></span>
+    <span class="stat__value num">{{ tile.money ? (tile.value | money) : tile.value }}</span>
+    <span class="stat__label">{{ tile.labelKey | t }}</span>
+  </ng-template>
+
+  <section class="home__section" aria-labelledby="home-recent">
+    <div class="home__head">
+      <h2 class="section-title" id="home-recent">{{ 'home.recent' | t }}</h2>
+      <a class="home__more" routerLink="/items">{{ 'home.allItems' | t }}</a>
+    </div>
+    @if (loading()) {
+      <app-skeleton variant="rows" [count]="4" [lead]="true" />
+    } @else if (recent().length === 0) {
+      <app-empty-state
+        icon="package"
+        [heading]="'home.emptyItems' | t"
+        [body]="'home.emptyItemsBody' | t"
+        [rows]="3"
+      />
+    } @else {
+      <div class="rowgroup">
+        @for (item of recent(); track item.id) {
+          <app-list-item [title]="item.name" [sub]="locationOf(item)" [link]="['/items', item.id]">
+            <app-entity-thumb lead [entity]="item" [size]="40" />
+            <span trail class="muted home__date">{{ item.createdAt | ldate }}</span>
+          </app-list-item>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="home__section" aria-labelledby="home-locations">
+    <div class="home__head">
+      <h2 class="section-title" id="home-locations">{{ 'home.locations' | t }}</h2>
+      <a class="home__more" routerLink="/locations">{{ 'home.allLocations' | t }}</a>
+    </div>
+    @if (!loading() && topLocations().length === 0) {
+      <p class="muted">{{ 'locations.empty' | t }}</p>
+    } @else {
+      <div class="home__cards">
+        @for (loc of topLocations(); track loc.id) {
+          <a class="loc" [routerLink]="['/locations', loc.id]">
+            <app-entity-thumb [entity]="loc" [size]="44" />
+            <span class="loc__text">
+              <span class="loc__name ell">{{ loc.name }}</span>
+              <span class="loc__sub muted">{{
+                (loc.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
+                  | t: { count: loc.itemCount ?? 0 }
+              }}</span>
+            </span>
+          </a>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="home__section" aria-labelledby="home-tags">
+    <div class="home__head">
+      <h2 class="section-title" id="home-tags">{{ 'home.tags' | t }}</h2>
+      <a class="home__more" routerLink="/tags">{{ 'home.allTags' | t }}</a>
+    </div>
+    @if (!loading() && ref.tags().length === 0) {
+      <p class="muted">{{ 'tags.empty' | t }}</p>
+    } @else {
+      <div class="home__tags">
+        @for (tag of ref.tags(); track tag.id) {
+          <app-tag-chip [tag]="tag" />
+        }
+      </div>
+    }
+  </section>
+</div>

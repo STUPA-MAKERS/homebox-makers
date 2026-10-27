@@ -1,0 +1,36 @@
+.auth__note {
+  margin-bottom: var(--space-4);
+}
+
+.auth__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.auth__link,
+.auth__switch {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-weight: var(--fw-medium);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.auth__oidc {
+  margin-top: var(--space-4);
+}
+
+.auth__version {
+  font-size: var(--fs-small);
+}
+
+.auth__done {
+  margin: 0;
+}

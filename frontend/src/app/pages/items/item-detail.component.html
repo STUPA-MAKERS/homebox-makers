@@ -1,0 +1,267 @@
+<div class="detail">
+  @if (loading() && !item()) {
+    <app-skeleton variant="panel" [label]="'common.loading' | t" />
+  } @else if (notFound()) {
+    <app-empty-state
+      code="404"
+      icon="package"
+      [heading]="'item.notFound' | t"
+      [body]="'item.notFoundBody' | t"
+    >
+      <a appButton="tonal" routerLink="/items">{{ 'home.allItems' | t }}</a>
+    </app-empty-state>
+  } @else if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
+  } @else if (item(); as it) {
+    <article class="sheet" animate.enter="motion-fade-in" aria-labelledby="id-title">
+      <header class="sheet-head">
+        <app-sheet-bar [bleed]="split()">
+          <h2 appSheetBarTitle id="id-title" class="sheet-title">{{ it.name }}</h2>
+          <app-button
+            variant="text"
+            [iconOnly]="true"
+            [ariaLabel]="'common.edit' | t"
+            [title]="'common.edit' | t"
+            (click)="edit()"
+          ><app-icon name="edit" /></app-button>
+          <app-row-menu
+            [label]="'common.actions' | t"
+            [sections]="menu()"
+            (selected)="onMenu($event)"
+          />
+        </app-sheet-bar>
+        <p class="sheet-line">
+          @if (crumbs().length) {
+            <span class="sheet-crumbs" role="navigation" [attr.aria-label]="'item.path' | t">
+              @for (c of crumbs(); track c.id; let last = $last) {
+                <a [routerLink]="crumbLink(c)">{{ c.name }}</a>
+                @if (!last) {
+                  <app-icon name="chevron-right" [size]="14" />
+                }
+              }
+            </span>
+          }
+          @if (it.assetId) {
+            <span class="sheet-dot" aria-hidden="true">·</span>
+            <span class="mono">#{{ it.assetId }}</span>
+          }
+          @if (it.entityType) {
+            <span class="sheet-dot" aria-hidden="true">·</span>
+            <span>{{ it.entityType.name }}</span>
+          }
+          @if (it.archived) {
+            <span class="sheet-dot" aria-hidden="true">·</span>
+            <app-status-text kind="muted">{{ 'items.archived' | t }}</app-status-text>
+          }
+          <span class="sheet-dot" aria-hidden="true">·</span>
+          <span
+            [title]="
+              ('item.created' | t: { date: (it.createdAt | ldate: 'medium') }) +
+              ' · ' +
+              ('item.updated' | t: { date: (it.updatedAt | ldate: 'medium') })
+            "
+            >{{ 'item.updated' | t: { date: (it.updatedAt | ldate: 'mediumDate') } }}</span
+          >
+        </p>
+        <div class="sheet-chips">
+          @for (tag of it.tags; track tag.id) {
+            <app-tag-chip [tag]="tag" />
+          }
+          <app-tag-assign [entity]="it" (changed)="item.set($event)" />
+        </div>
+      </header>
+
+      <div class="sheet-cols">
+        <div class="sheet-col">
+        @if (it.description) {
+          <section class="sheet-sec" aria-labelledby="desc-title">
+            <h3 class="sec" id="desc-title">{{ 'field.description' | t }}</h3>
+            <p class="sheet-note">{{ it.description }}</p>
+          </section>
+        }
+        <section class="sheet-sec" aria-labelledby="facts-title">
+          <h3 class="sec" id="facts-title">{{ 'item.details' | t }}</h3>
+          <app-field-group>
+            <div class="sheet-pair">
+              <app-field-row [label]="'field.quantity' | t" [value]="it.quantity" />
+              <app-field-row
+                [label]="'item.insured' | t"
+                [value]="(it.insured ? 'common.yes' : 'common.no') | t"
+              />
+            </div>
+            @if (it.location; as loc) {
+              <app-field-row [label]="'location.label' | t">
+                <a class="sheet-link" [routerLink]="childLink(loc)">{{ loc.name }}</a>
+              </app-field-row>
+            }
+            @if (parentItem(); as p) {
+              <app-field-row [label]="'item.parentItem' | t">
+                <a class="sheet-link" [routerLink]="childLink(p)">{{ p.name }}</a>
+              </app-field-row>
+            }
+            @if (it.manufacturer) {
+              <app-field-row [label]="'item.manufacturer' | t" [value]="it.manufacturer" />
+            }
+            @if (it.modelNumber) {
+              <app-field-row
+                [label]="'item.modelNumber' | t"
+                [value]="it.modelNumber"
+                [mono]="true"
+              />
+            }
+            @if (it.serialNumber) {
+              <app-field-row
+                [label]="'item.serialNumber' | t"
+                [value]="it.serialNumber"
+                [mono]="true"
+              />
+            }
+            @for (f of it.fields; track f.id) {
+              <app-field-row
+                [label]="f.name"
+                [value]="
+                  f.type === 'boolean'
+                    ? ((f.booleanValue ? 'common.yes' : 'common.no') | t)
+                    : f.type === 'number'
+                      ? f.numberValue
+                      : f.textValue
+                "
+              />
+            }
+          </app-field-group>
+        </section>
+
+        @if (hasPurchase()) {
+          <section class="sheet-sec" aria-labelledby="purchase-title">
+            <h3 class="sec" id="purchase-title">{{ 'item.purchase' | t }}</h3>
+            <app-field-group>
+              @if (it.purchaseFrom) {
+                <app-field-row [label]="'item.purchaseFrom' | t" [value]="it.purchaseFrom" />
+              }
+              @if (it.purchasePrice) {
+                <app-field-row
+                  [label]="'item.purchasePrice' | t"
+                  [value]="it.purchasePrice | money"
+                  [mono]="true"
+                />
+              }
+              @if (it.purchaseDate | ldate) {
+                <app-field-row
+                  [label]="'item.purchaseDate' | t"
+                  [value]="it.purchaseDate | ldate"
+                />
+              }
+            </app-field-group>
+          </section>
+        }
+
+        @if (hasWarranty()) {
+          <section class="sheet-sec" aria-labelledby="warranty-title">
+            <h3 class="sec" id="warranty-title">{{ 'item.warranty' | t }}</h3>
+            <app-field-group>
+              @if (it.lifetimeWarranty) {
+                <app-field-row [label]="'item.warrantyExpires' | t" [value]="'item.lifetime' | t" />
+              } @else if (it.warrantyExpires | ldate) {
+                <app-field-row
+                  [label]="'item.warrantyExpires' | t"
+                  [value]="it.warrantyExpires | ldate"
+                />
+              }
+              @if (it.warrantyDetails) {
+                <app-field-row [label]="'item.warrantyDetails' | t" [value]="it.warrantyDetails" />
+              }
+            </app-field-group>
+          </section>
+        }
+
+        @if (hasSale()) {
+          <section class="sheet-sec" aria-labelledby="sold-title">
+            <h3 class="sec" id="sold-title">{{ 'item.sold' | t }}</h3>
+            <app-field-group>
+              @if (it.soldTo) {
+                <app-field-row [label]="'item.soldTo' | t" [value]="it.soldTo" />
+              }
+              @if (it.soldPrice) {
+                <app-field-row
+                  [label]="'item.soldPrice' | t"
+                  [value]="it.soldPrice | money"
+                  [mono]="true"
+                />
+              }
+              @if (it.soldDate | ldate) {
+                <app-field-row [label]="'item.soldDate' | t" [value]="it.soldDate | ldate" />
+              }
+              @if (it.soldNotes) {
+                <app-field-row [label]="'item.soldNotes' | t" [value]="it.soldNotes" />
+              }
+            </app-field-group>
+          </section>
+        }
+
+        @if (it.notes) {
+          <section class="sheet-sec" aria-labelledby="notes-title">
+            <h3 class="sec" id="notes-title">{{ 'item.notes' | t }}</h3>
+            <p class="notes">{{ it.notes }}</p>
+          </section>
+        }
+      </div>
+
+      <div class="sheet-col">
+        @if (photos().length) {
+          <section class="gallery" [attr.aria-label]="'item.photos' | t">
+            @for (p of photos(); track p.id; let i = $index) {
+              <button
+                type="button"
+                class="gallery__photo"
+                [class.gallery__photo--main]="i === 0"
+                [attr.aria-label]="'item.openPhoto' | t: { name: p.title }"
+                (click)="openPhoto(i)"
+              >
+                <img [src]="viewerItems()[i].url" alt="" loading="lazy" />
+              </button>
+            }
+          </section>
+        }
+
+        @if (children().length) {
+          <section class="sheet-sec" aria-labelledby="children-title">
+            <h3 class="sec" id="children-title">{{ 'item.children' | t }}</h3>
+            <div class="rowgroup">
+              @for (child of children(); track child.id) {
+                <app-list-item [title]="child.name" [link]="childLink(child)">
+                  <app-entity-thumb lead [entity]="child" [size]="36" />
+                  @if (child.quantity > 1) {
+                    <span trail class="num">{{ child.quantity }}×</span>
+                  }
+                </app-list-item>
+              }
+            </div>
+          </section>
+        }
+
+        <app-attachments-panel [entity]="it" (changed)="item.set($event)" />
+        <app-maintenance-log
+          [entityId]="it.id"
+          [startNew]="maintenance() === 'new'"
+          (startedNew)="clearMaintenanceParam()"
+        />
+
+      </div>
+    </div>
+    </article>
+
+    <app-file-viewer [items]="viewerItems()" [(index)]="viewerIndex" [(open)]="viewerOpen" />
+
+    <app-confirm-dialog
+      [open]="confirmDelete()"
+      [title]="'item.deleteTitle' | t"
+      [body]="'item.deleteBody' | t: { name: it.name }"
+      [confirmLabel]="'common.delete' | t"
+      [busy]="busy()"
+      (confirm)="delete()"
+      (cancel)="confirmDelete.set(false)"
+    />
+  }
+</div>

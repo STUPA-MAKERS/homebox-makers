@@ -1,0 +1,137 @@
+<div class="page">
+  @if (loading()) {
+    <app-skeleton variant="panel" [label]="'common.loading' | t" />
+  } @else if (loadError()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
+  } @else if (template(); as tpl) {
+    <nav class="crumbs" [attr.aria-label]="'item.path' | t">
+      <a routerLink="/collection/templates">{{ 'collection.tab.templates' | t }}</a>
+    </nav>
+    <app-page-header [title]="'templates.edit' | t" [subtitle]="tpl.name" [flush]="true">
+      <ng-container ngProjectAs="[actions]">
+        <app-button variant="danger" size="sm" (click)="confirmDelete.set(true)">{{
+          'common.delete' | t
+        }}</app-button>
+      </ng-container>
+    </app-page-header>
+
+    <form class="te" (ngSubmit)="save()" novalidate>
+      <section class="te__sec" aria-labelledby="te-about">
+        <h2 class="section-title" id="te-about">{{ 'templates.about' | t }}</h2>
+        <app-input
+          name="name"
+          [label]="'field.name' | t"
+          [required]="true"
+          [(ngModel)]="form.name"
+        />
+        <app-textarea [label]="'field.description' | t">
+          <textarea name="description" rows="2" [(ngModel)]="form.description"></textarea>
+        </app-textarea>
+      </section>
+
+      <section class="te__sec" aria-labelledby="te-defaults">
+        <h2 class="section-title" id="te-defaults">{{ 'templates.defaults' | t }}</h2>
+        <p class="muted te__lead">{{ 'templates.defaultsBody' | t }}</p>
+        <div class="form-grid">
+          <app-input
+            name="defaultName"
+            [label]="'templates.defaultName' | t"
+            [(ngModel)]="form.defaultName"
+          />
+          <app-input
+            name="defaultQuantity"
+            type="number"
+            [label]="'field.quantity' | t"
+            [(ngModel)]="form.defaultQuantity"
+          />
+        </div>
+        <app-textarea [label]="'field.description' | t">
+          <textarea
+            name="defaultDescription"
+            rows="2"
+            [(ngModel)]="form.defaultDescription"
+          ></textarea>
+        </app-textarea>
+        <div class="form-grid">
+          <app-input
+            name="defaultManufacturer"
+            [label]="'item.manufacturer' | t"
+            [(ngModel)]="form.defaultManufacturer"
+          />
+          <app-input
+            name="defaultModelNumber"
+            [label]="'item.modelNumber' | t"
+            [(ngModel)]="form.defaultModelNumber"
+          />
+        </div>
+        <app-location-select [value]="locationId()" (valueChange)="locationId.set($event)" />
+        <app-tag-picker [value]="tagIds()" (valueChange)="tagIds.set($event)" />
+        <div class="te__checks">
+          <app-checkbox name="defaultInsured" [(ngModel)]="form.defaultInsured">{{
+            'item.insured' | t
+          }}</app-checkbox>
+          <app-checkbox name="defaultLifetimeWarranty" [(ngModel)]="form.defaultLifetimeWarranty">{{
+            'item.lifetimeWarranty' | t
+          }}</app-checkbox>
+        </div>
+        <app-input
+          name="defaultWarrantyDetails"
+          [label]="'item.warrantyDetails' | t"
+          [(ngModel)]="form.defaultWarrantyDetails"
+        />
+      </section>
+
+      <section class="te__sec" aria-labelledby="te-sections">
+        <h2 class="section-title" id="te-sections">{{ 'templates.sections' | t }}</h2>
+        <p class="muted te__lead">{{ 'templates.sectionsBody' | t }}</p>
+        <div class="te__checks">
+          <app-checkbox name="includePurchase" [(ngModel)]="form.includePurchaseFields">{{
+            'item.purchase' | t
+          }}</app-checkbox>
+          <app-checkbox name="includeWarranty" [(ngModel)]="form.includeWarrantyFields">{{
+            'item.warranty' | t
+          }}</app-checkbox>
+          <app-checkbox name="includeSold" [(ngModel)]="form.includeSoldFields">{{
+            'item.sold' | t
+          }}</app-checkbox>
+        </div>
+      </section>
+
+      <section class="te__sec" [attr.aria-label]="'item.customFields' | t">
+        <app-custom-fields-editor [(fields)]="fields" />
+      </section>
+
+      <section class="te__sec" aria-labelledby="te-notes">
+        <h2 class="section-title" id="te-notes">{{ 'item.notes' | t }}</h2>
+        <app-textarea [label]="'item.notes' | t" [grow]="true">
+          <textarea name="notes" rows="3" [(ngModel)]="form.notes"></textarea>
+        </app-textarea>
+      </section>
+
+      @if (error()) {
+        <app-note kind="error" icon="alert">{{ error() }}</app-note>
+      }
+      @if (dirty() || busy()) {
+        <app-fab
+          icon="check"
+          animate.enter="motion-fade-in"
+          [label]="'common.save' | t"
+          [loading]="busy()"
+          (activate)="save()"
+        />
+      }
+    </form>
+
+    <app-confirm-dialog
+      [open]="confirmDelete()"
+      [title]="'templates.deleteTitle' | t"
+      [body]="'templates.deleteBody' | t: { name: tpl.name }"
+      [confirmLabel]="'common.delete' | t"
+      [busy]="busy()"
+      (confirm)="delete()"
+      (cancel)="confirmDelete.set(false)"
+    />
+  }
+</div>

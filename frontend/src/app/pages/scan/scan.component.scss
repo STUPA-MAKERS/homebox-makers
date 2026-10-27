@@ -1,0 +1,272 @@
+.sc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-bottom: var(--space-8);
+}
+.sc__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+:host-context(.frame--phone) .sc__grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.sc__cam,
+.sc__recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+// Until the picture comes, a dark, slightly lit surface.
+.sc__view {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  background:
+    radial-gradient(120% 90% at 30% 20%, #3a4440 0%, transparent 60%),
+    radial-gradient(90% 80% at 80% 90%, #2b2420 0%, transparent 60%),
+    #151817;
+}
+:host-context(.frame--phone) .sc__view {
+  aspect-ratio: 3 / 4;
+}
+.sc__frame {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(62%, 300px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+}
+.sc__c {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 4px solid #fff;
+}
+.sc__c--tl { top: 0; left: 0; border-right: 0; border-bottom: 0; border-top-left-radius: 16px; }
+.sc__c--tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-top-right-radius: 16px; }
+.sc__c--bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-bottom-left-radius: 16px; }
+.sc__c--br { bottom: 0; right: 0; border-left: 0; border-top: 0; border-bottom-right-radius: 16px; }
+.sc__line {
+  position: absolute;
+  inset: 12% 10% auto;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent);
+  animation: sc-scan 2.4s var(--ease-standard) infinite alternate;
+}
+@keyframes sc-scan {
+  to {
+    top: 88%;
+  }
+}
+.sc__tools {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+.sc__hint {
+  position: absolute;
+  inset: auto 0 var(--space-5);
+  margin: 0;
+  text-align: center;
+  color: #fff;
+  font-weight: var(--fw-medium);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.sc__view--dim .sc__frame {
+  opacity: 0.35;
+}
+.sc__view--dim .sc__c {
+  border-color: var(--color-accent);
+}
+
+// The hit: a card over the lower part of the picture.
+.sc__hit {
+  overflow: hidden;
+  position: absolute;
+  inset: auto var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-1);
+  box-shadow: var(--shadow-elevated);
+  animation: motion-rise-in var(--motion-base) var(--ease-enter);
+}
+.sc__hitHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.sc__thumb {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--color-selected);
+  color: var(--color-accent-text);
+}
+.sc__hitText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sc__hitKicker {
+  color: var(--color-accent-text);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+}
+.sc__hitName {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sc__hitSub {
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+// The four next steps quarter the foot of the card: icon over label, the whole cell the
+// button.
+.sc__hit {
+  padding-bottom: 0;
+}
+.sc__hitActions {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
+  margin: 0 calc(-1 * var(--space-4));
+  border-top: var(--border-width) solid var(--color-border);
+}
+.sc__act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 64px;
+  padding: var(--space-2) var(--space-1);
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+.sc__act + .sc__act {
+  border-left: var(--border-width) solid var(--color-border);
+}
+.sc__act:hover {
+  background: var(--color-surface-2);
+}
+.sc__act:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+.sc__act--main {
+  background: var(--color-selected);
+}
+.sc__act > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sc__lead {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text-muted);
+}
+.sc__when {
+  pointer-events: none;
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+  white-space: nowrap;
+}
+.sc__note {
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+// The camera picture fills the viewfinder. A video sits on its own layer, which the
+// rounded `overflow: hidden` alone does not clip in Chrome; the clip path does.
+.sc__view {
+  clip-path: inset(0 round var(--radius-2xl));
+}
+.sc__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sc__view--off .sc__video {
+  visibility: hidden;
+}
+.sc__view--dim .sc__video {
+  filter: brightness(0.55);
+}
+
+// No picture: why, and the way out, in the middle of the viewfinder.
+.sc__off {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  color: #fff;
+  text-align: center;
+}
+.sc__offTitle {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+}
+.sc__offBody {
+  max-width: 34ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: var(--fs-small);
+}
+.sc__offActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.sc__tools app-button.on {
+  --btn-bg: var(--color-selected);
+}
+.sc__hitNone {
+  overflow-wrap: anywhere;
+}
+.sc__file {
+  display: none;
+}
+.sc__recentHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}

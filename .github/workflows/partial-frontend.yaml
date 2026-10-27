@@ -11,32 +11,40 @@ on:
 
 jobs:
   lint:
-    name: Lint
+    name: Lint, typecheck and unit tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
         with:
           fetch-depth: 0
+          # The UI kit is a git submodule (frontend/vendor/ui-kit).
+          submodules: recursive
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
+      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f
         with:
-          version: 10
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm ci
         working-directory: frontend
 
       - name: Run Lint
-        run: pnpm run lint:ci
+        run: npm run lint
         working-directory: frontend
 
       - name: Run Typecheck
-        # Upstream v0.26.2 itself fails this step (198 errors, most of them refs that are
-        # not unwrapped in templates), and upstream's own PR CI has been red since March.
-        # The step still runs and logs its errors, but it does not fail the check.
-        continue-on-error: true
-        run: pnpm run typecheck
+        run: npm run typecheck
+        working-directory: frontend
+
+      - name: Run Unit Tests
+        run: npm run test:ci
+        working-directory: frontend
+
+      - name: Build
+        run: npx ng build
         working-directory: frontend
 
   integration-tests:
@@ -61,6 +69,8 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
         with:
           fetch-depth: 0
+          # The UI kit is a git submodule (frontend/vendor/ui-kit).
+          submodules: recursive
 
       - name: Install Task
         uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
@@ -70,19 +80,15 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c
         with:
-          go-version: "1.26"
+          go-version: "1.27"
           cache-dependency-path: backend/go.mod
 
       - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f
         with:
           node-version: lts/*
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
-        with:
-          version: 10
-
       - name: Install dependencies
-        run: pnpm install
+        run: npm ci
         working-directory: frontend
 
       - name: Run Integration Tests
@@ -112,6 +118,8 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
         with:
           fetch-depth: 0
+          # The UI kit is a git submodule (frontend/vendor/ui-kit).
+          submodules: recursive
 
       - name: Install Task
         uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
@@ -121,19 +129,15 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c
         with:
-          go-version: "1.26"
+          go-version: "1.27"
           cache-dependency-path: backend/go.mod
 
       - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f
         with:
           node-version: lts/*
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
-        with:
-          version: 10
-
       - name: Install dependencies
-        run: pnpm install
+        run: npm ci
         working-directory: frontend
 
       - name: Run Integration Tests

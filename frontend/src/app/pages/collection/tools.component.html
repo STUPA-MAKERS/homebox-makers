@@ -1,0 +1,209 @@
+<div class="page co">
+  <app-page-header [title]="'collection.tab.tools' | t" />
+
+  <section class="co__sec" aria-labelledby="tools-csv">
+    <h2 class="section-title" id="tools-csv">{{ 'tools.csv.title' | t }}</h2>
+    <p class="muted co__lead">{{ 'tools.csv.body' | t }}</p>
+    <div class="tl__tiles">
+      <a class="tl__tile" [href]="csvUrl()" download>
+        <span class="tl__ico"><app-icon name="download" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.csv.export' | t }}</span>
+        <span class="tl__td">{{ 'tools.csv.exportBody' | t }}</span>
+      </a>
+      <button type="button" class="tl__tile" (click)="csvPicker.open()">
+        <span class="tl__ico"><app-icon name="upload" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.csv.import' | t }}</span>
+        <span class="tl__td">{{ 'tools.csv.importBody' | t }}</span>
+      </button>
+      <a class="tl__tile" [href]="bomUrl()" download>
+        <span class="tl__ico"><app-icon name="receipt" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.bom' | t }}</span>
+        <span class="tl__td">{{ 'tools.bomBody' | t }}</span>
+      </a>
+      <a class="tl__tile" routerLink="/labels">
+        <span class="tl__ico"><app-icon name="printer" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.labels' | t }}</span>
+        <span class="tl__td">{{ 'tools.labelsBody' | t }}</span>
+      </a>
+    </div>
+    <app-file-picker #csvPicker accept=".csv,.tsv,text/csv" (picked)="pendingCsv.set($event[0])" />
+  </section>
+
+  <section class="co__sec" aria-labelledby="tools-backups">
+    <div class="co__head">
+      <h2 class="section-title" id="tools-backups">{{ 'tools.backup.title' | t }}</h2>
+      <div class="tl__actions">
+        <app-button variant="text" size="sm" (click)="backupPicker.open()">
+          <span class="btn-label"><app-icon name="upload" />{{ 'tools.backup.import' | t }}</span>
+        </app-button>
+        <app-button
+          variant="text"
+          size="sm"
+          [loading]="busy() === 'export'"
+          (click)="createExport()"
+        >
+          <span class="btn-label"><app-icon name="plus" />{{ 'tools.backup.create' | t }}</span>
+        </app-button>
+      </div>
+    </div>
+    <p class="muted co__lead">{{ 'tools.backup.body' | t }}</p>
+    <app-file-picker
+      #backupPicker
+      accept=".zip,application/zip"
+      (picked)="pendingBackup.set($event[0])"
+    />
+    @if (exportsError()) {
+      <app-note kind="error" icon="alert" retryable (retry)="loadExports()">{{
+        'common.loadError' | t
+      }}</app-note>
+    } @else if (exports().length === 0) {
+      <app-empty-state shape="file" rows="2" [heading]="'tools.backup.empty' | t" />
+    } @else {
+      <div class="rowgroup">
+        @for (exp of exports(); track exp.id) {
+          <div class="co__row">
+            <span class="co__lead-icon"
+              ><app-icon [name]="exp.kind === 'import' ? 'upload' : 'archive'" [size]="18"
+            /></span>
+            <div class="co__text">
+              <span class="co__name"
+                >{{
+                  (exp.kind === 'import' ? 'tools.backup.kindImport' : 'tools.backup.kindExport')
+                    | t
+                }}
+                · {{ exp.createdAt | ldate: 'medium' }}</span
+              >
+              <span class="co__sub">
+                <app-status-text [kind]="statusKind(exp)">{{ statusKey(exp) | t }}</app-status-text>
+                @if (exp.status === 'running' && exp.progress) {
+                  <span class="muted"> · {{ exp.progress }} %</span>
+                }
+                @if (size(exp.sizeBytes); as s) {
+                  <span class="muted"> · {{ s }}</span>
+                }
+                @if (exp.error) {
+                  <span class="muted"> · {{ exp.error }}</span>
+                }
+              </span>
+            </div>
+            @if (exp.kind !== 'import' && exp.status === 'completed') {
+              <a appButton="text" size="sm" [href]="downloadUrl(exp)" download>
+                <span class="btn-label"
+                  ><app-icon name="download" />{{ 'tools.backup.download' | t }}</span
+                >
+              </a>
+            }
+            <app-button
+              variant="text"
+              size="sm"
+              [iconOnly]="true"
+              [ariaLabel]="'common.delete' | t"
+              [title]="'common.delete' | t"
+              (click)="deletingExport.set(exp)"
+              ><app-icon name="trash"
+            /></app-button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="co__sec" aria-labelledby="tools-actions">
+    <h2 class="section-title" id="tools-actions">{{ 'tools.action.title' | t }}</h2>
+    <div class="rowgroup">
+      @for (a of actions; track a.id) {
+        <div class="co__row">
+          <span class="tl__ico tl__ico--sm"><app-icon [name]="a.icon" [size]="18" /></span>
+          <div class="co__text">
+            <span class="co__name">{{ a.titleKey | t }}</span>
+            <span class="muted co__sub tl__wrap">{{ a.bodyKey | t }}</span>
+          </div>
+          <app-button variant="tonal" size="sm" (click)="pendingAction.set(a)">{{
+            'tools.action.run' | t
+          }}</app-button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="co__sec" aria-labelledby="tools-danger">
+    <h2 class="section-title" id="tools-danger">{{ 'tools.wipe.title' | t }}</h2>
+    <div class="rowgroup tl__danger">
+      <div class="co__row">
+        <span class="tl__ico tl__ico--sm tl__ico--danger"><app-icon name="alert" [size]="18" /></span>
+        <div class="co__text">
+          <span class="co__name">{{ 'tools.wipe.action' | t }}</span>
+          <span class="muted co__sub tl__wrap">{{ 'tools.wipe.body' | t }}</span>
+        </div>
+        <app-button variant="danger" size="sm" (click)="openWipe()">{{
+          'tools.wipe.action' | t
+        }}</app-button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<app-confirm-dialog
+  [open]="pendingCsv() !== null"
+  [title]="'tools.csv.confirmTitle' | t"
+  [body]="'tools.csv.confirmBody' | t: { name: pendingCsv()?.name ?? '' }"
+  [confirmLabel]="'tools.csv.import' | t"
+  [busy]="busy() === 'csv'"
+  (confirm)="importCsv()"
+  (cancel)="pendingCsv.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="pendingBackup() !== null"
+  [title]="'tools.backup.confirmTitle' | t"
+  [body]="'tools.backup.confirmBody' | t: { name: pendingBackup()?.name ?? '' }"
+  [confirmLabel]="'tools.backup.import' | t"
+  [busy]="busy() === 'backup'"
+  (confirm)="importBackup()"
+  (cancel)="pendingBackup.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="pendingAction() !== null"
+  [title]="pendingAction()?.titleKey ?? 'tools.action.title' | t"
+  [body]="pendingAction()?.bodyKey ?? 'tools.action.title' | t"
+  [confirmLabel]="'tools.action.run' | t"
+  [busy]="busy() === 'action'"
+  (confirm)="runAction()"
+  (cancel)="pendingAction.set(null)"
+/>
+
+<app-confirm-dialog
+  [open]="deletingExport() !== null"
+  [title]="'tools.backup.deleteTitle' | t"
+  [body]="'tools.backup.deleteBody' | t"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy() === 'delete'"
+  (confirm)="confirmDeleteExport()"
+  (cancel)="deletingExport.set(null)"
+/>
+
+<app-dialog
+  [open]="wiping()"
+  size="form"
+  [title]="'tools.wipe.confirmTitle' | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="wiping.set(false)"
+>
+  <div class="form-stack">
+    <app-note kind="error" icon="alert">{{ 'tools.wipe.warning' | t }}</app-note>
+    <app-checkbox name="wipeLocations" [(ngModel)]="wipeLocations">{{
+      'tools.wipe.locations' | t
+    }}</app-checkbox>
+    <app-checkbox name="wipeTags" [(ngModel)]="wipeTags">{{ 'tools.wipe.tags' | t }}</app-checkbox>
+    <app-checkbox name="wipeMaintenance" [(ngModel)]="wipeMaintenance">{{
+      'tools.wipe.maintenance' | t
+    }}</app-checkbox>
+  </div>
+  <div dialog-footer>
+    <app-button variant="text" (click)="wiping.set(false)">{{ 'common.cancel' | t }}</app-button>
+    <app-button variant="danger" [loading]="busy() === 'wipe'" (click)="wipe()">{{
+      'tools.wipe.action' | t
+    }}</app-button>
+  </div>
+</app-dialog>

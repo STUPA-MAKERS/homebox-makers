@@ -1,0 +1,139 @@
+<div class="il" [class.il--split]="split()">
+  <app-list-detail [detailOpen]="selectedId() !== null" (back)="closeDetail()">
+    <section list class="ld-pane il__pane" aria-labelledby="il-title">
+      <app-page-header [pane]="true" titleId="il-title" [title]="'nav.items' | t">
+        <ng-container ngProjectAs="[actions]">
+          <app-row-menu
+            icon="sort"
+            [label]="'items.sort.title' | t"
+            [sections]="sortSections()"
+            (selected)="onSortMenu($event)"
+          />
+        </ng-container>
+      </app-page-header>
+
+      <app-sticky-bar class="ld-pane__filters">
+        <app-search-pill
+          [placeholder]="'items.search' | t"
+          [label]="'items.searchLabel' | t"
+          [clearable]="true"
+          [value]="searchText()"
+          (valueChange)="onSearch($event)"
+        />
+        <div class="il__chips" role="group" [attr.aria-label]="'items.filter.group' | t">
+          <app-filter-select
+            [label]="'location.label' | t"
+            icon="mappin"
+            [options]="locationOptions()"
+            [value]="loc() ?? ''"
+            (valueChange)="setLocation($event)"
+            [text]="locationText()"
+            [resetLabel]="'items.filter.allLocations' | t"
+            filled
+          />
+          <app-filter-select
+            [label]="'tags.label' | t"
+            icon="tag"
+            [options]="tagOptions()"
+            [multiple]="true"
+            [values]="tagIds()"
+            (valuesChange)="setTags($event)"
+            [text]="tagText()"
+            [emptyText]="'tags.none' | t"
+            [resetLabel]="'items.filter.allTags' | t"
+            filled
+          />
+          <app-filter-select
+            [label]="'items.filter.archived' | t"
+            [options]="archivedOptions()"
+            [value]="archived() ?? ''"
+            (valueChange)="setArchived($event)"
+            [text]="includeArchived() ? ('items.filter.withArchived' | t) : null"
+            filled
+          />
+          @if (filterCount() > 0) {
+            <button
+              type="button"
+              class="chip il__reset"
+              [attr.aria-label]="'items.filter.reset' | t"
+              [title]="'items.filter.reset' | t"
+              (click)="resetFilters()"
+            >
+              <app-icon name="reset" [size]="15" />
+            </button>
+          }
+        </div>
+      </app-sticky-bar>
+
+      <div class="il__scroll" appScrollFade="y">
+        @if (error()) {
+          <app-note kind="error" icon="alert" retryable (retry)="reload()">{{
+            'common.loadError' | t
+          }}</app-note>
+        }
+
+        @if (loading() && !loaded()) {
+          <app-skeleton variant="rows" [count]="8" [lead]="true" [label]="'common.loading' | t" />
+        } @else if (items().length === 0) {
+          <app-empty-state
+            icon="package"
+            [heading]="(q() || filterCount() ? 'items.noMatch' : 'home.emptyItems') | t"
+            [body]="(q() || filterCount() ? 'items.noMatchBody' : 'home.emptyItemsBody') | t"
+          />
+        } @else {
+          <div class="il__rows" [class.rowgroup]="!split()" [class.il__rows--busy]="loading()" [attr.aria-busy]="loading()">
+            @for (item of items(); track item.id) {
+              <app-list-item
+                [title]="item.name"
+                [sub]="subLine(item)"
+                [link]="['/items', item.id]"
+                linkQueryParamsHandling="preserve"
+                [selected]="item.id === selectedId()"
+              >
+                <app-entity-thumb lead [entity]="item" [size]="44" />
+                @if (item.archived) {
+                  <span status class="il__badge">{{ 'items.archived' | t }}</span>
+                }
+                <span trail class="il__trail">
+                  @if (item.quantity > 1) {
+                    <span class="il__qty num">{{ item.quantity }}×</span>
+                  }
+                  <app-tag-strip [tags]="item.tags" [max]="1" />
+                </span>
+                <app-row-menu
+                  trail
+                  [label]="('common.actions' | t) + ': ' + item.name"
+                  [sections]="rowMenu(item)"
+                  (selected)="onRowMenu($event, item)"
+                />
+              </app-list-item>
+            }
+          </div>
+          @if (hasMore()) {
+            <div appInfiniteScroll (scrolledToEnd)="loadMore()" aria-hidden="true"></div>
+            <div class="il__more">
+              <app-button variant="text" [loading]="loadingMore()" (click)="loadMore()">{{
+                'items.loadMore' | t
+              }}</app-button>
+            </div>
+          }
+        }
+      </div>
+      <app-fab [label]="'fab.item' | t" [contained]="split()" (activate)="newItem()" />
+    </section>
+
+    <div detail class="il__detail">
+      <router-outlet />
+    </div>
+  </app-list-detail>
+
+  <app-confirm-dialog
+    [open]="deleting() !== null"
+    [title]="'item.deleteTitle' | t"
+    [body]="'item.deleteBody' | t: { name: deleting()?.name ?? '' }"
+    [confirmLabel]="'common.delete' | t"
+    [busy]="busy()"
+    (confirm)="confirmDelete()"
+    (cancel)="deleting.set(null)"
+  />
+</div>

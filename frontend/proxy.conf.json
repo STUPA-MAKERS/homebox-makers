@@ -1,0 +1,9 @@
+{
+  "$comment": "Dev proxy for `ng serve`: forwards /api (REST and the event WebSocket) to the local Go backend (`task go:run`, port 7745).",
+  "/api": {
+    "target": "http://localhost:7745",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true
+  }
+}

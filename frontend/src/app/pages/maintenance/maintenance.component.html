@@ -1,0 +1,98 @@
+<div class="mt" [class.mt--split]="split()">
+  <app-list-detail [detailOpen]="selectedId() !== null" (back)="closeDetail()">
+    <section list class="ld-pane mt__pane" aria-labelledby="mt-title">
+      <app-page-header [pane]="true" titleId="mt-title" [title]="'nav.maintenance' | t" />
+
+      <app-sticky-bar class="ld-pane__filters">
+        <div class="mt__chips" role="group" [attr.aria-label]="'maint.filter' | t">
+          <app-filter-select
+            [label]="'maint.statusLabel' | t"
+            [options]="filterOptions()"
+            [value]="filter()"
+            unsetValue="scheduled"
+            (valueChange)="setFilter($event)"
+            [text]="filterText()"
+            filled
+          />
+        </div>
+      </app-sticky-bar>
+
+      <div class="mt__scroll" appScrollFade="y">
+        @if (error()) {
+          <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+            'common.loadError' | t
+          }}</app-note>
+        } @else if (loading()) {
+          <app-skeleton variant="rows" [count]="6" [lead]="true" [label]="'common.loading' | t" />
+        } @else if (groups().length === 0) {
+          <app-empty-state
+            rows="4"
+            [heading]="(hasRows() ? 'maint.emptyAll' : 'maint.emptyNone') | t"
+            [body]="'maint.emptyAllBody' | t"
+          />
+        } @else {
+          @for (g of groups(); track g.key) {
+            <section class="mt__group" [attr.aria-labelledby]="'mt-g-' + g.key">
+              <h2 class="sec mt__sec" [class.mt__sec--over]="g.key === 'over'" [id]="'mt-g-' + g.key">
+                {{ g.title | t }}
+              </h2>
+              <div class="mt__rows" [class.rowgroup]="!split()" role="list">
+                @for (e of g.rows; track e.id) {
+                  <app-list-item
+                    role="listitem"
+                    [title]="e.name"
+                    [sub]="e.itemName"
+                    [link]="['/maintenance', e.id]"
+                    linkQueryParamsHandling="preserve"
+                    [selected]="e.id === selectedId()"
+                  >
+                    <app-date-block
+                      lead
+                      [date]="isDone(e) ? e.completedDate : e.scheduledDate"
+                      [muted]="isDone(e)"
+                    />
+                    @if (g.key === 'over') {
+                      <app-status-text trail kind="warn" class="mt__late">{{
+                        lateText(e)
+                      }}</app-status-text>
+                    }
+                    <app-row-menu
+                      trail
+                      [label]="('common.actions' | t) + ': ' + e.name"
+                      [sections]="menu(e)"
+                      (selected)="onMenu(e, $event)"
+                    />
+                  </app-list-item>
+                }
+              </div>
+            </section>
+          }
+        }
+      </div>
+      <app-fab
+        [label]="'maint.plan' | t"
+        [contained]="split()"
+        (activate)="planning.set(true)"
+      />
+    </section>
+    <div detail class="mt__detail">
+      <router-outlet />
+    </div>
+  </app-list-detail>
+</div>
+
+<app-maintenance-plan-dialog
+  [open]="planning()"
+  (closed)="planning.set(false)"
+  (planned)="onPlanned($event)"
+/>
+
+<app-confirm-dialog
+  [open]="deleting() !== null"
+  [title]="'maint.deleteTitle' | t"
+  [body]="'maint.deleteBody' | t: { name: deleting()?.name ?? '' }"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy()"
+  (confirm)="confirmDelete()"
+  (cancel)="deleting.set(null)"
+/>

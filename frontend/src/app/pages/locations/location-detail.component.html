@@ -1,0 +1,158 @@
+<div class="detail">
+  @if (loading() && !location()) {
+    <app-skeleton variant="panel" [label]="'common.loading' | t" />
+  } @else if (notFound()) {
+    <app-empty-state
+      code="404"
+      icon="mappin"
+      [heading]="'location.notFound' | t"
+      [body]="'item.notFoundBody' | t"
+    >
+      <a appButton="tonal" routerLink="/locations">{{ 'home.allLocations' | t }}</a>
+    </app-empty-state>
+  } @else if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
+  } @else if (location(); as loc) {
+    <article class="sheet" animate.enter="motion-fade-in" aria-labelledby="ld-title">
+      <header class="sheet-head">
+        <app-sheet-bar [bleed]="split()">
+          <h2 appSheetBarTitle id="ld-title" class="sheet-title">{{ loc.name }}</h2>
+          <app-button
+            variant="text"
+            [iconOnly]="true"
+            [ariaLabel]="'common.edit' | t"
+            (click)="edit()"
+          ><app-icon name="edit" /></app-button>
+          <app-row-menu
+            [label]="'common.actions' | t"
+            [sections]="menu()"
+            (selected)="onMenu($event)"
+          />
+        </app-sheet-bar>
+        @if (crumbs().length) {
+          <p class="sheet-line">
+            @if (crumbs().length) {
+              <span class="sheet-crumbs" role="navigation" [attr.aria-label]="'item.path' | t">
+                @for (c of crumbs(); track c.id; let last = $last) {
+                  <a [routerLink]="crumbLink(c)">{{ c.name }}</a>
+                  @if (!last) {
+                    <app-icon name="chevron-right" [size]="14" />
+                  }
+                }
+              </span>
+            }
+          </p>
+        }
+        <div class="sheet-chips">
+          @for (tag of loc.tags; track tag.id) {
+            <app-tag-chip [tag]="tag" />
+          }
+          <app-tag-assign [entity]="loc" (changed)="location.set($event)" />
+        </div>
+      </header>
+
+      <div class="sheet-cols">
+      <div class="sheet-col">
+        @if (loc.description) {
+          <section class="sheet-sec" aria-labelledby="ld-desc">
+            <h3 class="sec" id="ld-desc">{{ 'field.description' | t }}</h3>
+            <p class="sheet-note">{{ loc.description }}</p>
+          </section>
+        }
+        <section class="sheet-sec" aria-labelledby="ld-items">
+          <div class="sheet-sec__head">
+            <h3 class="sec ld__title" id="ld-items">
+              {{ 'nav.items' | t }}
+            </h3>
+            @if (itemsTotal() > 0) {
+              <a class="ld__more" routerLink="/items" [queryParams]="{ loc: loc.id }">{{
+                'location.openInList' | t
+              }}</a>
+            }
+          </div>
+          @if (itemsLoading()) {
+            <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
+          } @else if (items().length === 0) {
+            <app-empty-state rows="2" [heading]="'location.noItems' | t" />
+          } @else {
+            <div class="rowgroup">
+              @for (item of items(); track item.id) {
+                <app-list-item
+                  [title]="item.name"
+                  [sub]="subLine(item)"
+                  [link]="['/items', item.id]"
+                >
+                  <app-entity-thumb lead [entity]="item" [size]="40" />
+                  <span trail class="ld__trail">
+                    @if (item.quantity > 1) {
+                      <span class="num">{{ item.quantity }}×</span>
+                    }
+                    <app-tag-strip [tags]="item.tags" />
+                  </span>
+                </app-list-item>
+              }
+            </div>
+            @if (items().length < itemsTotal()) {
+              <div appInfiniteScroll (scrolledToEnd)="loadItems()" aria-hidden="true"></div>
+              <app-button variant="text" [loading]="itemsMore()" (click)="loadItems()">{{
+                'items.loadMore' | t
+              }}</app-button>
+            }
+          }
+        </section>
+      </div>
+
+      <div class="sheet-col">
+        <section class="sheet-sec" aria-labelledby="ld-subs">
+          <div class="sheet-sec__head">
+            <h3 class="sec ld__title" id="ld-subs">{{ 'location.subLocations' | t }}</h3>
+            <app-button variant="text" size="sm" (click)="addSub()">
+              <span class="btn-label"
+                ><app-icon name="plus" />{{ 'create.location.short' | t }}</span
+              >
+            </app-button>
+          </div>
+          @if (subLocations().length === 0) {
+            <app-empty-state rows="2" [heading]="'location.noSubs' | t" />
+          } @else {
+            <div class="rowgroup">
+              @for (sub of subLocations(); track sub.id) {
+                <app-list-item [title]="sub.name" [link]="['/locations', sub.id]">
+                  <span lead class="ld__icon"><app-icon name="mappin" [size]="18" /></span>
+                  @if (sub.itemCount) {
+                    <span trail class="muted num">{{
+                      (sub.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
+                        | t: { count: sub.itemCount }
+                    }}</span>
+                  }
+                </app-list-item>
+              }
+            </div>
+          }
+        </section>
+
+        <app-attachments-panel [entity]="loc" (changed)="location.set($event)" />
+
+        @if (loc.notes) {
+          <section class="sheet-sec" aria-labelledby="ld-notes">
+            <h3 class="sec ld__title" id="ld-notes">{{ 'item.notes' | t }}</h3>
+            <p class="ld__notes">{{ loc.notes }}</p>
+          </section>
+        }
+      </div>
+      </div>
+    </article>
+
+    <app-confirm-dialog
+      [open]="confirmDelete()"
+      [title]="'location.deleteTitle' | t"
+      [body]="'location.deleteBody' | t: { name: loc.name }"
+      [confirmLabel]="'common.delete' | t"
+      [busy]="busy()"
+      (confirm)="delete()"
+      (cancel)="confirmDelete.set(false)"
+    />
+  }
+</div>

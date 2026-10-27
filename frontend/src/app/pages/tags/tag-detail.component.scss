@@ -1,0 +1,73 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+.detail {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tg__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.tg__dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.tg__title {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.tg__more {
+  margin-inline-start: auto;
+  font-size: var(--fs-small);
+  color: var(--color-accent-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tg__chips {
+  padding: 0 var(--space-1);
+}
+
+.tg__trail {
+  // Only text: a click goes through to the row link below.
+  pointer-events: none;
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.tg__empty {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+.tg__lead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface-3);
+}
+.tg__lead .tg__dot {
+  width: 12px;
+  height: 12px;
+}

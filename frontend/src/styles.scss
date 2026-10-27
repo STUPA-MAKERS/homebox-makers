@@ -1,0 +1,513 @@
+// The design system of the kit: fonts, tokens, base reset, skeletons, row groups and the
+// list/detail geometry (vendor/ui-kit/src/styles/index.scss).
+@use 'index';
+@use 'breakpoints' as bp;
+
+// The utilities the kit's templates use (tailwind.config.js); preflight is off.
+@tailwind utilities;
+
+// A pane page (a list beside its detail) fills the free height of `.main` and its panes
+// scroll inside themselves. A basis of 0 keeps the rows from pushing it taller than the
+// viewport; the bottom padding shrinks to `--pane-foot-gap`.
+.pane-page {
+  flex: 1 1 0;
+  min-height: 0;
+  margin-bottom: calc(var(--pane-foot-gap, 0px) - var(--main-pad-bottom, 0px));
+}
+
+.sec {
+  margin: 0;
+  font-size: 0.84375rem;
+  line-height: 1.25rem;
+  font-weight: var(--fw-semibold);
+  color: var(--color-accent-text);
+}
+
+.section-title {
+  margin: 0;
+  font-size: var(--fs-h3);
+  line-height: 1.375rem;
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+}
+
+// A centred page column, capped to the content width of the design system.
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin-inline: auto;
+}
+// The head of a detail sheet (STUPA-Workflow): the bar with the title and the actions
+// (`app-sheet-bar`), a muted line with the context, a rule below.
+.sheet-title {
+  margin: 0;
+  font-size: var(--fs-d2);
+  line-height: var(--lh-d2);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  overflow-wrap: anywhere;
+}
+.sheet-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  margin: 0;
+  min-width: 0;
+  color: var(--color-text-muted);
+  font-size: var(--fs-md);
+  line-height: var(--lh-h3);
+}
+.sheet-line a {
+  color: inherit;
+  text-decoration: none;
+}
+.sheet-line a:hover {
+  color: var(--color-accent-text);
+}
+.sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 22px;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+@include bp.phone {
+  .sheet-title {
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+  }
+}
+
+// The two columns of a detail sheet: they sit side by side while the sheet is wide enough
+// and wrap below each other otherwise, whatever the viewport.
+.sheet-cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  align-items: flex-start;
+}
+.sheet-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.sheet-col:first-child {
+  flex: 1.4 1 0;
+  min-width: min(100%, 22.5rem);
+}
+.sheet-col:last-child {
+  flex: 1 1 0;
+  min-width: min(100%, 20rem);
+}
+
+// The sheet itself, its sections and the pairs of field rows (`td__*` in STUPA-Workflow).
+.sheet {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+.sheet-dot {
+  color: var(--color-text-subtle);
+}
+.sheet-crumbs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  min-width: 0;
+}
+.sheet-crumbs app-icon {
+  color: var(--color-text-subtle);
+}
+.sheet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.sheet-sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.sheet-sec > .sec,
+.sheet-sec__head > .sec {
+  padding: 0 var(--space-1);
+}
+.sheet-sec__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+}
+.sheet-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+}
+.sheet-pair > * {
+  border-radius: 4px;
+  background: var(--color-surface-2);
+}
+.sheet-pair:first-child > :first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+.sheet-pair:first-child > :last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+.sheet-pair:last-child > :first-child {
+  border-bottom-left-radius: var(--radius-lg);
+}
+.sheet-pair:last-child > :last-child {
+  border-bottom-right-radius: var(--radius-lg);
+}
+.sheet-link {
+  color: var(--color-accent-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+@media (hover: hover) {
+  .sheet-link:hover {
+    text-decoration: underline;
+  }
+}
+.sheet-foot {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+// A page on a `wide` route that uses the whole width beside the rail (the start page).
+.page--wide {
+  max-width: none;
+}
+// A page in the detail of a list/detail layout fills the sheet.
+app-list-detail .page {
+  max-width: none;
+  margin-inline: 0;
+}
+
+// A form inside a card or a dialog: one field per row, the actions at the end.
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+// A button label with a leading icon.
+.btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+/* Detail pages: the parent path above the title, a small badge and the description. */
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: calc(-1 * var(--space-3));
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
+.crumbs a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.crumbs a:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.badge {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--color-surface-3);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+.desc {
+  margin: 0;
+  white-space: pre-line;
+  color: var(--color-text-muted);
+}
+
+/* Stat tiles: the icon at the top start, the big number at the top end, the label below
+   (home, maintenance). */
+.stat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'icon value'
+    'label label';
+  align-items: start;
+  column-gap: var(--space-3);
+  row-gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-1);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.stat--link:hover {
+  background: var(--color-surface-2);
+}
+.stat--link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.stat--skel {
+  display: flex;
+  min-height: 6.5rem;
+  align-items: flex-end;
+}
+.stat__icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-selected);
+  color: var(--color-accent-text);
+}
+.stat__value {
+  grid-area: value;
+  justify-self: end;
+  max-width: 100%;
+  font-size: var(--fs-d2);
+  line-height: 36px;
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stat__label {
+  grid-area: label;
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+// The motion utilities of STUPA-Workflow, for `animate.enter` / `animate.leave`.
+.motion-pop-in {
+  animation: motion-pop-in var(--motion-fast) var(--ease-enter);
+}
+.motion-rise-in {
+  animation: motion-rise-in var(--motion-base) var(--ease-enter);
+}
+.motion-fade-in {
+  animation: motion-fade-in var(--motion-base) var(--ease-standard);
+}
+.motion-fade-out {
+  pointer-events: none;
+  animation: motion-fade-out var(--motion-xs) var(--ease-exit) forwards;
+}
+@keyframes motion-pop-in {
+  from {
+    opacity: 0;
+    scale: var(--motion-scale-in);
+  }
+}
+@keyframes motion-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-shift-sm));
+  }
+}
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes motion-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+// Route transitions (STUPA-Workflow, `core/motion/motion.ts`): a fade between the sections of
+// the rail, a slide one level deeper or back on a phone.
+// The page moves as the root snapshot, not as a group of `.main`, because `.main` moves with the
+// document scroll and its own group would morph from the old box to the new one. The frame gets
+// groups of its own, so it stays still.
+:root[data-motion] .frame__rail {
+  view-transition-name: rail;
+}
+// A group of its own, so the moving page never paints over the bottom bar.
+:root[data-motion] .bb {
+  view-transition-name: bottom-bar;
+}
+:root[data-motion]::view-transition {
+  background: var(--color-bg);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-base);
+  animation-timing-function: var(--ease-standard);
+}
+// The rail does not crossfade: its old and new pictures are the same but for the active
+// entry, and a crossfade of the half transparent snapshots showed garbage on some GPUs. The
+// new picture shows at once on an opaque ground.
+:root[data-motion] .frame__rail {
+  background: var(--color-bg);
+}
+::view-transition-old(rail),
+::view-transition-old(bottom-bar) {
+  display: none;
+}
+::view-transition-group(rail),
+::view-transition-new(rail),
+::view-transition-group(bottom-bar),
+::view-transition-new(bottom-bar) {
+  animation: none;
+}
+:root[data-motion='section']::view-transition-old(root) {
+  animation: vt-fade-out var(--motion-xs) var(--ease-exit) both;
+}
+:root[data-motion='section']::view-transition-new(root) {
+  animation: vt-rise-in var(--motion-base) var(--ease-enter) var(--motion-xs) both;
+}
+:root[data-motion='push']::view-transition-old(root) {
+  animation: vt-recede var(--motion-slow) var(--ease-standard) both;
+}
+:root[data-motion='push']::view-transition-new(root) {
+  animation: vt-from-end var(--motion-slow) var(--ease-standard) both;
+}
+:root[data-motion='pop']::view-transition-old(root) {
+  z-index: 1;
+  animation: vt-to-end var(--motion-base) var(--ease-exit) both;
+}
+:root[data-motion='pop']::view-transition-new(root) {
+  animation: vt-recede var(--motion-base) var(--ease-standard) reverse both;
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-shift-sm));
+  }
+}
+@keyframes vt-recede {
+  to {
+    opacity: 0.6;
+    transform: translateX(-25%);
+  }
+}
+@keyframes vt-from-end {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes vt-to-end {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+// The trailing slot of a list row sits above the stretched title link. Only its controls
+// (row menu, buttons) take the pointer; the space and the text around them pass the click
+// through to the row.
+app-list-item .li__trail {
+  pointer-events: none;
+}
+app-list-item .li__trail > :is(app-row-menu, app-button, button, a, [appButton]) {
+  pointer-events: auto;
+}
+
+// A checkbox in a form lines up with the text inside the fields above and below it
+// (the field's inner padding), not with the field's outer edge.
+app-checkbox {
+  padding-inline-start: var(--space-4);
+}
+
+// "+ Tag": the dashed chip after a row of tags that opens the tag list (tag picker, tag
+// assign). The kit chip shows a check once tags are chosen; here it always reads "+ Tag".
+// A text on a sheet (a description, the note of a maintenance entry): a block on the row surface of a
+// field group, its text inset like the value of a field row.
+.sheet-note {
+  margin: 0;
+  padding: 12px var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+// The "+ Tag" chip: the size of a tag chip (`app-tag-chip`: 26px pill, small text),
+// dashed. The plus is a drawn glyph at the size of the tag dot's line, so it sits on the
+// centre line of the text; the select's own icon turns into a check once a value is set
+// and stays hidden.
+.tag-add .fs__chip,
+.tag-add .fs__chip.on {
+  height: 26px;
+  padding: 0 10px 0 8px;
+  gap: 4px;
+  border: 1.5px dashed var(--color-border-strong, var(--color-border));
+  border-radius: 13px;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+.tag-add .fs__chip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.tag-add .fs__chip > app-icon {
+  display: none;
+}
+.tag-add .fs__chip::before {
+  content: '';
+  flex: none;
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 1v8M1 5h8' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+// The page does not bounce: an overscroll at the top or bottom moved the whole frame, the
+// sticky rail with it, so the rail seemed to scroll away with the page.
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+// The installed app stops the double-tap zoom; the pinch zoom stops in `lockInstalledAppZoom`.
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html,
+  body {
+    touch-action: manipulation;
+  }
+}

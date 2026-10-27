@@ -1,0 +1,71 @@
+.tl__wrap {
+  white-space: normal;
+}
+
+// The data tools as tiles: an icon, a title and what the tool does, the whole tile a button.
+.tl__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--space-3);
+}
+.tl__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
+}
+.tl__tile:hover {
+  background: var(--color-surface-3);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+}
+.tl__tile:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.tl__tile .tl__ico {
+  margin-bottom: var(--space-2);
+}
+.tl__tt {
+  font-weight: var(--fw-semibold);
+}
+.tl__td {
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+}
+
+.tl__ico {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.tl__ico--sm {
+  width: 36px;
+  height: 36px;
+}
+.tl__ico--danger {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  color: var(--color-danger);
+}
+.tl__danger {
+  border: 1px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  border-radius: var(--radius-lg);
+}

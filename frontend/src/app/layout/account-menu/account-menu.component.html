@@ -1,0 +1,83 @@
+<ng-template #content>
+  <div class="am__who">
+    <span class="am__whoLabel">{{ 'auth.signedInAs' | t }}</span>
+    <span class="am__whoName ell">{{ displayName() }}</span>
+  </div>
+  <!-- On a desktop the rail switches the collection; the phone has no rail. -->
+  @if (variant() === 'sheet' && collectionOptions().length > 1) {
+    <div class="am__collection">
+      <app-select
+        [label]="'collection.switch' | t"
+        [options]="collectionOptions()"
+        [clearable]="false"
+        [value]="collections.selectedId() ?? ''"
+        (valueChange)="switchCollection($event)"
+      />
+    </div>
+  }
+  <div class="am__sep" role="separator"></div>
+  <a class="am__item" routerLink="/profile" (click)="onNavigate()">
+    <app-icon name="user" [size]="19" />{{ 'nav.profile' | t }}
+  </a>
+  <a class="am__item" routerLink="/collection" (click)="onNavigate()">
+    <app-icon name="gear" [size]="19" />{{ 'nav.collection' | t }}
+  </a>
+  <div class="am__sep" role="separator"></div>
+  <div class="am__item am__item--field">
+    <app-icon name="globe" [size]="19" />
+    <span class="am__grow">{{ 'shell.account.language' | t }}</span>
+    <app-segmented
+      [options]="languageOptions"
+      [value]="i18n.locale()"
+      [ariaLabel]="'shell.account.language' | t"
+      [check]="false"
+      (valueChange)="setLocale($event)"
+    />
+  </div>
+  <div class="am__item am__item--field">
+    <app-icon name="moon" [size]="19" />
+    <app-switch
+      class="am__grow"
+      [checked]="theme.resolved() === 'dark'"
+      (checkedChange)="setDark($event)"
+      >{{ 'shell.account.darkMode' | t }}</app-switch
+    >
+  </div>
+  <div class="am__sep" role="separator"></div>
+  <button type="button" class="am__item" (click)="logout()">
+    <app-icon name="logout" [size]="19" />{{ 'auth.logout' | t }}
+  </button>
+</ng-template>
+
+@if (variant() === 'popover') {
+  <button
+    #trigger
+    type="button"
+    class="am__trigger"
+    [class.am__trigger--on]="open()"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="open() ? panelId : null"
+    [attr.aria-label]="'shell.account.open' | t: { name: displayName() }"
+    [title]="'shell.account.open' | t: { name: displayName() }"
+    (click)="toggle()"
+  >
+    <app-avatar [name]="displayName()" [decorative]="true" />
+  </button>
+  @if (open()) {
+    <div
+      #panel
+      class="am am--popover"
+      role="region"
+      [id]="panelId"
+      [attr.aria-label]="'shell.account.region' | t"
+      [style.left.px]="position().left"
+      [style.bottom.px]="position().bottom"
+    >
+      <ng-container [ngTemplateOutlet]="content" />
+    </div>
+  }
+} @else {
+  <div class="am am--sheet" role="group" [attr.aria-label]="'shell.account.region' | t">
+    <ng-container [ngTemplateOutlet]="content" />
+  </div>
+}

@@ -1,0 +1,81 @@
+<app-public-card
+  [title]="(mode() === 'login' ? 'auth.login.title' : 'auth.register.title') | t"
+  [subtitle]="status()?.message || ('auth.tagline' | t)"
+>
+  @if (status()?.demo) {
+    <app-note class="auth__note" kind="neutral">{{ 'auth.demo' | t }}</app-note>
+  }
+
+  @if (localLogin() || mode() === 'register') {
+    <form class="form-stack" (ngSubmit)="submit()" novalidate>
+      @if (mode() === 'register') {
+        <app-input
+          name="name"
+          [label]="'auth.field.name' | t"
+          [required]="true"
+          [(ngModel)]="name"
+        />
+      }
+      <app-input
+        name="email"
+        type="email"
+        [label]="'auth.field.email' | t"
+        [required]="true"
+        [(ngModel)]="email"
+      />
+      <app-input
+        name="password"
+        type="password"
+        [label]="'auth.field.password' | t"
+        [required]="true"
+        [hint]="mode() === 'register' ? ('auth.field.passwordHint' | t) : ''"
+        [(ngModel)]="password"
+      />
+      @if (mode() === 'login') {
+        <div class="auth__row">
+          <app-checkbox name="remember" [(ngModel)]="remember">{{
+            'auth.field.remember' | t
+          }}</app-checkbox>
+          <a class="auth__link" routerLink="/forgot-password">{{ 'auth.forgot.link' | t }}</a>
+        </div>
+      }
+      @if (error()) {
+        <app-note kind="error" icon="alert">{{ error() }}</app-note>
+      }
+      <app-button type="submit" [block]="true" [loading]="busy()">
+        {{ (mode() === 'login' ? 'auth.login.submit' : 'auth.register.submit') | t }}
+      </app-button>
+    </form>
+  }
+
+  @if (oidc()?.enabled && mode() === 'login') {
+    <div class="auth__oidc">
+      <app-button variant="tonal" [block]="true" (click)="oidcLogin()">
+        {{ oidc()?.buttonText || ('auth.oidc' | t) }}
+      </app-button>
+    </div>
+  }
+
+  <ng-container ngProjectAs="[foot]">
+    @if (canRegister()) {
+      @if (mode() === 'login') {
+        <span
+          >{{ 'auth.register.prompt' | t }}
+          <button type="button" class="auth__switch" (click)="setMode('register')">
+            {{ 'auth.register.link' | t }}
+          </button></span
+        >
+      } @else {
+        <span
+          >{{ 'auth.login.prompt' | t }}
+          <button type="button" class="auth__switch" (click)="setMode('login')">
+            {{ 'auth.login.link' | t }}
+          </button></span
+        >
+      }
+    }
+    @if (status(); as s) {
+      <span class="auth__version">Homebox {{ s.build.version }}</span>
+    }
+  </ng-container>
+</app-public-card>

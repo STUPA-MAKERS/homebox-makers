@@ -1,0 +1,54 @@
+@use '../../shared/ui/list-page' as lp;
+
+@include lp.frame(il);
+
+.il__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.il__trail {
+  // Only text: a click goes through to the row link below.
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: var(--fs-small);
+  white-space: nowrap;
+}
+.il__qty {
+  font-weight: var(--fw-semibold);
+}
+
+.il__badge {
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--color-surface-3);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+.il__more {
+  display: flex;
+  justify-content: center;
+}
+
+
+// A new filter keeps the old rows, a little faded, until its answer replaces them.
+.il__rows {
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+.il__rows--busy {
+  opacity: 0.6;
+  // A quick answer replaces the rows before they fade.
+  transition-delay: 150ms;
+}
+
+// "Filter zurücksetzen": a square chip with the circle arrow, at the end of the filter line.
+.il__reset {
+  justify-content: center;
+  width: var(--control-height-sm);
+  margin-inline-start: auto;
+  padding: 0;
+}

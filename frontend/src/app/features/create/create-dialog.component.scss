@@ -1,0 +1,19 @@
+.cd__photos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.cd__file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4);
+}
+.cd__fileIcon {
+  flex: none;
+  color: var(--color-text-muted);
+}
+.cd__fileName {
+  flex: 1 1 auto;
+  min-width: 0;
+}
