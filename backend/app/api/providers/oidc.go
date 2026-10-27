@@ -63,7 +63,7 @@ func NewOIDCProvider(service *services.UserService, config *config.OIDCConf, opt
 	delays := []time.Duration{0, 500 * time.Millisecond, 2 * time.Second, 5 * time.Second}
 
 	for attempt := 1; attempt <= maxRetries; attempt++ {
-	ctx, cancel := context.WithTimeout(context.Background(), config.RequestTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), config.RequestTimeout)
 		provider, err = oidc.NewProvider(ctx, config.IssuerURL)
 		cancel()
 

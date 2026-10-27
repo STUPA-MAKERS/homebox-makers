@@ -157,7 +157,7 @@ type DebugConf struct {
 }
 
 type WebConfig struct {
-	Port string `yaml:"port"            conf:"default:7745"`
+	Port string `yaml:"port" conf:"default:7745"`
 	Host string `yaml:"host"`
 	// MaxUploadSize is the body cap (in MB) applied to ordinary upload
 	// endpoints (attachments, item imports, etc.). Defaults to 10 MB.
@@ -219,7 +219,7 @@ func (c OIDCConf) MarshalJSON() ([]byte, error) {
 }
 
 type BarcodeAPIConf struct {
-	TokenBarcodespider string `yaml:"token_barcodespider"`
+	TokenBarcodespider   string `yaml:"token_barcodespider"`
 	OpenFoodFactsContact string `yaml:"openfoodfacts_contact"`
 }
 

@@ -41,7 +41,7 @@ type (
 		DefaultGroupID uuid.UUID `json:"defaultGroupID"`
 		// IsOwner controls the role on the membership row created for
 		// (user, DefaultGroupID). It does not grant any cross-group privilege.
-		IsOwner        bool      `json:"isOwner"`
+		IsOwner bool `json:"isOwner"`
 	}
 
 	UserUpdate struct {
@@ -62,9 +62,9 @@ type (
 	}
 
 	UserSummary struct {
-		Name    string    `json:"name"`
-		Email   string    `json:"email"`
-		ID      uuid.UUID `json:"id"`
+		Name  string    `json:"name"`
+		Email string    `json:"email"`
+		ID    uuid.UUID `json:"id"`
 	}
 )
 
@@ -92,9 +92,9 @@ func mapUserOut(user *ent.User) UserOut {
 
 func mapUserSummary(user *ent.User) UserSummary {
 	return UserSummary{
-		Name:    user.Name,
-		Email:   user.Email,
-		ID:      user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		ID:    user.ID,
 	}
 }
 
