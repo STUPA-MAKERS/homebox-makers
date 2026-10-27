@@ -17,6 +17,7 @@ import { apiDate } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
 import { entityLink, isLocation } from '@shared/entity.util';
+import { CustomFieldsEditorComponent } from '../../features/fields/custom-fields-editor.component';
 import { errorMessage } from '@shared/http-error';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
@@ -27,7 +28,6 @@ import {
   CheckboxComponent,
   CurrencyInputComponent,
   DatepickerComponent,
-  IconComponent,
   InputComponent,
   NoteComponent,
   SelectFieldComponent,
@@ -99,9 +99,9 @@ function money(value: number | null | undefined): string {
     ButtonComponent,
     ButtonLinkComponent,
     CheckboxComponent,
+    CustomFieldsEditorComponent,
     CurrencyInputComponent,
     DatepickerComponent,
-    IconComponent,
     InputComponent,
     NoteComponent,
     SelectFieldComponent,
@@ -149,12 +149,6 @@ export class ItemEditComponent {
       label: t.name,
     })),
   );
-  readonly fieldTypeOptions = computed<SelectFieldOption[]>(() => [
-    { value: 'text', label: this.i18n.translate('item.field.text') },
-    { value: 'number', label: this.i18n.translate('item.field.number') },
-    { value: 'boolean', label: this.i18n.translate('item.field.boolean') },
-  ]);
-
   constructor() {
     this.ref.ensureLoaded().subscribe();
     effect(() => this.load(this.id()));
@@ -174,21 +168,6 @@ export class ItemEditComponent {
         this.error.set(errorMessage(err, this.i18n.translate('common.loadError')));
       },
     });
-  }
-
-  addField(): void {
-    this.fields.update((f) => [
-      ...f,
-      { id: '', name: '', type: 'text', textValue: '', numberValue: 0, booleanValue: false },
-    ]);
-  }
-
-  removeField(index: number): void {
-    this.fields.update((f) => f.filter((_, i) => i !== index));
-  }
-
-  updateField(index: number, patch: Partial<EntityFieldData>): void {
-    this.fields.update((f) => f.map((x, i) => (i === index ? { ...x, ...patch } : x)));
   }
 
   save(): void {

@@ -22,17 +22,6 @@
   flex-wrap: wrap;
   gap: var(--space-3) var(--space-6);
 }
-.ie__field {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 2fr) auto;
-  align-items: center;
-  gap: var(--space-3);
-}
-@include bp.phone {
-  .ie__field {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-}
 .ie__bar {
   position: sticky;
   bottom: var(--app-bottom-inset, 0px);

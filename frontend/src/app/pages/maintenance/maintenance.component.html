@@ -1,0 +1,87 @@
+<div class="page">
+  <app-page-header [title]="'nav.maintenance' | t">
+    <ng-container ngProjectAs="[actions]">
+      <app-segmented
+        [ariaLabel]="'maint.filter' | t"
+        [options]="filterOptions()"
+        [value]="filter()"
+        (valueChange)="setFilter($event)"
+      />
+    </ng-container>
+  </app-page-header>
+
+  <section class="mt__stats" [attr.aria-label]="'home.stats' | t">
+    <div class="stat">
+      <span class="stat__icon"><app-icon name="clock" [size]="20" /></span>
+      <span class="stat__value num">{{ loading() ? '–' : entries().length }}</span>
+      <span class="stat__label">{{ 'maint.count' | t }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat__icon"><app-icon name="euro" [size]="20" /></span>
+      <span class="stat__value num">{{ loading() ? '–' : (totalCost() | money) }}</span>
+      <span class="stat__label">{{ 'maint.totalCost' | t }}</span>
+    </div>
+    @if (filter() !== 'completed') {
+      <div class="stat">
+        <span class="stat__icon"><app-icon name="alert" [size]="20" /></span>
+        <span class="stat__value num">{{ loading() ? '–' : overdueCount() }}</span>
+        <span class="stat__label">{{ 'maint.overdue' | t }}</span>
+      </div>
+    }
+  </section>
+
+  @if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
+  } @else if (loading()) {
+    <app-skeleton variant="rows" [count]="5" [lead]="true" [label]="'common.loading' | t" />
+  } @else if (sorted().length === 0) {
+    <app-empty-state
+      icon="clock"
+      [heading]="'maint.emptyAll' | t"
+      [body]="'maint.emptyAllBody' | t"
+    />
+  } @else {
+    <div class="rowgroup">
+      @for (e of sorted(); track e.id) {
+        <div class="mt__row">
+          <app-icon class="mt__icon" [name]="isDone(e) ? 'circleok' : 'clock'" [size]="20" />
+          <div class="mt__text">
+            <span class="mt__name">
+              {{ e.name }}
+              @if (isOverdue(e)) {
+                <app-status-text kind="warn">{{ 'maint.overdueBadge' | t }}</app-status-text>
+              }
+            </span>
+            <span class="mt__sub muted">
+              <a class="mt__item" [routerLink]="['/items', e.itemID]">{{ e.itemName }}</a>
+              · {{ isDone(e) ? (e.completedDate | ldate) : (e.scheduledDate | ldate) }}
+              @if (cost(e)) {
+                · {{ cost(e) | money }}
+              }
+            </span>
+            @if (e.description) {
+              <span class="mt__desc">{{ e.description }}</span>
+            }
+          </div>
+          <app-row-menu
+            [label]="'common.actions' | t"
+            [sections]="menu(e)"
+            (selected)="onMenu(e, $event)"
+          />
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="deleting() !== null"
+  [title]="'maint.deleteTitle' | t"
+  [body]="'maint.deleteBody' | t: { name: deleting()?.name ?? '' }"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy()"
+  (confirm)="confirmDelete()"
+  (cancel)="deleting.set(null)"
+/>

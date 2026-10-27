@@ -9,6 +9,7 @@
       </app-button>
     </ng-container>
   </app-page-header>
+  <app-collection-tabs active="overview" />
 
   @if (error()) {
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{

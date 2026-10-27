@@ -145,65 +145,8 @@
         </section>
       }
 
-      <section class="ie__sec" aria-labelledby="ie-fields">
-        <div class="ie__head">
-          <h2 class="section-title" id="ie-fields">{{ 'item.customFields' | t }}</h2>
-          <app-button variant="tonal" size="sm" (click)="addField()">
-            <span class="btn-label"><app-icon name="plus" />{{ 'item.addField' | t }}</span>
-          </app-button>
-        </div>
-        @for (f of fields(); track $index; let i = $index) {
-          <div class="ie__field">
-            <app-input
-              [name]="'fname' + i"
-              [label]="'field.name' | t"
-              [ngModel]="f.name"
-              (ngModelChange)="updateField(i, { name: $event })"
-            />
-            <app-select
-              [label]="'field.type' | t"
-              [options]="fieldTypeOptions()"
-              [clearable]="false"
-              [value]="f.type"
-              (valueChange)="updateField(i, { type: $event })"
-            />
-            @switch (f.type) {
-              @case ('boolean') {
-                <app-checkbox
-                  [name]="'fbool' + i"
-                  [ngModel]="f.booleanValue"
-                  (ngModelChange)="updateField(i, { booleanValue: $event })"
-                  >{{ 'item.field.value' | t }}</app-checkbox
-                >
-              }
-              @case ('number') {
-                <app-input
-                  [name]="'fnum' + i"
-                  type="number"
-                  [label]="'item.field.value' | t"
-                  [ngModel]="'' + f.numberValue"
-                  (ngModelChange)="updateField(i, { numberValue: +$event })"
-                />
-              }
-              @default {
-                <app-input
-                  [name]="'ftext' + i"
-                  [label]="'item.field.value' | t"
-                  [ngModel]="f.textValue"
-                  (ngModelChange)="updateField(i, { textValue: $event })"
-                />
-              }
-            }
-            <app-button
-              variant="text"
-              [iconOnly]="true"
-              [ariaLabel]="'common.remove' | t"
-              (click)="removeField(i)"
-            >
-              <app-icon name="trash" />
-            </app-button>
-          </div>
-        }
+      <section class="ie__sec" aria-label="{{ 'item.customFields' | t }}">
+        <app-custom-fields-editor [(fields)]="fields" />
       </section>
 
       <section class="ie__sec" aria-labelledby="ie-notes">

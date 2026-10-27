@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
+import { CollectionService } from '@core/collection/collection.service';
 import type { EntityOut, EntityPath, EntitySummary } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
@@ -78,6 +79,7 @@ export class LocationDetailComponent {
   private readonly toast = inject(ToastService);
   private readonly title = inject(AppTitleStrategy);
   private readonly createSvc = inject(CreateService);
+  private readonly collections = inject(CollectionService);
   private readonly ref = inject(RefDataService);
 
   readonly id = input.required<string>();
@@ -201,7 +203,7 @@ export class LocationDetailComponent {
         this.createSvc.open({ kind: 'item', parentId: loc.id });
         break;
       case 'label':
-        window.open(this.api.labelUrl(loc.id), '_blank', 'noopener');
+        window.open(this.api.labelUrl(loc.id, this.collections.selectedId()), '_blank', 'noopener');
         break;
       case 'delete':
         this.confirmDelete.set(true);

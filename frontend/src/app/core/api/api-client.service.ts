@@ -7,7 +7,9 @@ import type {
   APIKeyCreatedOut,
   APIKeyOut,
   APISummary,
+  ActionAmountResult,
   AttachmentKind,
+  BarcodeProduct,
   CurrenciesCurrency,
   EntityCreate,
   EntityListResult,
@@ -16,10 +18,16 @@ import type {
   EntityPath,
   EntityQuery,
   EntitySummary,
+  EntityTemplateCreate,
+  EntityTemplateCreateItemRequest,
+  EntityTemplateOut,
+  EntityTemplateSummary,
+  EntityTemplateUpdate,
   EntityTypeCreate,
   EntityTypeSummary,
   EntityTypeUpdate,
   EntityUpdate,
+  ExportOut,
   Group,
   GroupInvitation,
   GroupInvitationCreate,
@@ -31,6 +39,9 @@ import type {
   MaintenanceEntryCreate,
   MaintenanceEntryUpdate,
   MaintenanceEntryWithDetails,
+  NotifierCreate,
+  NotifierOut,
+  NotifierUpdate,
   Result,
   TagCreate,
   TagUpdate,
@@ -42,6 +53,7 @@ import type {
   UserRegistration,
   UserSummary,
   ValueOverTime,
+  WipeInventoryOptions,
 } from './models';
 
 type QueryValue = string | number | boolean | readonly (string | number)[] | null | undefined;
@@ -95,6 +107,17 @@ export class ApiClient {
 
   private url(path: string): string {
     return `${this.base}${path}`;
+  }
+
+  /**
+   * A URL the browser opens itself (`<img src>`, download links). Such a request sends the
+   * session cookie but no header, so the tenant goes into the query.
+   */
+  private browserUrl(path: string, tenant: string | null, query: Record<string, string> = {}) {
+    const params = new URLSearchParams(query);
+    if (tenant) params.set('tenant', tenant);
+    const qs = params.toString();
+    return this.url(path) + (qs ? `?${qs}` : '');
   }
 
   // --- public -------------------------------------------------------------------------
@@ -306,8 +329,8 @@ export class ApiClient {
     return this.http.post<void>(this.url('/entities/import'), form);
   }
 
-  exportUrl(): string {
-    return this.url('/entities/export');
+  exportUrl(tenant: string | null): string {
+    return this.browserUrl('/entities/export', tenant);
   }
 
   /** Resolve an asset id (`000-123`) to its entity. */
@@ -353,8 +376,7 @@ export class ApiClient {
    * sends the session cookie but no header, so the tenant goes into the query.
    */
   attachmentUrl(entityId: string, attachmentId: string, tenant: string | null): string {
-    const query = tenant ? `?tenant=${encodeURIComponent(tenant)}` : '';
-    return this.url(`/entities/${entityId}/attachments/${attachmentId}${query}`);
+    return this.browserUrl(`/entities/${entityId}/attachments/${attachmentId}`, tenant);
   }
 
   // --- maintenance ----------------------------------------------------------------------
@@ -427,10 +449,126 @@ export class ApiClient {
     return this.http.delete<void>(this.url(`/entity-types/${id}`));
   }
 
-  // --- labels ---------------------------------------------------------------------------
+  // --- templates ------------------------------------------------------------------------
+
+  templates(): Observable<EntityTemplateSummary[]> {
+    return this.http.get<EntityTemplateSummary[]>(this.url('/templates'));
+  }
+
+  template(id: string): Observable<EntityTemplateOut> {
+    return this.http.get<EntityTemplateOut>(this.url(`/templates/${id}`));
+  }
+
+  createTemplate(body: EntityTemplateCreate): Observable<EntityTemplateOut> {
+    return this.http.post<EntityTemplateOut>(this.url('/templates'), body);
+  }
+
+  updateTemplate(id: string, body: EntityTemplateUpdate): Observable<EntityTemplateOut> {
+    return this.http.put<EntityTemplateOut>(this.url(`/templates/${id}`), body);
+  }
+
+  deleteTemplate(id: string): Observable<void> {
+    return this.http.delete<void>(this.url(`/templates/${id}`));
+  }
+
+  /** Create an item from a template: its defaults and custom fields, overridden by `body`. */
+  createFromTemplate(id: string, body: EntityTemplateCreateItemRequest): Observable<EntityOut> {
+    return this.http
+      .post<EntityOut>(this.url(`/templates/${id}/create-item`), body)
+      .pipe(map(normalizeEntity));
+  }
+
+  // --- notifiers ------------------------------------------------------------------------
+
+  notifiers(): Observable<NotifierOut[]> {
+    return this.http.get<NotifierOut[]>(this.url('/notifiers'));
+  }
+
+  createNotifier(body: NotifierCreate): Observable<NotifierOut> {
+    return this.http.post<NotifierOut>(this.url('/notifiers'), body);
+  }
+
+  updateNotifier(id: string, body: NotifierUpdate): Observable<NotifierOut> {
+    return this.http.put<NotifierOut>(this.url(`/notifiers/${id}`), body);
+  }
+
+  deleteNotifier(id: string): Observable<void> {
+    return this.http.delete<void>(this.url(`/notifiers/${id}`));
+  }
+
+  testNotifier(url: string): Observable<void> {
+    return this.http.post<void>(this.url('/notifiers/test'), { url });
+  }
+
+  // --- backups (collection exports and imports) -----------------------------------------
+
+  exports(): Observable<ExportOut[]> {
+    return this.http
+      .get<{ items: ExportOut[] }>(this.url('/group/exports'))
+      .pipe(map((r) => r.items ?? []));
+  }
+
+  createExport(): Observable<ExportOut> {
+    return this.http.post<ExportOut>(this.url('/group/exports'), {});
+  }
+
+  deleteExport(id: string): Observable<void> {
+    return this.http.delete<void>(this.url(`/group/exports/${id}`));
+  }
+
+  exportDownloadUrl(id: string, tenant: string | null): string {
+    return this.browserUrl(`/group/exports/${id}/download`, tenant);
+  }
+
+  /** Restore a backup zip into the collection; the server works on it in the background. */
+  importBackup(file: File): Observable<ExportOut> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<ExportOut>(this.url('/group/import'), form);
+  }
+
+  billOfMaterialsUrl(tenant: string | null): string {
+    return this.browserUrl('/reporting/bill-of-materials', tenant);
+  }
+
+  // --- maintenance actions --------------------------------------------------------------
+
+  runAction(
+    action:
+      | 'ensure-asset-ids'
+      | 'ensure-import-refs'
+      | 'zero-item-time-fields'
+      | 'set-primary-photos'
+      | 'create-missing-thumbnails',
+  ): Observable<ActionAmountResult> {
+    return this.http.post<ActionAmountResult>(this.url(`/actions/${action}`), {});
+  }
+
+  wipeInventory(options: WipeInventoryOptions): Observable<ActionAmountResult> {
+    return this.http.post<ActionAmountResult>(this.url('/actions/wipe-inventory'), options);
+  }
+
+  // --- labels, QR codes and barcodes ----------------------------------------------------
 
   /** The printable label image of an entity. */
-  labelUrl(entityId: string): string {
-    return this.url(`/labelmaker/entity/${entityId}`);
+  labelUrl(entityId: string, tenant: string | null): string {
+    return this.browserUrl(`/labelmaker/entity/${entityId}`, tenant);
+  }
+
+  /** The label image of an asset id (also one that has no item yet). */
+  assetLabelUrl(assetId: string, tenant: string | null): string {
+    return this.browserUrl(`/labelmaker/asset/${encodeURIComponent(assetId)}`, tenant);
+  }
+
+  /** A QR code image of `data`, for `<img src>`. */
+  qrCodeUrl(data: string, tenant: string | null): string {
+    return this.browserUrl('/qrcode', tenant, { data });
+  }
+
+  /** Look a product barcode (EAN/UPC) up in the configured product databases. */
+  productsByBarcode(barcode: string): Observable<BarcodeProduct[]> {
+    return this.http.get<BarcodeProduct[]>(this.url('/products/search-from-barcode'), {
+      params: toParams({ data: barcode }),
+    });
   }
 }

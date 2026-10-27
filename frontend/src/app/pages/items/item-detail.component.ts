@@ -10,6 +10,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
+import { CollectionService } from '@core/collection/collection.service';
 import type { EntityOut, EntityPath } from '@core/api/models';
 import { I18nService } from '@core/i18n/i18n.service';
 import { LocalizedDatePipe, apiDate } from '@core/i18n/localized-date.pipe';
@@ -83,6 +84,7 @@ export class ItemDetailComponent {
   private readonly toast = inject(ToastService);
   private readonly title = inject(AppTitleStrategy);
   private readonly createSvc = inject(CreateService);
+  private readonly collections = inject(CollectionService);
   private readonly url = injectAttachmentUrl();
 
   readonly id = input.required<string>();
@@ -213,7 +215,11 @@ export class ItemDetailComponent {
         this.createSvc.open({ kind: 'item', parentId: current.id });
         break;
       case 'label':
-        window.open(this.api.labelUrl(current.id), '_blank', 'noopener');
+        window.open(
+          this.api.labelUrl(current.id, this.collections.selectedId()),
+          '_blank',
+          'noopener',
+        );
         break;
       case 'archive':
         this.toggleArchive(current);

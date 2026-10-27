@@ -108,6 +108,14 @@ export const routes: Routes = [
               import('./pages/tags/tag-detail.component').then((m) => m.TagDetailComponent),
           },
           {
+            path: 'maintenance',
+            data: { title: 'nav.maintenance' },
+            loadComponent: () =>
+              import('./pages/maintenance/maintenance.component').then(
+                (m) => m.MaintenanceComponent,
+              ),
+          },
+          {
             path: 'profile',
             data: { title: 'nav.profile' },
             loadComponent: () =>
@@ -118,6 +126,40 @@ export const routes: Routes = [
             data: { title: 'nav.collection' },
             loadComponent: () =>
               import('./pages/collection/collection.component').then((m) => m.CollectionComponent),
+          },
+          {
+            path: 'collection/types',
+            data: { title: 'collection.tab.types' },
+            loadComponent: () =>
+              import('./pages/collection/entity-types.component').then(
+                (m) => m.EntityTypesComponent,
+              ),
+          },
+          {
+            path: 'collection/templates',
+            data: { title: 'collection.tab.templates' },
+            loadComponent: () =>
+              import('./pages/collection/templates.component').then((m) => m.TemplatesComponent),
+          },
+          {
+            path: 'collection/templates/:id',
+            data: { title: 'collection.tab.templates' },
+            loadComponent: () =>
+              import('./pages/collection/template-edit.component').then(
+                (m) => m.TemplateEditComponent,
+              ),
+          },
+          {
+            path: 'collection/notifiers',
+            data: { title: 'collection.tab.notifiers' },
+            loadComponent: () =>
+              import('./pages/collection/notifiers.component').then((m) => m.NotifiersComponent),
+          },
+          {
+            path: 'collection/tools',
+            data: { title: 'collection.tab.tools' },
+            loadComponent: () =>
+              import('./pages/collection/tools.component').then((m) => m.ToolsComponent),
           },
           {
             path: 'a/:assetId',

@@ -1,0 +1,98 @@
+<div class="page co">
+  <app-page-header [title]="'nav.collection' | t" [meta]="'collection.tab.types' | t" />
+  <app-collection-tabs active="types" />
+
+  @if (error()) {
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
+  } @else if (loading()) {
+    <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
+  } @else {
+    <p class="muted co__lead">{{ 'types.body' | t }}</p>
+    @for (g of groups(); track g.key) {
+      <section class="co__sec" [attr.aria-labelledby]="'types-' + g.key">
+        <div class="co__head">
+          <h2 class="section-title" [id]="'types-' + g.key">{{ g.titleKey | t }}</h2>
+          <app-button
+            variant="tonal"
+            size="sm"
+            (click)="openNew(g.key === 'location' ? 'location' : 'item')"
+          >
+            <span class="btn-label"><app-icon name="plus" />{{ 'types.new' | t }}</span>
+          </app-button>
+        </div>
+        @if (g.types.length === 0) {
+          <p class="muted">{{ 'types.empty' | t }}</p>
+        } @else {
+          <div class="rowgroup">
+            @for (type of g.types; track type.id) {
+              <div class="co__row">
+                <app-icon
+                  class="co__icon"
+                  [name]="type.isLocation ? 'building' : 'box'"
+                  [size]="20"
+                />
+                <div class="co__text">
+                  <span class="co__name">{{ type.name }}</span>
+                  @if (templateName(type); as tpl) {
+                    <span class="muted co__sub">{{ 'types.withTemplate' | t: { name: tpl } }}</span>
+                  }
+                </div>
+                <app-row-menu
+                  [label]="'common.actions' | t"
+                  [sections]="menu()"
+                  (selected)="onMenu(type, $event)"
+                />
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</div>
+
+<app-dialog
+  [open]="editing() !== null"
+  size="form"
+  [title]="(editing() === 'new' ? 'types.new' : 'types.edit') | t"
+  [closeLabel]="'common.close' | t"
+  (closed)="editing.set(null)"
+>
+  <form class="form-stack" (ngSubmit)="save()" novalidate>
+    <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="name" />
+    <app-segmented
+      [ariaLabel]="'types.kind.label' | t"
+      [options]="kindOptions()"
+      [value]="kind()"
+      (valueChange)="kind.set($event === 'location' ? 'location' : 'item')"
+    />
+    @if (kind() === 'item') {
+      <app-select
+        [label]="'types.template' | t"
+        [placeholder]="'types.noTemplate' | t"
+        [options]="templateOptions()"
+        [value]="templateId()"
+        (valueChange)="templateId.set($event)"
+      />
+    }
+    @if (formError()) {
+      <app-note kind="error" icon="alert">{{ formError() }}</app-note>
+    }
+  </form>
+  <div dialog-footer>
+    <app-button variant="text" (click)="editing.set(null)">{{ 'common.cancel' | t }}</app-button>
+    <app-button [loading]="busy()" (click)="save()">{{ 'common.save' | t }}</app-button>
+  </div>
+</app-dialog>
+
+<app-confirm-dialog
+  [open]="deleting() !== null"
+  [title]="'types.deleteTitle' | t"
+  [body]="'types.deleteBody' | t: { name: deleting()?.name ?? '' }"
+  [confirmLabel]="'common.delete' | t"
+  [busy]="busy()"
+  (confirm)="confirmDelete()"
+  (cancel)="deleting.set(null)"
+/>

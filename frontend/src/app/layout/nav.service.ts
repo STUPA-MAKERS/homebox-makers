@@ -25,6 +25,13 @@ const ITEMS: readonly NavItem[] = [
   },
   { key: 'tags', path: '/tags', icon: 'tag', labelKey: 'nav.tags', place: 'main' },
   {
+    key: 'maintenance',
+    path: '/maintenance',
+    icon: 'clock',
+    labelKey: 'nav.maintenance',
+    place: 'main',
+  },
+  {
     key: 'collection',
     path: '/collection',
     icon: 'users',

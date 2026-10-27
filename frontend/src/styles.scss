@@ -92,3 +92,49 @@
   white-space: pre-line;
   color: var(--color-text-muted);
 }
+
+/* Stat tiles: an icon, a big number and a label (home, maintenance). */
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-1);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.stat--link:hover {
+  background: var(--color-surface-2);
+}
+.stat--link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.stat--skel {
+  min-height: 6.5rem;
+  justify-content: flex-end;
+}
+.stat__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-selected);
+  color: var(--color-accent-text);
+}
+.stat__value {
+  font-size: var(--fs-d2);
+  line-height: var(--lh-d2);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stat__label {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+}
