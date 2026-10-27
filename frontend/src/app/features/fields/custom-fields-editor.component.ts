@@ -41,7 +41,7 @@ export interface CustomField {
   template: `
     <div class="cf__head">
       <h2 class="section-title">{{ 'item.customFields' | t }}</h2>
-      <app-button variant="tonal" size="sm" (click)="add()">
+      <app-button variant="text" size="sm" (click)="add()">
         <span class="btn-label"><app-icon name="plus" />{{ 'item.addField' | t }}</span>
       </app-button>
     </div>

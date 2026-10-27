@@ -244,6 +244,16 @@ export class ItemEditComponent {
     this.parentId.set(item.parent?.id ?? '');
     this.tagIds.set(item.tags.map((t) => t.id));
     this.fields.set(item.fields ?? []);
+    this.pristine = this.snapshot();
+  }
+
+  /** The loaded state, to show the save button only after a change. */
+  private pristine = '';
+  private snapshot(): string {
+    return JSON.stringify([this.form, this.typeId(), this.parentId(), this.tagIds(), this.fields()]);
+  }
+  dirty(): boolean {
+    return !!this.pristine && this.snapshot() !== this.pristine;
   }
 
   private emptyForm(): ItemForm {

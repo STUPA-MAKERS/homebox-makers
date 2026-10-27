@@ -264,11 +264,17 @@ app-list-detail .page {
   color: var(--color-text-muted);
 }
 
-/* Stat tiles: an icon, a big number and a label (home, maintenance). */
+/* Stat tiles: the icon at the top start, the big number at the top end, the label below
+   (home, maintenance). */
 .stat {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'icon value'
+    'label label';
+  align-items: start;
+  column-gap: var(--space-3);
+  row-gap: var(--space-3);
   min-width: 0;
   padding: var(--space-4);
   border-radius: var(--radius-lg);
@@ -284,29 +290,34 @@ app-list-detail .page {
   outline-offset: 2px;
 }
 .stat--skel {
+  display: flex;
   min-height: 6.5rem;
-  justify-content: flex-end;
+  align-items: flex-end;
 }
 .stat__icon {
+  grid-area: icon;
   display: grid;
   place-items: center;
   width: 36px;
   height: 36px;
-  margin-bottom: var(--space-2);
   border-radius: var(--radius-md);
   background: var(--color-selected);
   color: var(--color-accent-text);
 }
 .stat__value {
+  grid-area: value;
+  justify-self: end;
+  max-width: 100%;
   font-size: var(--fs-d2);
-  line-height: var(--lh-d2);
+  line-height: 36px;
   font-weight: var(--fw-semibold);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .stat__label {
-  font-size: var(--fs-sm);
+  grid-area: label;
+  font-size: var(--fs-body);
   color: var(--color-text-muted);
 }
 
@@ -417,4 +428,46 @@ app-list-detail .page {
   to {
     transform: translateX(100%);
   }
+}
+
+// The trailing slot of a list row sits above the stretched title link. Only its controls
+// (row menu, buttons) take the pointer; the space and the text around them pass the click
+// through to the row.
+app-list-item .li__trail {
+  pointer-events: none;
+}
+app-list-item .li__trail > :is(app-row-menu, app-button, button, a, [appButton]) {
+  pointer-events: auto;
+}
+
+// A checkbox in a form lines up with the text inside the fields above and below it
+// (the field's inner padding), not with the field's outer edge.
+app-checkbox {
+  padding-inline-start: var(--space-4);
+}
+
+// "+ Tag": the dashed chip after a row of tags that opens the tag list (tag picker, tag
+// assign). The kit chip shows a check once tags are chosen; here it always reads "+ Tag".
+.tag-add .fs__chip,
+.tag-add .fs__chip.on {
+  border: 1.5px dashed var(--color-border-strong, var(--color-border));
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.tag-add .fs__chip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.tag-add .fs__chip > app-icon {
+  display: none;
+}
+.tag-add .fs__chip::before {
+  content: '+';
+  margin-inline-end: 2px;
+  font-size: 1.1em;
+  line-height: 1;
+}
+// Beside the small tag chips of a sheet head the "+ Tag" chip takes their height.
+.sheet-chips .tag-add .fs__chip {
+  height: 28px;
 }

@@ -1,5 +1,5 @@
 <div class="page page--wide">
-  <app-page-header
+  <app-page-header class="home__ph"
     [title]="collections.selected()?.name || ('nav.home' | t)"
     [subtitle]="'home.greeting' | t: { name: auth.user()?.name || '' }"
   />

@@ -49,10 +49,10 @@
           <p class="sheet-desc">{{ loc.description }}</p>
         }
         <div class="sheet-chips">
-          <app-tag-assign [entity]="loc" (changed)="location.set($event)" />
           @for (tag of loc.tags; track tag.id) {
             <app-tag-chip [tag]="tag" />
           }
+          <app-tag-assign [entity]="loc" (changed)="location.set($event)" />
         </div>
       </header>
 

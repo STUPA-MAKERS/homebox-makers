@@ -9,6 +9,7 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
 import { errorMessage } from '@shared/http-error';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
 import {
@@ -19,7 +20,6 @@ import {
   InputComponent,
   NoteComponent,
   SkeletonComponent,
-  StickyBarComponent,
   TextareaComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
@@ -55,6 +55,7 @@ interface TemplateForm {
     RouterLink,
     TranslatePipe,
     PageHeaderComponent,
+    FabComponent,
     LocationSelectComponent,
     TagPickerComponent,
     CustomFieldsEditorComponent,
@@ -65,7 +66,6 @@ interface TemplateForm {
     InputComponent,
     NoteComponent,
     SkeletonComponent,
-    StickyBarComponent,
     TextareaComponent,
   ],
   templateUrl: './template-edit.component.html',
@@ -108,6 +108,7 @@ export class TemplateEditComponent {
         this.locationId.set(tpl.defaultLocation?.id ?? '');
         this.tagIds.set((tpl.defaultTags ?? []).map((t) => t.id));
         this.fields.set(tpl.fields ?? []);
+        this.pristine = this.snapshot();
         this.loading.set(false);
         this.title.setPageTitle(tpl.name);
       },
@@ -116,6 +117,15 @@ export class TemplateEditComponent {
         this.loadError.set(true);
       },
     });
+  }
+
+  /** The loaded state, to show the save button only after a change. */
+  private pristine = '';
+  private snapshot(): string {
+    return JSON.stringify([this.form, this.locationId(), this.tagIds(), this.fields()]);
+  }
+  dirty(): boolean {
+    return !!this.pristine && this.snapshot() !== this.pristine;
   }
 
   save(): void {

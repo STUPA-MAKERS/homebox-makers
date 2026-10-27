@@ -20,8 +20,8 @@ import {
 } from '@stupa-makers/ui-kit';
 
 /**
- * Assign the tags of an item or a location right on its sheet: a tag chip that opens the
- * list of all tags, where a click toggles one. The change shows at once and is saved a
+ * Assign the tags of an item or a location right on its sheet: a dashed "+ Tag" chip after
+ * the tags opens the list of all tags, where a click toggles one. The change shows at once and is saved a
  * moment after the last click, so a few clicks in a row make one request.
  */
 @Component({
@@ -31,13 +31,14 @@ import {
   imports: [TranslatePipe, FilterSelectComponent],
   template: `
     <app-filter-select
-      [label]="'tags.assign' | t"
-      icon="tag"
+      class="tag-add"
+      [label]="'tags.add' | t"
       [options]="options()"
       [multiple]="true"
       [values]="ids()"
       (valuesChange)="change($event)"
-      [text]="(entity().tags.length ? 'tags.edit' : 'tags.assign') | t"
+      [text]="'tags.addShort' | t"
+      [chevron]="false"
       [emptyText]="'tags.none' | t"
       (opened)="ref.ensureLoaded().subscribe()"
     />

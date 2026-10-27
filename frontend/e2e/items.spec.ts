@@ -23,6 +23,7 @@ test('edit an item and see the change on its page', async ({ signedIn: page }) =
 
   await page.getByRole('button', { name: 'Bearbeiten' }).first().click();
   const pane = page.getByRole('dialog', { name: 'Gegenstand bearbeiten' });
+  await expect(pane.getByRole('button', { name: 'Speichern' })).toHaveCount(0);
   await pane.getByLabel('Hersteller').fill('Makita');
   await pane.getByLabel('Seriennummer').fill('SN-42');
   await pane.getByRole('button', { name: 'Speichern' }).click();
@@ -61,7 +62,7 @@ test('assign tags from the item and from the tag', async ({ signedIn: page }) =>
   const id = await createItem(page, 'Lötkolben', loc);
   await createItem(page, 'Multimeter', loc);
   await page.goto(`/items/${id}`);
-  await page.getByRole('button', { name: 'Tags zuweisen' }).click();
+  await page.getByRole('button', { name: /^Tag hinzufügen/ }).click();
   await page.getByRole('option', { name: 'Electronics' }).click();
   await page.keyboard.press('Escape');
   await expect(page.locator('app-item-detail app-tag-chip')).toContainText('Electronics');
@@ -91,4 +92,17 @@ test('row menu of the list deletes an item', async ({ signedIn: page }) => {
   await page.getByRole('menuitem', { name: 'Löschen' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Löschen' }).click();
   await expect(page.getByRole('link', { name: 'Rasenmäher' })).toHaveCount(0);
+});
+
+test('the trailing area of a list row opens the item', async ({ signedIn: page }) => {
+  const loc = await createLocation(page, 'Flur');
+  await createItem(page, 'Staubsauger', loc);
+  await page.goto('/items');
+  const link = page.getByRole('link', { name: 'Staubsauger' });
+  await expect(link).toBeVisible();
+  // Click left of the row menu, in the trailing slot where tags and quantity sit.
+  const menu = page.getByRole('button', { name: /Aktionen: Staubsauger/ });
+  const box = (await menu.boundingBox())!;
+  await page.mouse.click(box.x - 30, box.y + box.height / 2);
+  await expect(page).toHaveURL(/\/items\/[0-9a-f-]+/);
 });

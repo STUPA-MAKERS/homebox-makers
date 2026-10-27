@@ -24,6 +24,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { LocalizedDatePipe } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { errorMessage } from '@shared/http-error';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
@@ -62,6 +63,7 @@ function inAWeek(): string {
     TranslatePipe,
     LocalizedDatePipe,
     PageHeaderComponent,
+    FabComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     CopyButtonComponent,
@@ -87,6 +89,8 @@ export class CollectionComponent {
 
   /** Query `join`: an invitation token from a link. */
   readonly join = input<string | undefined>();
+  /** Query `action`: `new` or `join`, from the buttons of the collection list and the rail. */
+  readonly action = input<string | undefined>();
 
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -95,7 +99,13 @@ export class CollectionComponent {
   readonly currencies = signal<CurrenciesCurrency[]>([]);
 
   // Settings
-  name = '';
+  readonly name = signal('');
+  /** The saved name and currency, to show the save button only after a change. */
+  private readonly saved = signal({ name: '', currency: '' });
+  readonly dirty = computed(
+    () =>
+      this.name().trim() !== this.saved().name || this.currency() !== this.saved().currency,
+  );
   readonly currency = signal('');
   readonly settingsBusy = signal(false);
   readonly settingsError = signal<string | null>(null);
@@ -144,6 +154,15 @@ export class CollectionComponent {
         void this.router.navigate([], { queryParams: { join: null }, replaceUrl: true });
       });
     });
+    effect(() => {
+      const action = this.action();
+      if (action !== 'new' && action !== 'join') return;
+      untracked(() => {
+        if (action === 'new') this.openNew();
+        else this.openJoin();
+        void this.router.navigate([], { queryParams: { action: null }, replaceUrl: true });
+      });
+    });
   }
 
   load(): void {
@@ -156,8 +175,9 @@ export class CollectionComponent {
       currencies: this.api.currencies(),
     }).subscribe({
       next: ({ group, members, invitations, currencies }) => {
-        this.name = group.name;
+        this.name.set(group.name);
         this.currency.set(group.currency);
+        this.saved.set({ name: group.name, currency: group.currency });
         this.members.set(members ?? []);
         this.invitations.set(invitations ?? []);
         this.currencies.set(currencies ?? []);
@@ -172,7 +192,7 @@ export class CollectionComponent {
 
   saveSettings(): void {
     if (this.settingsBusy()) return;
-    const name = this.name.trim();
+    const name = this.name().trim();
     if (!name) {
       this.settingsError.set(this.i18n.translate('create.error.name'));
       return;
@@ -182,6 +202,7 @@ export class CollectionComponent {
     this.api.updateGroup({ name, currency: this.currency() }).subscribe({
       next: (group) => {
         this.settingsBusy.set(false);
+        this.saved.set({ name: group.name, currency: group.currency });
         this.collections.upsert(group);
         this.toast.show(this.i18n.translate('common.saved'), 'success');
       },

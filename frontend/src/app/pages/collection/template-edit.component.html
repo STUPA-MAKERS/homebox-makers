@@ -110,15 +110,18 @@
         </app-textarea>
       </section>
 
-      <app-sticky-bar class="te__bar">
-        @if (error()) {
-          <app-note kind="error" icon="alert">{{ error() }}</app-note>
-        }
-        <div class="form-actions">
-          <a appButton="text" routerLink="/collection/templates">{{ 'common.cancel' | t }}</a>
-          <app-button type="submit" [loading]="busy()">{{ 'common.save' | t }}</app-button>
-        </div>
-      </app-sticky-bar>
+      @if (error()) {
+        <app-note kind="error" icon="alert">{{ error() }}</app-note>
+      }
+      @if (dirty() || busy()) {
+        <app-fab
+          icon="check"
+          animate.enter="motion-fade-in"
+          [label]="'common.save' | t"
+          [loading]="busy()"
+          (activate)="save()"
+        />
+      }
     </form>
 
     <app-confirm-dialog

@@ -6,6 +6,9 @@ test('entity types and templates', async ({ signedIn: page }) => {
   await page.getByRole('dialog').getByLabel('Name').fill('Werkzeug-Vorlage');
   await page.getByRole('dialog').getByRole('button', { name: 'Anlegen' }).click();
   await page.waitForURL('**/collection/templates/*');
+  // Saving shows only after a change.
+  await expect(page.getByRole('button', { name: 'Speichern' })).toHaveCount(0);
+  await page.getByLabel('Hersteller').fill('Bosch');
   await page.getByRole('button', { name: 'Speichern' }).click();
   await page.waitForURL('**/collection/templates');
   await expect(page.getByRole('link', { name: /Werkzeug-Vorlage/ })).toBeVisible();
@@ -30,7 +33,7 @@ test('notifiers and backups', async ({ signedIn: page }) => {
   await page.goto('/collection/tools');
   await page.getByRole('button', { name: 'Sicherung erstellen' }).click();
   await expect(page.getByText('Fertig').first()).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByRole('link', { name: 'Herunterladen' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Herunterladen', exact: true })).toBeVisible();
 });
 
 test('global search finds items, places and pages', async ({ signedIn: page }) => {
@@ -80,4 +83,11 @@ test('create an item from a template', async ({ signedIn: page }) => {
   await page.waitForURL('**/items/*');
   await expect(page.locator('app-item-detail')).toContainText('Bosch');
   await expect(page.getByRole('heading', { name: 'Bosch Stichsäge' })).toBeVisible();
+});
+
+test('switch the collection from the rail', async ({ signedIn: page }) => {
+  await page.goto('/home');
+  await page.getByRole('button', { name: 'Sammlung wechseln' }).click();
+  await expect(page.getByRole('menuitem', { name: /Sammlung beitreten/ })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: /Neue Sammlung/ })).toBeVisible();
 });

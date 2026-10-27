@@ -4,18 +4,26 @@
   <section class="co__sec" aria-labelledby="tools-csv">
     <h2 class="section-title" id="tools-csv">{{ 'tools.csv.title' | t }}</h2>
     <p class="muted co__lead">{{ 'tools.csv.body' | t }}</p>
-    <div class="tl__actions">
-      <a appButton="tonal" size="sm" [href]="csvUrl()" download>
-        <span class="btn-label"><app-icon name="download" />{{ 'tools.csv.export' | t }}</span>
+    <div class="tl__tiles">
+      <a class="tl__tile" [href]="csvUrl()" download>
+        <span class="tl__ico"><app-icon name="download" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.csv.export' | t }}</span>
+        <span class="tl__td">{{ 'tools.csv.exportBody' | t }}</span>
       </a>
-      <app-button variant="tonal" size="sm" (click)="csvPicker.open()">
-        <span class="btn-label"><app-icon name="upload" />{{ 'tools.csv.import' | t }}</span>
-      </app-button>
-      <a appButton="text" size="sm" [href]="bomUrl()" download>
-        <span class="btn-label"><app-icon name="receipt" />{{ 'tools.bom' | t }}</span>
+      <button type="button" class="tl__tile" (click)="csvPicker.open()">
+        <span class="tl__ico"><app-icon name="upload" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.csv.import' | t }}</span>
+        <span class="tl__td">{{ 'tools.csv.importBody' | t }}</span>
+      </button>
+      <a class="tl__tile" [href]="bomUrl()" download>
+        <span class="tl__ico"><app-icon name="receipt" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.bom' | t }}</span>
+        <span class="tl__td">{{ 'tools.bomBody' | t }}</span>
       </a>
-      <a appButton="text" size="sm" routerLink="/labels">
-        <span class="btn-label"><app-icon name="printer" />{{ 'tools.labels' | t }}</span>
+      <a class="tl__tile" routerLink="/labels">
+        <span class="tl__ico"><app-icon name="printer" [size]="20" /></span>
+        <span class="tl__tt">{{ 'tools.labels' | t }}</span>
+        <span class="tl__td">{{ 'tools.labelsBody' | t }}</span>
       </a>
     </div>
     <app-file-picker #csvPicker accept=".csv,.tsv,text/csv" (picked)="pendingCsv.set($event[0])" />
@@ -29,7 +37,7 @@
           <span class="btn-label"><app-icon name="upload" />{{ 'tools.backup.import' | t }}</span>
         </app-button>
         <app-button
-          variant="tonal"
+          variant="text"
           size="sm"
           [loading]="busy() === 'export'"
           (click)="createExport()"
@@ -105,11 +113,12 @@
     <div class="rowgroup">
       @for (a of actions; track a.id) {
         <div class="co__row">
+          <span class="tl__ico tl__ico--sm"><app-icon [name]="a.icon" [size]="18" /></span>
           <div class="co__text">
             <span class="co__name">{{ a.titleKey | t }}</span>
             <span class="muted co__sub tl__wrap">{{ a.bodyKey | t }}</span>
           </div>
-          <app-button variant="outlined" size="sm" (click)="pendingAction.set(a)">{{
+          <app-button variant="tonal" size="sm" (click)="pendingAction.set(a)">{{
             'tools.action.run' | t
           }}</app-button>
         </div>
@@ -119,8 +128,9 @@
 
   <section class="co__sec" aria-labelledby="tools-danger">
     <h2 class="section-title" id="tools-danger">{{ 'tools.wipe.title' | t }}</h2>
-    <div class="rowgroup">
+    <div class="rowgroup tl__danger">
       <div class="co__row">
+        <span class="tl__ico tl__ico--sm tl__ico--danger"><app-icon name="alert" [size]="18" /></span>
         <div class="co__text">
           <span class="co__name">{{ 'tools.wipe.action' | t }}</span>
           <span class="muted co__sub tl__wrap">{{ 'tools.wipe.body' | t }}</span>

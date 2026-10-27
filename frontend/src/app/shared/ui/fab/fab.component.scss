@@ -23,6 +23,6 @@
 }
 :host(.fab--contained) {
   position: absolute;
-  right: var(--space-4);
-  bottom: var(--space-4);
+  right: var(--fab-inset, var(--space-4));
+  bottom: var(--fab-inset, var(--space-4));
 }

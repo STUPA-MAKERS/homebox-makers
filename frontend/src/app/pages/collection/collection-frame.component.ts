@@ -13,12 +13,13 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { CollectionService } from '@core/collection/collection.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import type { TranslationKey } from '@core/i18n/translations';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   IconComponent,
   type IconName,
   ListDetailLayoutComponent,
   ListItemComponent,
+  SelectFieldComponent,
+  type SelectFieldOption,
 } from '@stupa-makers/ui-kit';
 import { filter } from 'rxjs';
 import { PageFrameService } from '../../layout/page-frame.service';
@@ -60,7 +61,7 @@ const SECTIONS: readonly Section[] = [
     path: 'tools',
     titleKey: 'collection.tab.tools',
     bodyKey: 'collection.sec.tools',
-    icon: 'gear',
+    icon: 'tune',
   },
 ];
 
@@ -77,7 +78,7 @@ const SECTIONS: readonly Section[] = [
   imports: [
     RouterOutlet,
     TranslatePipe,
-    PageHeaderComponent,
+    SelectFieldComponent,
     IconComponent,
     ListDetailLayoutComponent,
     ListItemComponent,
@@ -87,11 +88,17 @@ const SECTIONS: readonly Section[] = [
     <div class="cf" [class.cf--split]="split()">
       <app-list-detail [detailOpen]="active() !== null" (back)="back()">
         <nav list class="ld-pane cf__pane" [attr.aria-label]="'nav.collection' | t">
-          <app-page-header
-            [pane]="true"
-            [title]="'nav.collection' | t"
-            [meta]="collections.selected()?.name ?? null"
-          />
+          <h1 class="sr-only">{{ 'nav.collection' | t }}</h1>
+          <div class="cf__switch">
+            <app-select
+              [label]="'collection.switchLabel' | t"
+              [required]="true"
+              [clearable]="false"
+              [options]="collectionOptions()"
+              [value]="collections.selectedId() ?? ''"
+              (valueChange)="switchTo($event)"
+            />
+          </div>
           <div class="cf__scroll">
             <div class="cf__rows" [class.rowgroup]="!split()">
               @for (s of sections; track s.path) {
@@ -145,6 +152,17 @@ export class CollectionFrameComponent {
       .subscribe(read);
     effect(() => this.frame.fill.set(this.split()));
     inject(DestroyRef).onDestroy(() => this.frame.fill.set(false));
+  }
+
+  readonly collectionOptions = computed<SelectFieldOption[]>(() =>
+    this.collections.all().map((g) => ({ value: g.id, label: g.name })),
+  );
+
+  /** Another collection shows other data everywhere, so the app starts over on the start page. */
+  switchTo(id: string): void {
+    if (!id || id === this.collections.selectedId()) return;
+    this.collections.select(id);
+    void this.router.navigateByUrl('/home').then(() => window.location.reload());
   }
 
   link(s: Section): string[] {

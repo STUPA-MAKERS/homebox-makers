@@ -174,3 +174,25 @@
     min-height: 52px;
   }
 }
+
+// The switch of the collection: the menu button takes the place and the shape of the pill,
+// and its hit area covers the whole entry, the label too.
+.rail__coll {
+  position: relative;
+}
+.rail__coll ::ng-deep app-row-menu,
+.rail__coll ::ng-deep .rm {
+  position: static;
+}
+.rail__coll ::ng-deep .rm__trigger {
+  position: static;
+  width: 56px;
+  height: 32px;
+  border-radius: 16px;
+  color: inherit;
+}
+.rail__coll ::ng-deep .rm__trigger::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}

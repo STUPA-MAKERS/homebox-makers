@@ -8,6 +8,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { LocalizedDatePipe } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { errorMessage } from '@shared/http-error';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
@@ -37,6 +38,7 @@ import {
     TranslatePipe,
     LocalizedDatePipe,
     PageHeaderComponent,
+    FabComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     CopyButtonComponent,
@@ -65,6 +67,11 @@ export class ProfileComponent {
   name = this.user()?.name ?? '';
   email = this.user()?.email ?? '';
   readonly accountBusy = signal(false);
+  /** The save button shows only after the name or the e-mail changed. */
+  accountDirty(): boolean {
+    const u = this.user();
+    return this.name.trim() !== (u?.name ?? '') || this.email.trim() !== (u?.email ?? '');
+  }
   readonly accountError = signal<string | null>(null);
 
   // Password

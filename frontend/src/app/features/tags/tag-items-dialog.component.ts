@@ -19,6 +19,7 @@ import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.compo
 import {
   ButtonComponent,
   DialogComponent,
+  EmptyStateComponent,
   IconComponent,
   SearchPillComponent,
   SkeletonComponent,
@@ -38,6 +39,7 @@ import {
     EntityThumbComponent,
     ButtonComponent,
     DialogComponent,
+    EmptyStateComponent,
     IconComponent,
     SearchPillComponent,
     SkeletonComponent,
@@ -61,7 +63,11 @@ import {
         @if (loading() && !rows().length) {
           <app-skeleton variant="rows" [count]="5" [lead]="true" [label]="'common.loading' | t" />
         } @else if (!rows().length) {
-          <p class="tid__empty">{{ 'items.noMatch' | t }}</p>
+          <app-empty-state
+            rows="4"
+            [heading]="(query().trim() ? 'items.noMatch' : 'tag.dialogEmpty') | t"
+            [body]="(query().trim() ? 'tag.dialogNoMatchBody' : 'tag.dialogEmptyBody') | t"
+          />
         } @else {
           <div class="rowgroup tid__rows" [class.tid__rows--busy]="loading()">
             @for (item of rows(); track item.id) {
@@ -100,10 +106,6 @@ import {
       flex-direction: column;
       gap: var(--space-3);
       min-height: 20rem;
-    }
-    .tid__empty {
-      margin: 0;
-      color: var(--color-text-muted);
     }
     .tid__rows {
       transition: opacity var(--motion-fast) var(--ease-standard);

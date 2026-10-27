@@ -1,14 +1,5 @@
 <div class="page co">
-  <app-page-header [title]="collections.selected()?.name ?? ('nav.collection' | t)">
-    <ng-container ngProjectAs="[actions]">
-      <app-button variant="text" size="sm" (click)="openJoin()">{{
-        'collection.join.title' | t
-      }}</app-button>
-      <app-button variant="tonal" size="sm" (click)="openNew()">
-        <span class="btn-label"><app-icon name="plus" />{{ 'collection.new.short' | t }}</span>
-      </app-button>
-    </ng-container>
-  </app-page-header>
+  <app-page-header [title]="collections.selected()?.name ?? ('nav.collection' | t)" />
 
   @if (error()) {
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{
@@ -33,9 +24,15 @@
         @if (settingsError()) {
           <app-note kind="error" icon="alert">{{ settingsError() }}</app-note>
         }
-        <div class="form-actions">
-          <app-button type="submit" [loading]="settingsBusy()">{{ 'common.save' | t }}</app-button>
-        </div>
+        @if (dirty()) {
+          <app-fab
+            icon="check"
+            animate.enter="motion-fade-in"
+            [label]="'common.save' | t"
+            [loading]="settingsBusy()"
+            (activate)="saveSettings()"
+          />
+        }
       </form>
     </section>
 
@@ -69,7 +66,7 @@
     <section class="co__sec" aria-labelledby="co-invites">
       <div class="co__head">
         <h2 class="section-title" id="co-invites">{{ 'collection.invites' | t }}</h2>
-        <app-button variant="tonal" size="sm" (click)="openInviteDialog()">
+        <app-button variant="text" size="sm" (click)="openInviteDialog()">
           <span class="btn-label"><app-icon name="plus" />{{ 'collection.invite.new' | t }}</span>
         </app-button>
       </div>

@@ -30,6 +30,17 @@
 
   <div class="rail__spacer"></div>
 
+  <div class="rail__item rail__coll">
+    <app-row-menu
+      icon="warehouse"
+      align="start"
+      [label]="'collection.switch' | t"
+      [sections]="collectionMenu()"
+      (selected)="onCollectionMenu($event)"
+    />
+    <span class="rail__label" aria-hidden="true">{{ 'nav.collections' | t }}</span>
+  </div>
+
   @for (item of endItems; track item.key) {
     <a
       class="rail__item"

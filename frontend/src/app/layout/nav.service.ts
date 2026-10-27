@@ -34,7 +34,7 @@ const ITEMS: readonly NavItem[] = [
   {
     key: 'collection',
     path: '/collection',
-    icon: 'users',
+    icon: 'gear',
     labelKey: 'nav.collection',
     place: 'end',
   },

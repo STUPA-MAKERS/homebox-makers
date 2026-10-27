@@ -8,8 +8,8 @@ import {
 } from '@stupa-makers/ui-kit';
 
 /**
- * Pick tags of the collection: a chip opens the list with several choices, the chosen tags
- * show as removable chips below.
+ * Pick tags of the collection: the chosen tags as removable chips, then a dashed "+ Tag"
+ * chip that opens the list with several choices.
  */
 @Component({
   selector: 'app-tag-picker',
@@ -17,41 +17,32 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, ChipComponent, FilterSelectComponent],
   template: `
-    <div class="tp">
+    <div class="tp" role="group" [attr.aria-label]="label() || ('tags.label' | t)">
+      @for (tag of chosen(); track tag.id) {
+        <app-chip
+          [removable]="true"
+          [removeLabel]="'tags.remove' | t: { name: tag.name }"
+          (remove)="remove(tag.id)"
+          >{{ tag.name }}</app-chip
+        >
+      }
       <app-filter-select
-        [label]="label() || ('tags.label' | t)"
-        icon="tag"
+        class="tag-add"
+        [label]="'tags.add' | t"
         [options]="options()"
         [multiple]="true"
         [(values)]="value"
-        [text]="summary()"
+        [text]="'tags.addShort' | t"
+        [chevron]="false"
         [emptyText]="'tags.none' | t"
-        filled
       />
-      @if (chosen().length) {
-        <div class="tp__chips">
-          @for (tag of chosen(); track tag.id) {
-            <app-chip
-              [removable]="true"
-              [removeLabel]="'tags.remove' | t: { name: tag.name }"
-              (remove)="remove(tag.id)"
-              >{{ tag.name }}</app-chip
-            >
-          }
-        </div>
-      }
     </div>
   `,
   styles: `
     .tp {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-2);
-    }
-    .tp__chips {
-      display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: var(--space-2);
     }
   `,
@@ -69,11 +60,6 @@ export class TagPickerComponent {
     const ids = new Set(this.value());
     return this.ref.tags().filter((t) => ids.has(t.id));
   });
-  readonly summary = computed(() => {
-    const n = this.chosen().length;
-    return n === 0 ? null : n === 1 ? this.chosen()[0].name : String(n);
-  });
-
   remove(id: string): void {
     this.value.update((v) => v.filter((x) => x !== id));
   }

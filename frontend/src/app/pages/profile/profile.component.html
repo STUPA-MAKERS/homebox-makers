@@ -26,9 +26,15 @@
       @if (accountError()) {
         <app-note kind="error" icon="alert">{{ accountError() }}</app-note>
       }
-      <div class="form-actions">
-        <app-button type="submit" [loading]="accountBusy()">{{ 'common.save' | t }}</app-button>
-      </div>
+      @if (accountDirty() || accountBusy()) {
+        <app-fab
+          icon="check"
+          animate.enter="motion-fade-in"
+          [label]="'common.save' | t"
+          [loading]="accountBusy()"
+          (activate)="saveAccount()"
+        />
+      }
     </form>
   </section>
 
@@ -72,7 +78,7 @@
   <section class="pf__sec" aria-labelledby="pf-keys">
     <div class="pf__head">
       <h2 class="section-title" id="pf-keys">{{ 'profile.keys.title' | t }}</h2>
-      <app-button variant="tonal" size="sm" (click)="openKeyDialog()">
+      <app-button variant="text" size="sm" (click)="openKeyDialog()">
         <span class="btn-label"><app-icon name="plus" />{{ 'profile.keys.new' | t }}</span>
       </app-button>
     </div>

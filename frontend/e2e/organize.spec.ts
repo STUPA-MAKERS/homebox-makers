@@ -33,7 +33,7 @@ test('create a tag, give it to an item and find the item under the tag', async (
   await page.goto(`/items/${item}`);
   await page.getByRole('button', { name: 'Bearbeiten' }).first().click();
   const pane = page.getByRole('dialog', { name: 'Gegenstand bearbeiten' });
-  await pane.getByRole('button', { name: /Tags/ }).click();
+  await pane.getByRole('button', { name: /^Tag hinzufügen/ }).click();
   await page.getByRole('option', { name: 'Elektronik' }).click();
   await page.keyboard.press('Escape');
   await pane.getByRole('button', { name: 'Speichern' }).click();

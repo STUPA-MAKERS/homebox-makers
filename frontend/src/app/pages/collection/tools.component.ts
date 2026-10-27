@@ -26,6 +26,7 @@ import {
   EmptyStateComponent,
   FilePickerComponent,
   IconComponent,
+  type IconName,
   NoteComponent,
   StatusTextComponent,
   ToastService,
@@ -42,6 +43,7 @@ interface ActionRow {
   id: MaintenanceAction;
   titleKey: TranslationKey;
   bodyKey: TranslationKey;
+  icon: IconName;
 }
 
 const ACTIONS: readonly ActionRow[] = [
@@ -49,26 +51,31 @@ const ACTIONS: readonly ActionRow[] = [
     id: 'ensure-asset-ids',
     titleKey: 'tools.action.assetIds',
     bodyKey: 'tools.action.assetIdsBody',
+    icon: 'tag',
   },
   {
     id: 'ensure-import-refs',
     titleKey: 'tools.action.importRefs',
     bodyKey: 'tools.action.importRefsBody',
+    icon: 'link',
   },
   {
     id: 'zero-item-time-fields',
     titleKey: 'tools.action.zeroTimes',
     bodyKey: 'tools.action.zeroTimesBody',
+    icon: 'clock',
   },
   {
     id: 'set-primary-photos',
     titleKey: 'tools.action.primaryPhotos',
     bodyKey: 'tools.action.primaryPhotosBody',
+    icon: 'image',
   },
   {
     id: 'create-missing-thumbnails',
     titleKey: 'tools.action.thumbnails',
     bodyKey: 'tools.action.thumbnailsBody',
+    icon: 'grid',
   },
 ];
 

@@ -55,15 +55,24 @@
             <span class="sheet-dot" aria-hidden="true">·</span>
             <app-status-text kind="muted">{{ 'items.archived' | t }}</app-status-text>
           }
+          <span class="sheet-dot" aria-hidden="true">·</span>
+          <span
+            [title]="
+              ('item.created' | t: { date: (it.createdAt | ldate: 'medium') }) +
+              ' · ' +
+              ('item.updated' | t: { date: (it.updatedAt | ldate: 'medium') })
+            "
+            >{{ 'item.updated' | t: { date: (it.updatedAt | ldate: 'mediumDate') } }}</span
+          >
         </p>
         @if (it.description) {
           <p class="sheet-desc">{{ it.description }}</p>
         }
         <div class="sheet-chips">
-          <app-tag-assign [entity]="it" (changed)="item.set($event)" />
           @for (tag of it.tags; track tag.id) {
             <app-tag-chip [tag]="tag" />
           }
+          <app-tag-assign [entity]="it" (changed)="item.set($event)" />
         </div>
       </header>
 
@@ -227,10 +236,6 @@
         <app-attachments-panel [entity]="it" (changed)="item.set($event)" />
         <app-maintenance-log [entityId]="it.id" />
 
-        <p class="sheet-foot">
-          {{ 'item.created' | t: { date: (it.createdAt | ldate: 'medium') } }} ·
-          {{ 'item.updated' | t: { date: (it.updatedAt | ldate: 'medium') } }}
-        </p>
       </div>
     </div>
     </article>

@@ -34,3 +34,17 @@
   background: color-mix(in srgb, var(--color-text) 8%, transparent);
   color: var(--color-text-muted);
 }
+
+
+// The pane opens with the switch of the collection in place of a title: a large select.
+.cf__switch {
+  flex: none;
+  padding: 0 var(--space-4) var(--space-3);
+}
+.cf__switch ::ng-deep .fld__req {
+  display: none;
+}
+.cf__switch ::ng-deep .sel__value {
+  font-size: var(--fs-h3, 1.125rem);
+  font-weight: var(--fw-semibold, 600);
+}

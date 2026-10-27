@@ -92,7 +92,7 @@
                   @if (item.quantity > 1) {
                     <span class="il__qty num">{{ item.quantity }}×</span>
                   }
-                  <app-tag-strip [tags]="item.tags" />
+                  <app-tag-strip [tags]="item.tags" [max]="1" />
                 </span>
                 <app-row-menu
                   trail

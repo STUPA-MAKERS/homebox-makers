@@ -171,13 +171,16 @@
       @if (error()) {
         <app-note kind="error" icon="alert">{{ error() }}</app-note>
       }
-      <app-fab
-        icon="check"
-        [label]="'common.save' | t"
-        [contained]="true"
-        [loading]="busy()"
-        (activate)="save()"
-      />
+      @if (dirty() || busy()) {
+        <app-fab
+          icon="check"
+          animate.enter="motion-fade-in"
+          [label]="'common.save' | t"
+          [contained]="true"
+          [loading]="busy()"
+          (activate)="save()"
+        />
+      }
     </form>
   } @else if (error()) {
     <app-note kind="error" icon="alert">{{ error() }}</app-note>
