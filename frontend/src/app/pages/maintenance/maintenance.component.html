@@ -34,7 +34,7 @@
           @for (g of groups(); track g.key) {
             <section class="mt__group" [attr.aria-labelledby]="'mt-g-' + g.key">
               <h2 class="sec mt__sec" [class.mt__sec--over]="g.key === 'over'" [id]="'mt-g-' + g.key">
-                {{ g.title | t }} <span class="muted num">{{ g.rows.length }}</span>
+                {{ g.title | t }}
               </h2>
               <div class="mt__rows" [class.rowgroup]="!split()" role="list">
                 @for (e of g.rows; track e.id) {
