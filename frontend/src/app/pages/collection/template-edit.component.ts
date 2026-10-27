@@ -14,7 +14,6 @@ import { PageHeaderComponent } from '@shared/ui/page-header/page-header.componen
 import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
 import {
   ButtonComponent,
-  ButtonLinkComponent,
   CheckboxComponent,
   ConfirmDialogComponent,
   InputComponent,
@@ -60,7 +59,6 @@ interface TemplateForm {
     TagPickerComponent,
     CustomFieldsEditorComponent,
     ButtonComponent,
-    ButtonLinkComponent,
     CheckboxComponent,
     ConfirmDialogComponent,
     InputComponent,

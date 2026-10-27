@@ -1,0 +1,71 @@
+@use '../../shared/ui/list-page' as lp;
+
+@include lp.frame(ma);
+
+.ma__rows {
+  display: flex;
+  flex-direction: column;
+}
+.ma__sum {
+  margin: 0;
+  padding: 0 var(--space-4);
+  font-size: var(--fs-small);
+}
+.ma__over {
+  color: var(--color-warning);
+  font-weight: var(--fw-semibold);
+}
+.ma__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.ma__sec {
+  margin: 0;
+  padding-inline: var(--space-4);
+}
+.ma__sec--over {
+  color: var(--color-warning);
+}
+.ma__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text-muted);
+}
+.ma__icon--over {
+  background: var(--color-warning-subtle);
+  color: var(--color-warning);
+}
+.ma__icon--done {
+  background: var(--color-selected);
+  color: var(--color-accent-text);
+}
+.ma__due {
+  pointer-events: none;
+  font-size: var(--fs-small);
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+.ma__due--over {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--color-warning-subtle);
+  color: var(--color-warning);
+  font-weight: var(--fw-semibold);
+}
+.ma__note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  line-height: 1.5;
+}
+.ma--split .ma__detail {
+  position: relative;
+  --fab-inset: var(--space-6);
+}

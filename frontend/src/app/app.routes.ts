@@ -142,6 +142,38 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'mockups',
+            data: { title: 'nav.maintenance', wide: true },
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import('./pages/mockups/mockups.component').then((m) => m.MockupsComponent),
+              },
+              {
+                path: 'maintenance-a',
+                loadComponent: () =>
+                  import('./pages/mockups/maint-a.component').then((m) => m.MockMaintAComponent),
+              },
+              {
+                path: 'maintenance-b',
+                loadComponent: () =>
+                  import('./pages/mockups/maint-b.component').then((m) => m.MockMaintBComponent),
+              },
+              {
+                path: 'scanner',
+                loadComponent: () =>
+                  import('./pages/mockups/scanner.component').then((m) => m.MockScannerComponent),
+              },
+              {
+                path: 'scanner-hit',
+                data: { found: true },
+                loadComponent: () =>
+                  import('./pages/mockups/scanner.component').then((m) => m.MockScannerComponent),
+              },
+            ],
+          },
+          {
             path: 'profile',
             data: { title: 'nav.profile' },
             loadComponent: () =>
