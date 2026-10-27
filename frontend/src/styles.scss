@@ -31,6 +31,13 @@
   color: var(--color-text);
 }
 
+// The Homebox mark in the theme of the app (not of the system, which favicon.svg follows):
+// the hexagon behind the colours is #2a2a2a in the light theme and white in the dark one.
+[data-theme='dark'] .mark-light,
+:root:not([data-theme='dark']) .mark-dark {
+  display: none !important;
+}
+
 // A centred page column, capped to the content width of the design system.
 .page {
   display: flex;

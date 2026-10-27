@@ -6,7 +6,8 @@ unless index.html links a launch image of the exact screen size of the device. E
 image is the page background of a theme with the app mark in the centre, at a quarter
 of the screen width, so the start looks like the first frame of the app.
 
-The mark comes from public/icons/icon-512x512.png (rendered from public/favicon.svg by
+The mark comes from public/icons/icon-512x512.png in the light theme and from
+public/icons/icon-dark-512x512.png in the dark one (rendered from public/favicon.svg by
 scripts/make-icons.mjs, on transparent). The images are palette PNGs, a few KB each.
 
 Run from frontend/ after a change of the sizes, the colours or the icon (after
@@ -22,7 +23,10 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-ICON = ROOT / "public" / "icons" / "icon-512x512.png"
+ICONS = {
+    "light": ROOT / "public" / "icons" / "icon-512x512.png",
+    "dark": ROOT / "public" / "icons" / "icon-dark-512x512.png",
+}
 OUT = ROOT / "public" / "splash"
 
 # The page background (--color-bg of the ui-kit tokens) per theme.
@@ -46,12 +50,12 @@ SCREENS = [
 ]
 
 
-def mark() -> Image.Image:
-    """The mark of the icon, cut to its bounds."""
-    icon = Image.open(ICON).convert("RGBA")
+def mark(path: Path) -> Image.Image:
+    """The mark of an icon, cut to its bounds."""
+    icon = Image.open(path).convert("RGBA")
     bbox = icon.getbbox()
     if bbox is None:
-        raise SystemExit(f"{ICON} holds no mark")
+        raise SystemExit(f"{path} holds no mark")
     return icon.crop(bbox)
 
 
@@ -70,9 +74,9 @@ def splash(
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    logo = mark()
     links = []
     for theme, background in THEMES.items():
+        logo = mark(ICONS[theme])
         for w, h, ratio in SCREENS:
             name = f"splash-{theme}-{w * ratio}x{h * ratio}.png"
             splash(logo, w * ratio, h * ratio, background).save(OUT / name, optimize=True)

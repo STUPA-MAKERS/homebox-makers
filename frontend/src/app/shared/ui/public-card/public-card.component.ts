@@ -10,7 +10,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pc" [attr.aria-labelledby]="'pc-title'">
-      <img class="pc__mark" src="favicon.svg" alt="" width="48" height="48" />
+      <img class="pc__mark mark-light" src="mark-light.svg" alt="" width="48" height="48" />
+      <img class="pc__mark mark-dark" src="mark-dark.svg" alt="" width="48" height="48" />
       <h1 class="pc__title" id="pc-title">{{ title() }}</h1>
       @if (subtitle()) {
         <p class="pc__sub">{{ subtitle() }}</p>
