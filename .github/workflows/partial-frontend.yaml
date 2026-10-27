@@ -91,6 +91,10 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      # e2e/scan.spec.ts turns a printed label into a fake-camera video with ffmpeg.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
       - name: Run Integration Tests
         run: task test:ci
   integration-tests-pgsql:
@@ -139,6 +143,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: frontend
+
+      # e2e/scan.spec.ts turns a printed label into a fake-camera video with ffmpeg.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
 
       - name: Run Integration Tests
         run: task test:ci:postgresql
