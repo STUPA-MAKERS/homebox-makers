@@ -1,15 +1,29 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  forwardRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ApiClient } from '@core/api/api-client.service';
 import type { EntitySummary } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
+import { injectListDetailPage } from '@shared/list-detail-page';
+import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
   EmptyStateComponent,
   IconComponent,
+  ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
+  ScrollFadeDirective,
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
@@ -43,13 +57,25 @@ interface TreeRow {
     SearchPillComponent,
     SkeletonComponent,
     StickyBarComponent,
+    ListDetailLayoutComponent,
+    RouterOutlet,
+    ScrollFadeDirective,
   ],
+  providers: [{ provide: LIST_PAGE_STATE, useExisting: forwardRef(() => LocationsComponent) }],
+  host: { '[class.pane-page]': 'split()' },
   templateUrl: './locations.component.html',
   styleUrl: './locations.component.scss',
 })
 export class LocationsComponent {
   private readonly createSvc = inject(CreateService);
+  private readonly router = inject(Router);
   readonly ref = inject(RefDataService);
+
+  private readonly layout = viewChild(ListDetailLayoutComponent);
+  private readonly panes = injectListDetailPage(this.layout);
+  readonly selectedId = this.panes.selectedId;
+  readonly split = this.panes.split;
+  readonly hasRows = computed(() => this.ref.locations().length > 0);
 
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -105,7 +131,9 @@ export class LocationsComponent {
 
   constructor() {
     this.load();
-    this.createSvc.created.pipe(takeUntilDestroyed()).subscribe(() => this.load());
+    inject(ApiClient)
+      .changed$.pipe(takeUntilDestroyed())
+      .subscribe((kind) => kind === 'entity' && this.load());
   }
 
   load(): void {
@@ -142,5 +170,10 @@ export class LocationsComponent {
 
   newLocation(): void {
     this.createSvc.open({ kind: 'location' });
+  }
+
+  /** "Zur Liste" (one pane at a time). */
+  closeDetail(): void {
+    void this.router.navigate(['/locations']);
   }
 }

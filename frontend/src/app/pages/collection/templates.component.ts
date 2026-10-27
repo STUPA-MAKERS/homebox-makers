@@ -18,7 +18,6 @@ import {
   SkeletonComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
-import { CollectionTabsComponent } from './collection-tabs.component';
 
 /**
  * The item templates of the collection. A template fills in a new item (name, description,
@@ -33,7 +32,6 @@ import { CollectionTabsComponent } from './collection-tabs.component';
     FormsModule,
     TranslatePipe,
     PageHeaderComponent,
-    CollectionTabsComponent,
     ButtonComponent,
     DialogComponent,
     EmptyStateComponent,
@@ -45,14 +43,13 @@ import { CollectionTabsComponent } from './collection-tabs.component';
   ],
   template: `
     <div class="page co">
-      <app-page-header [title]="'nav.collection' | t" [meta]="'collection.tab.templates' | t">
+      <app-page-header [title]="'collection.tab.templates' | t">
         <ng-container ngProjectAs="[actions]">
           <app-button size="sm" (click)="openNew()">
             <span class="btn-label"><app-icon name="plus" />{{ 'templates.new' | t }}</span>
           </app-button>
         </ng-container>
       </app-page-header>
-      <app-collection-tabs active="templates" />
 
       @if (error()) {
         <app-note kind="error" icon="alert" retryable (retry)="load()">{{
@@ -62,7 +59,7 @@ import { CollectionTabsComponent } from './collection-tabs.component';
         <app-skeleton variant="rows" [count]="4" [lead]="true" [label]="'common.loading' | t" />
       } @else if (sorted().length === 0) {
         <app-empty-state
-          icon="form"
+          icon="template"
           [heading]="'templates.empty' | t"
           [body]="'templates.emptyBody' | t"
         />
@@ -75,7 +72,7 @@ import { CollectionTabsComponent } from './collection-tabs.component';
               [sub]="tpl.description || null"
               [link]="['/collection/templates', tpl.id]"
             >
-              <span lead class="co__lead-icon"><app-icon name="form" [size]="18" /></span>
+              <span lead class="co__lead-icon"><app-icon name="template" [size]="18" /></span>
             </app-list-item>
           }
         </div>

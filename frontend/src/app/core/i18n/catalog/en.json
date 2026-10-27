@@ -416,5 +416,13 @@
   "tools.wipe.locations": "Also delete locations",
   "tools.wipe.tags": "Also delete tags",
   "tools.wipe.maintenance": "Also delete maintenance entries",
-  "tools.wipe.done": "{count} entries deleted."
+  "tools.wipe.done": "{count} entries deleted.",
+  "items.none": "Pick an item.",
+  "locations.none": "Pick a location.",
+  "tags.pick": "Pick a tag.",
+  "collection.sec.overview": "Members, invitations and settings",
+  "collection.sec.types": "Kinds of items and locations",
+  "collection.sec.templates": "Defaults for new items",
+  "collection.sec.notifiers": "Alerts for due maintenance",
+  "collection.sec.tools": "Import, export, backups and actions"
 }

@@ -20,7 +20,8 @@ test('main pages load cleanly', async ({ signedIn: page }) => {
     '/collection',
   ]) {
     await page.goto(path);
-    await expect(page.locator('h1').first()).toBeVisible();
+    // A list page beside its detail has two headings; on a phone one of them is hidden.
+    await expect(page.locator('h1').filter({ visible: true }).first()).toBeAttached();
   }
   expect(errors).toEqual([]);
 });

@@ -1,0 +1,75 @@
+@use 'breakpoints' as bp;
+@use 'scroll-fade' as fade;
+@use 'list-pane' as lp;
+
+/// The frame of a list page with a detail outlet beside it (`app-list-detail`): `$b` is the
+/// block name of the page. It styles `.<b>` (with `.<b>--split` while the panes sit side by
+/// side), `.<b>__pane` (the list column), `.<b>__scroll` (its rows), `.<b>__chips` and
+/// `.<b>__detail` (the outlet, a sheet while split). The geometry of STUPA-Workflow's
+/// tickets and applications pages.
+@mixin frame($b) {
+  :host {
+    @include lp.stack;
+  }
+  :host(:not(.pane-page)) {
+    flex: 1 0 auto;
+  }
+
+  .#{$b} {
+    min-width: 0;
+  }
+  .#{$b}:not(.#{$b}--split) {
+    @include lp.single-column;
+  }
+  .#{$b}:not(.#{$b}--split) > app-list-detail {
+    flex: 1 0 auto;
+  }
+  .#{$b}--split {
+    @include lp.split-column;
+  }
+  .#{$b}:not(.#{$b}--split) .#{$b}__pane {
+    flex: 1 0 auto;
+  }
+
+  .#{$b}__chips {
+    @include lp.chips;
+  }
+
+  .#{$b}__scroll {
+    @include lp.scroll(--#{$b}-fade);
+    gap: var(--space-3);
+  }
+  .#{$b}:not(.#{$b}--split) .#{$b}__scroll {
+    flex: 1 0 auto;
+  }
+  .#{$b}--split .#{$b}__scroll {
+    @include lp.split-scroll(--#{$b}-fade);
+    @include fade.fade-y(var(--#{$b}-fade));
+  }
+  .#{$b}--split .#{$b}__scroll > * {
+    flex: none;
+  }
+
+  .#{$b}__detail {
+    @include lp.detail;
+  }
+  .#{$b}--split .#{$b}__detail {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-5) var(--space-6) var(--space-6);
+    border-radius: var(--radius-2xl);
+    background: var(--color-surface-1);
+  }
+  // The empty detail (`app-detail-none`) brings its own sheet.
+  .#{$b}--split .#{$b}__detail:has(app-detail-none) {
+    padding: 0;
+    background: none;
+  }
+
+  @include bp.phone {
+    .#{$b}__chips {
+      @include lp.phone-chips;
+    }
+  }
+}

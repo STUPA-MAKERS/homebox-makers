@@ -1,6 +1,5 @@
 <div class="page co">
-  <app-page-header [title]="'nav.collection' | t" [meta]="'collection.tab.types' | t" />
-  <app-collection-tabs active="types" />
+  <app-page-header [title]="'collection.tab.types' | t" />
 
   @if (error()) {
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{
@@ -30,7 +29,7 @@
               <div class="co__row">
                 <app-icon
                   class="co__icon"
-                  [name]="type.isLocation ? 'building' : 'box'"
+                  [name]="type.isLocation ? 'mappin' : 'package'"
                   [size]="20"
                 />
                 <div class="co__text">

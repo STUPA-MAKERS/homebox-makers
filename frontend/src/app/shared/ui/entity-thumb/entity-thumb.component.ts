@@ -19,7 +19,7 @@ import { injectAttachmentUrl, isLocation } from '@shared/entity.util';
       <img class="th" [src]="url" alt="" loading="lazy" (error)="failed.set(true)" />
     } @else {
       <span class="th th--icon" aria-hidden="true">
-        <app-icon [name]="location() ? 'building' : 'box'" [size]="size() / 2" />
+        <app-icon [name]="location() ? 'mappin' : 'package'" [size]="size() / 2" />
       </span>
     }
   `,

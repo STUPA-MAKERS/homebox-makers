@@ -1,3 +1,12 @@
+@use '../../shared/ui/list-page' as lp;
+
+@include lp.frame(loc);
+
+.loc__rows {
+  display: flex;
+  flex-direction: column;
+}
+
 .loc__lead {
   display: inline-flex;
   align-items: center;

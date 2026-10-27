@@ -25,7 +25,6 @@ import { LocalizedDatePipe } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { errorMessage } from '@shared/http-error';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
-import { CollectionTabsComponent } from './collection-tabs.component';
 import {
   ButtonComponent,
   ConfirmDialogComponent,
@@ -62,7 +61,6 @@ function inAWeek(): string {
     TranslatePipe,
     LocalizedDatePipe,
     PageHeaderComponent,
-    CollectionTabsComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     CopyButtonComponent,

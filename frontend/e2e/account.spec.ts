@@ -36,8 +36,9 @@ test('invite a second user who joins the collection', async ({
   await guestPage.waitForURL('**/collection**');
   await guestPage.getByRole('dialog').getByRole('button', { name: 'Beitreten' }).click();
   // The app reloads in the joined collection.
-  await expect(guestPage.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(guestPage.locator('app-page-header')).toContainText(account.name);
+  await expect(
+    guestPage.locator('app-page-header').filter({ hasText: account.name }).first(),
+  ).toBeVisible();
   await other.close();
 
   await page.reload();

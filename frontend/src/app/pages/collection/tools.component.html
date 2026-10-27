@@ -1,6 +1,5 @@
 <div class="page co">
-  <app-page-header [title]="'nav.collection' | t" [meta]="'collection.tab.tools' | t" />
-  <app-collection-tabs active="tools" />
+  <app-page-header [title]="'collection.tab.tools' | t" />
 
   <section class="co__sec" aria-labelledby="tools-csv">
     <h2 class="section-title" id="tools-csv">{{ 'tools.csv.title' | t }}</h2>
@@ -16,7 +15,7 @@
         <span class="btn-label"><app-icon name="receipt" />{{ 'tools.bom' | t }}</span>
       </a>
       <a appButton="text" size="sm" routerLink="/labels">
-        <span class="btn-label"><app-icon name="tag" />{{ 'tools.labels' | t }}</span>
+        <span class="btn-label"><app-icon name="printer" />{{ 'tools.labels' | t }}</span>
       </a>
     </div>
     <app-file-picker #csvPicker accept=".csv,.tsv,text/csv" (picked)="pendingCsv.set($event[0])" />

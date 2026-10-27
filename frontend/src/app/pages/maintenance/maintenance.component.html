@@ -12,7 +12,7 @@
 
   <section class="mt__stats" [attr.aria-label]="'home.stats' | t">
     <div class="stat">
-      <span class="stat__icon"><app-icon name="clock" [size]="20" /></span>
+      <span class="stat__icon"><app-icon name="wrench" [size]="20" /></span>
       <span class="stat__value num">{{ loading() ? '–' : entries().length }}</span>
       <span class="stat__label">{{ 'maint.count' | t }}</span>
     </div>
@@ -38,7 +38,7 @@
     <app-skeleton variant="rows" [count]="5" [lead]="true" [label]="'common.loading' | t" />
   } @else if (sorted().length === 0) {
     <app-empty-state
-      icon="clock"
+      icon="wrench"
       [heading]="'maint.emptyAll' | t"
       [body]="'maint.emptyAllBody' | t"
     />

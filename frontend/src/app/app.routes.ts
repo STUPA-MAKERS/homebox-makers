@@ -26,7 +26,7 @@ export const routes: Routes = [
           if (!token) return '/home';
           const router = inject(Router);
           return inject(AuthService).user()
-            ? router.createUrlTree(['/collection'], { queryParams: { join: token } })
+            ? router.createUrlTree(['/collection/overview'], { queryParams: { join: token } })
             : router.createUrlTree(['/login'], { queryParams: { token } });
         },
       },
@@ -59,36 +59,33 @@ export const routes: Routes = [
             loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
           },
           {
-            path: 'items',
-            data: { title: 'nav.items' },
-            loadComponent: () =>
-              import('./pages/items/items-list.component').then((m) => m.ItemsListComponent),
-          },
-          {
-            path: 'items/:id',
-            data: { title: 'nav.items' },
-            loadComponent: () =>
-              import('./pages/items/item-detail.component').then((m) => m.ItemDetailComponent),
-          },
-          {
             path: 'items/:id/edit',
             data: { title: 'item.edit.title' },
             loadComponent: () =>
               import('./pages/items/item-edit.component').then((m) => m.ItemEditComponent),
           },
           {
-            path: 'locations',
-            data: { title: 'nav.locations' },
+            path: 'items',
+            data: { title: 'nav.items', wide: true },
             loadComponent: () =>
-              import('./pages/locations/locations.component').then((m) => m.LocationsComponent),
-          },
-          {
-            path: 'locations/:id',
-            data: { title: 'nav.locations' },
-            loadComponent: () =>
-              import('./pages/locations/location-detail.component').then(
-                (m) => m.LocationDetailComponent,
-              ),
+              import('./pages/items/items-list.component').then((m) => m.ItemsListComponent),
+            children: [
+              {
+                path: '',
+                data: {
+                  none: { icon: 'package', heading: 'items.none', emptyHeading: 'home.emptyItems' },
+                },
+                loadComponent: () =>
+                  import('./shared/ui/detail-none/list-none.component').then(
+                    (m) => m.ListNoneComponent,
+                  ),
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import('./pages/items/item-detail.component').then((m) => m.ItemDetailComponent),
+              },
+            ],
           },
           {
             path: 'locations/:id/edit',
@@ -97,15 +94,53 @@ export const routes: Routes = [
               import('./pages/items/item-edit.component').then((m) => m.ItemEditComponent),
           },
           {
-            path: 'tags',
-            data: { title: 'nav.tags' },
-            loadComponent: () => import('./pages/tags/tags.component').then((m) => m.TagsComponent),
+            path: 'locations',
+            data: { title: 'nav.locations', wide: true },
+            loadComponent: () =>
+              import('./pages/locations/locations.component').then((m) => m.LocationsComponent),
+            children: [
+              {
+                path: '',
+                data: {
+                  none: {
+                    icon: 'mappin',
+                    heading: 'locations.none',
+                    emptyHeading: 'locations.empty',
+                  },
+                },
+                loadComponent: () =>
+                  import('./shared/ui/detail-none/list-none.component').then(
+                    (m) => m.ListNoneComponent,
+                  ),
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import('./pages/locations/location-detail.component').then(
+                    (m) => m.LocationDetailComponent,
+                  ),
+              },
+            ],
           },
           {
-            path: 'tags/:id',
-            data: { title: 'nav.tags' },
-            loadComponent: () =>
-              import('./pages/tags/tag-detail.component').then((m) => m.TagDetailComponent),
+            path: 'tags',
+            data: { title: 'nav.tags', wide: true },
+            loadComponent: () => import('./pages/tags/tags.component').then((m) => m.TagsComponent),
+            children: [
+              {
+                path: '',
+                data: { none: { icon: 'tag', heading: 'tags.pick', emptyHeading: 'tags.empty' } },
+                loadComponent: () =>
+                  import('./shared/ui/detail-none/list-none.component').then(
+                    (m) => m.ListNoneComponent,
+                  ),
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import('./pages/tags/tag-detail.component').then((m) => m.TagDetailComponent),
+              },
+            ],
           },
           {
             path: 'maintenance',
@@ -123,43 +158,65 @@ export const routes: Routes = [
           },
           {
             path: 'collection',
-            data: { title: 'nav.collection' },
+            data: { title: 'nav.collection', wide: true },
             loadComponent: () =>
-              import('./pages/collection/collection.component').then((m) => m.CollectionComponent),
-          },
-          {
-            path: 'collection/types',
-            data: { title: 'collection.tab.types' },
-            loadComponent: () =>
-              import('./pages/collection/entity-types.component').then(
-                (m) => m.EntityTypesComponent,
+              import('./pages/collection/collection-frame.component').then(
+                (m) => m.CollectionFrameComponent,
               ),
-          },
-          {
-            path: 'collection/templates',
-            data: { title: 'collection.tab.templates' },
-            loadComponent: () =>
-              import('./pages/collection/templates.component').then((m) => m.TemplatesComponent),
-          },
-          {
-            path: 'collection/templates/:id',
-            data: { title: 'collection.tab.templates' },
-            loadComponent: () =>
-              import('./pages/collection/template-edit.component').then(
-                (m) => m.TemplateEditComponent,
-              ),
-          },
-          {
-            path: 'collection/notifiers',
-            data: { title: 'collection.tab.notifiers' },
-            loadComponent: () =>
-              import('./pages/collection/notifiers.component').then((m) => m.NotifiersComponent),
-          },
-          {
-            path: 'collection/tools',
-            data: { title: 'collection.tab.tools' },
-            loadComponent: () =>
-              import('./pages/collection/tools.component').then((m) => m.ToolsComponent),
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import('./pages/collection/collection.component').then(
+                    (m) => m.CollectionComponent,
+                  ),
+              },
+              {
+                path: 'overview',
+                loadComponent: () =>
+                  import('./pages/collection/collection.component').then(
+                    (m) => m.CollectionComponent,
+                  ),
+              },
+              {
+                path: 'types',
+                data: { title: 'collection.tab.types' },
+                loadComponent: () =>
+                  import('./pages/collection/entity-types.component').then(
+                    (m) => m.EntityTypesComponent,
+                  ),
+              },
+              {
+                path: 'templates',
+                data: { title: 'collection.tab.templates' },
+                loadComponent: () =>
+                  import('./pages/collection/templates.component').then(
+                    (m) => m.TemplatesComponent,
+                  ),
+              },
+              {
+                path: 'templates/:id',
+                data: { title: 'collection.tab.templates' },
+                loadComponent: () =>
+                  import('./pages/collection/template-edit.component').then(
+                    (m) => m.TemplateEditComponent,
+                  ),
+              },
+              {
+                path: 'notifiers',
+                data: { title: 'collection.tab.notifiers' },
+                loadComponent: () =>
+                  import('./pages/collection/notifiers.component').then(
+                    (m) => m.NotifiersComponent,
+                  ),
+              },
+              {
+                path: 'tools',
+                data: { title: 'collection.tab.tools' },
+                loadComponent: () =>
+                  import('./pages/collection/tools.component').then((m) => m.ToolsComponent),
+              },
+            ],
           },
           {
             path: 'a/:assetId',

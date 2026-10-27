@@ -29,7 +29,6 @@ import {
   StatusTextComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
-import { CollectionTabsComponent } from './collection-tabs.component';
 
 type MaintenanceAction =
   | 'ensure-asset-ids'
@@ -87,7 +86,6 @@ const ACTIONS: readonly ActionRow[] = [
     TranslatePipe,
     LocalizedDatePipe,
     PageHeaderComponent,
-    CollectionTabsComponent,
     ButtonComponent,
     ButtonLinkComponent,
     CheckboxComponent,

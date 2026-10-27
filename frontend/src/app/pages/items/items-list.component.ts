@@ -6,13 +6,15 @@ import {
   afterNextRender,
   computed,
   effect,
+  forwardRef,
   inject,
   input,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Subject, debounceTime, switchMap, catchError, of, tap } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
 import type { EntityListResult, EntityQuery, EntitySummary } from '@core/api/models';
@@ -20,6 +22,8 @@ import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import type { TranslationKey } from '@core/i18n/translations';
+import { injectListDetailPage } from '@shared/list-detail-page';
+import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
@@ -30,11 +34,13 @@ import {
   type FilterSelectOption,
   IconComponent,
   InfiniteScrollDirective,
+  ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
+  ScrollFadeDirective,
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
@@ -79,7 +85,12 @@ const SORTS: readonly { value: string; key: TranslationKey }[] = [
     FilterSelectComponent,
     RowMenuComponent,
     InfiniteScrollDirective,
+    ListDetailLayoutComponent,
+    RouterOutlet,
+    ScrollFadeDirective,
   ],
+  providers: [{ provide: LIST_PAGE_STATE, useExisting: forwardRef(() => ItemsListComponent) }],
+  host: { '[class.pane-page]': 'split()' },
   templateUrl: './items-list.component.html',
   styleUrl: './items-list.component.scss',
 })
@@ -91,6 +102,11 @@ export class ItemsListComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly ref = inject(RefDataService);
+
+  private readonly layout = viewChild(ListDetailLayoutComponent);
+  private readonly panes = injectListDetailPage(this.layout);
+  readonly selectedId = this.panes.selectedId;
+  readonly split = this.panes.split;
 
   // Query parameters (router input binding).
   readonly q = input<string | undefined>();
@@ -120,6 +136,7 @@ export class ItemsListComponent {
   readonly includeArchived = computed(() => this.archived() === '1');
   readonly sortBy = computed(() => this.sort() ?? 'name');
   readonly sortDir = computed<'asc' | 'desc'>(() => (this.dir() === 'desc' ? 'desc' : 'asc'));
+  readonly hasRows = computed(() => this.items().length > 0);
   readonly hasMore = computed(() => this.items().length < this.total());
 
   readonly locationOptions = computed<FilterSelectOption[]>(() =>
@@ -223,13 +240,24 @@ export class ItemsListComponent {
       });
     });
 
-    this.createSvc.created.pipe(takeUntilDestroyed()).subscribe(() => this.reload());
+    // A write anywhere (the detail beside the list, the create dialog) refreshes the rows
+    // in place, without the skeleton.
+    this.api.changed$.pipe(takeUntilDestroyed()).subscribe((kind) => {
+      if (kind !== 'entity') return;
+      this.page.set(1);
+      this.query$.next(this.currentQuery(1));
+    });
 
     afterNextRender(() => {
       if (this.focus() === 'search') {
         this.host.nativeElement.querySelector<HTMLInputElement>('app-search-pill input')?.focus();
       }
     });
+  }
+
+  /** "Zur Liste" (one pane at a time): close the detail and keep the filters. */
+  closeDetail(): void {
+    void this.router.navigate(['/items'], { queryParamsHandling: 'preserve' });
   }
 
   onSearch(value: string): void {

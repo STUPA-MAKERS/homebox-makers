@@ -1,0 +1,19 @@
+@use '../../shared/ui/list-page' as lp;
+
+@include lp.frame(cf);
+
+.cf__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.cf__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: var(--color-text-muted);
+}

@@ -1,82 +1,90 @@
-<div class="page">
-  <app-page-header
-    [title]="'nav.locations' | t"
-    [meta]="loading() ? null : ('locations.count' | t: { count: ref.locations().length })"
-  >
-    <ng-container ngProjectAs="[actions]">
-      @if (hasBranches() && !search()) {
-        <app-button variant="text" size="sm" (click)="toggleAll()">{{
-          (allCollapsed() ? 'locations.expandAll' : 'locations.collapseAll') | t
-        }}</app-button>
+<div class="loc" [class.loc--split]="split()">
+  <app-list-detail [detailOpen]="selectedId() !== null" (back)="closeDetail()">
+    <section list class="ld-pane loc__pane" aria-labelledby="loc-title">
+      <app-page-header [pane]="true" titleId="loc-title" [title]="'nav.locations' | t">
+        <ng-container ngProjectAs="[actions]">
+          @if (hasBranches() && !search()) {
+            <app-button variant="text" size="sm" (click)="toggleAll()">{{
+              (allCollapsed() ? 'locations.expandAll' : 'locations.collapseAll') | t
+            }}</app-button>
+          }
+          <app-button size="sm" (click)="newLocation()">
+            <span class="btn-label"><app-icon name="plus" />{{ 'create.location.short' | t }}</span>
+          </app-button>
+        </ng-container>
+      </app-page-header>
+
+      @if (ref.locations().length > 8) {
+        <app-sticky-bar class="ld-pane__filters">
+          <app-search-pill
+            [placeholder]="'locations.search' | t"
+            [label]="'locations.search' | t"
+            [clearable]="true"
+            [value]="search()"
+            (valueChange)="search.set($event)"
+          />
+        </app-sticky-bar>
       }
-      <app-button size="sm" (click)="newLocation()">
-        <span class="btn-label"><app-icon name="plus" />{{ 'create.location.short' | t }}</span>
-      </app-button>
-    </ng-container>
-  </app-page-header>
 
-  @if (ref.locations().length > 8) {
-    <app-sticky-bar>
-      <app-search-pill
-        [placeholder]="'locations.search' | t"
-        [label]="'locations.search' | t"
-        [clearable]="true"
-        [value]="search()"
-        (valueChange)="search.set($event)"
-      />
-    </app-sticky-bar>
-  }
-
-  @if (error()) {
-    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
-      'common.loadError' | t
-    }}</app-note>
-  } @else if (loading()) {
-    <app-skeleton variant="rows" [count]="6" [lead]="true" [label]="'common.loading' | t" />
-  } @else if (rows().length === 0) {
-    <app-empty-state
-      icon="building"
-      [heading]="(search() ? 'locations.noMatch' : 'locations.empty') | t"
-      [body]="search() ? '' : ('locations.emptyBody' | t)"
-    />
-  } @else {
-    <div class="rowgroup" role="list">
-      @for (r of rows(); track r.loc.id) {
-        <app-list-item
-          role="listitem"
-          [title]="r.loc.name"
-          [sub]="search() ? r.path : null"
-          [link]="['/locations', r.loc.id]"
-          [style.--loc-depth]="search() ? 0 : r.depth"
-        >
-          <span lead class="loc__lead"><app-icon name="building" [size]="20" /></span>
-          <span trail class="loc__trail">
-            @if (r.loc.itemCount) {
-              <span class="muted num">{{
-                (r.loc.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
-                  | t: { count: r.loc.itemCount }
-              }}</span>
-            }
-            @if (r.hasChildren && !search()) {
-              <button
-                type="button"
-                class="loc__toggle"
-                [attr.aria-expanded]="!collapsed().has(r.loc.id)"
-                [attr.aria-label]="
-                  (collapsed().has(r.loc.id) ? 'locations.expand' : 'locations.collapse')
-                    | t: { name: r.loc.name }
-                "
-                (click)="toggle(r.loc.id)"
+      <div class="loc__scroll" appScrollFade="y">
+        @if (error()) {
+          <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+            'common.loadError' | t
+          }}</app-note>
+        } @else if (loading()) {
+          <app-skeleton variant="rows" [count]="6" [lead]="true" [label]="'common.loading' | t" />
+        } @else if (rows().length === 0) {
+          <app-empty-state
+            icon="mappin"
+            [heading]="(search() ? 'locations.noMatch' : 'locations.empty') | t"
+            [body]="search() ? '' : ('locations.emptyBody' | t)"
+          />
+        } @else {
+          <div class="loc__rows" [class.rowgroup]="!split()" role="list">
+            @for (r of rows(); track r.loc.id) {
+              <app-list-item
+                role="listitem"
+                [title]="r.loc.name"
+                [sub]="search() ? r.path : null"
+                [link]="['/locations', r.loc.id]"
+                [selected]="r.loc.id === selectedId()"
+                [style.--loc-depth]="search() ? 0 : r.depth"
               >
-                <app-icon
-                  [name]="collapsed().has(r.loc.id) ? 'chevron-right' : 'chevron-down'"
-                  [size]="18"
-                />
-              </button>
+                <span lead class="loc__lead"><app-icon name="mappin" [size]="20" /></span>
+                <span trail class="loc__trail">
+                  @if (r.loc.itemCount) {
+                    <span class="muted num">{{
+                      (r.loc.itemCount === 1 ? 'locations.itemCountOne' : 'locations.itemCount')
+                        | t: { count: r.loc.itemCount }
+                    }}</span>
+                  }
+                  @if (r.hasChildren && !search()) {
+                    <button
+                      type="button"
+                      class="loc__toggle"
+                      [attr.aria-expanded]="!collapsed().has(r.loc.id)"
+                      [attr.aria-label]="
+                        (collapsed().has(r.loc.id) ? 'locations.expand' : 'locations.collapse')
+                          | t: { name: r.loc.name }
+                      "
+                      (click)="toggle(r.loc.id)"
+                    >
+                      <app-icon
+                        [name]="collapsed().has(r.loc.id) ? 'chevron-right' : 'chevron-down'"
+                        [size]="18"
+                      />
+                    </button>
+                  }
+                </span>
+              </app-list-item>
             }
-          </span>
-        </app-list-item>
-      }
+          </div>
+        }
+      </div>
+    </section>
+
+    <div detail class="loc__detail">
+      <router-outlet />
     </div>
-  }
+  </app-list-detail>
 </div>

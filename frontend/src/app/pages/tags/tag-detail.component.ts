@@ -105,7 +105,7 @@ export class TagDetailComponent {
     {
       items: [
         { id: 'sub', label: this.i18n.translate('tag.addSub'), icon: 'plus' },
-        { id: 'item', label: this.i18n.translate('tag.addItem'), icon: 'box' },
+        { id: 'item', label: this.i18n.translate('tag.addItem'), icon: 'package' },
       ],
     },
     {

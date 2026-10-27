@@ -416,5 +416,13 @@
   "tools.wipe.locations": "Auch Orte löschen",
   "tools.wipe.tags": "Auch Tags löschen",
   "tools.wipe.maintenance": "Auch Wartungseinträge löschen",
-  "tools.wipe.done": "{count} Einträge gelöscht."
+  "tools.wipe.done": "{count} Einträge gelöscht.",
+  "items.none": "Wähle einen Gegenstand aus.",
+  "locations.none": "Wähle einen Ort aus.",
+  "tags.pick": "Wähle einen Tag aus.",
+  "collection.sec.overview": "Mitglieder, Einladungen und Einstellungen",
+  "collection.sec.types": "Arten von Gegenständen und Orten",
+  "collection.sec.templates": "Vorgaben für neue Gegenstände",
+  "collection.sec.notifiers": "Hinweise auf fällige Wartung",
+  "collection.sec.tools": "Import, Export, Sicherungen und Aktionen"
 }

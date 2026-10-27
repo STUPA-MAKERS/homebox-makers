@@ -1,5 +1,5 @@
 <div class="page co">
-  <app-page-header [title]="'nav.collection' | t" [meta]="collections.selected()?.name ?? null">
+  <app-page-header [title]="collections.selected()?.name ?? ('nav.collection' | t)">
     <ng-container ngProjectAs="[actions]">
       <app-button variant="text" size="sm" (click)="openJoin()">{{
         'collection.join.title' | t
@@ -9,7 +9,6 @@
       </app-button>
     </ng-container>
   </app-page-header>
-  <app-collection-tabs active="overview" />
 
   @if (error()) {
     <app-note kind="error" icon="alert" retryable (retry)="load()">{{

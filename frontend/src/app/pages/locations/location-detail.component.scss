@@ -4,7 +4,10 @@
   gap: var(--space-6);
   align-items: start;
 }
-@media (max-width: 1100px) {
+:host {
+  container-type: inline-size;
+}
+@container (max-width: 960px) {
   .ld {
     grid-template-columns: minmax(0, 1fr);
   }

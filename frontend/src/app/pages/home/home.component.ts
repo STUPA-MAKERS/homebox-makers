@@ -86,9 +86,9 @@ export class HomeComponent {
     const s = this.stats();
     if (!s) return [];
     return [
-      { icon: 'box', labelKey: 'home.stat.items', value: s.totalItems, link: '/items' },
+      { icon: 'package', labelKey: 'home.stat.items', value: s.totalItems, link: '/items' },
       {
-        icon: 'building',
+        icon: 'mappin',
         labelKey: 'home.stat.locations',
         value: s.totalLocations,
         link: '/locations',

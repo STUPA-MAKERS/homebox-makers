@@ -1,0 +1,24 @@
+@use '../../shared/ui/list-page' as lp;
+
+@include lp.frame(tg);
+
+.tg__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.tg__lead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface-3);
+}
+.tg__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}

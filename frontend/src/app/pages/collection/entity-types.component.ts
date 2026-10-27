@@ -25,7 +25,6 @@ import {
   SkeletonComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
-import { CollectionTabsComponent } from './collection-tabs.component';
 
 /**
  * The entity types of the collection: kinds of items ("Werkzeug", "Buch") and kinds of
@@ -39,7 +38,6 @@ import { CollectionTabsComponent } from './collection-tabs.component';
     FormsModule,
     TranslatePipe,
     PageHeaderComponent,
-    CollectionTabsComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     DialogComponent,

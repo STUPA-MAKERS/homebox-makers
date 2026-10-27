@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { type Observable, map } from 'rxjs';
+import { type Observable, Subject, map, tap } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import type {
   APIKeyCreate,
@@ -104,6 +104,16 @@ function normalizeEntity(e: EntityOut): EntityOut {
 export class ApiClient {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE_URL);
+
+  private readonly changes = new Subject<'entity' | 'tag'>();
+  /**
+   * Fires after a write to an entity or a tag succeeded, so a list beside an open detail
+   * (`app-list-detail`) loads again without a link between the two panes.
+   */
+  readonly changed$ = this.changes.asObservable();
+
+  private readonly entityWritten = () => this.changes.next('entity');
+  private readonly tagWritten = () => this.changes.next('tag');
 
   private url(path: string): string {
     return `${this.base}${path}`;
@@ -284,19 +294,25 @@ export class ApiClient {
   }
 
   createEntity(body: EntityCreate): Observable<EntityOut> {
-    return this.http.post<EntityOut>(this.url('/entities'), body).pipe(map(normalizeEntity));
+    return this.http
+      .post<EntityOut>(this.url('/entities'), body)
+      .pipe(map(normalizeEntity), tap(this.entityWritten));
   }
 
   updateEntity(id: string, body: EntityUpdate): Observable<EntityOut> {
-    return this.http.put<EntityOut>(this.url(`/entities/${id}`), body).pipe(map(normalizeEntity));
+    return this.http
+      .put<EntityOut>(this.url(`/entities/${id}`), body)
+      .pipe(map(normalizeEntity), tap(this.entityWritten));
   }
 
   patchEntity(id: string, body: EntityPatch): Observable<EntityOut> {
-    return this.http.patch<EntityOut>(this.url(`/entities/${id}`), body).pipe(map(normalizeEntity));
+    return this.http
+      .patch<EntityOut>(this.url(`/entities/${id}`), body)
+      .pipe(map(normalizeEntity), tap(this.entityWritten));
   }
 
   deleteEntity(id: string): Observable<void> {
-    return this.http.delete<void>(this.url(`/entities/${id}`));
+    return this.http.delete<void>(this.url(`/entities/${id}`)).pipe(tap(this.entityWritten));
   }
 
   duplicateEntity(
@@ -310,7 +326,7 @@ export class ApiClient {
   ): Observable<EntityOut> {
     return this.http
       .post<EntityOut>(this.url(`/entities/${id}/duplicate`), options)
-      .pipe(map(normalizeEntity));
+      .pipe(map(normalizeEntity), tap(this.entityWritten));
   }
 
   customFieldNames(): Observable<string[]> {
@@ -420,15 +436,15 @@ export class ApiClient {
   }
 
   createTag(body: TagCreate): Observable<TagOut> {
-    return this.http.post<TagOut>(this.url('/tags'), body);
+    return this.http.post<TagOut>(this.url('/tags'), body).pipe(tap(this.tagWritten));
   }
 
   updateTag(id: string, body: TagUpdate): Observable<TagOut> {
-    return this.http.put<TagOut>(this.url(`/tags/${id}`), body);
+    return this.http.put<TagOut>(this.url(`/tags/${id}`), body).pipe(tap(this.tagWritten));
   }
 
   deleteTag(id: string): Observable<void> {
-    return this.http.delete<void>(this.url(`/tags/${id}`));
+    return this.http.delete<void>(this.url(`/tags/${id}`)).pipe(tap(this.tagWritten));
   }
 
   // --- entity types ---------------------------------------------------------------------
@@ -475,7 +491,7 @@ export class ApiClient {
   createFromTemplate(id: string, body: EntityTemplateCreateItemRequest): Observable<EntityOut> {
     return this.http
       .post<EntityOut>(this.url(`/templates/${id}/create-item`), body)
-      .pipe(map(normalizeEntity));
+      .pipe(map(normalizeEntity), tap(this.entityWritten));
   }
 
   // --- notifiers ------------------------------------------------------------------------

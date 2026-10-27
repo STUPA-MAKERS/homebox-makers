@@ -112,9 +112,9 @@ export class LocationDetailComponent {
   readonly menu = computed<RowMenuSection[]>(() => [
     {
       items: [
-        { id: 'sub', label: this.i18n.translate('location.addSub'), icon: 'building' },
-        { id: 'item', label: this.i18n.translate('location.addItem'), icon: 'box' },
-        { id: 'label', label: this.i18n.translate('item.label'), icon: 'tag' },
+        { id: 'sub', label: this.i18n.translate('location.addSub'), icon: 'mappin' },
+        { id: 'item', label: this.i18n.translate('location.addItem'), icon: 'package' },
+        { id: 'label', label: this.i18n.translate('item.label'), icon: 'printer' },
       ],
     },
     {

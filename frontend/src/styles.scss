@@ -5,6 +5,15 @@
 // The utilities the kit's templates use (tailwind.config.js); preflight is off.
 @tailwind utilities;
 
+// A pane page (a list beside its detail) fills the free height of `.main` and its panes
+// scroll inside themselves. A basis of 0 keeps the rows from pushing it taller than the
+// viewport; the bottom padding shrinks to `--pane-foot-gap`.
+.pane-page {
+  flex: 1 1 0;
+  min-height: 0;
+  margin-bottom: calc(var(--pane-foot-gap, 0px) - var(--main-pad-bottom, 0px));
+}
+
 .sec {
   margin: 0;
   font-size: 0.84375rem;

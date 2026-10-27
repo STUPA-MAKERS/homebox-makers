@@ -161,7 +161,7 @@ export class MaintenanceComponent {
                   icon: 'check' as const,
                 },
               ]),
-          { id: 'item', label: this.i18n.translate('maint.openItem'), icon: 'box' },
+          { id: 'item', label: this.i18n.translate('maint.openItem'), icon: 'package' },
         ],
       },
       {

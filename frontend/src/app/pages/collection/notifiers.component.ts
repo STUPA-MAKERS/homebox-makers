@@ -21,7 +21,6 @@ import {
   SwitchComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
-import { CollectionTabsComponent } from './collection-tabs.component';
 
 /**
  * The notifiers of the signed-in user: Shoutrrr URLs (ntfy, Discord, Matrix, mail …) that
@@ -35,7 +34,6 @@ import { CollectionTabsComponent } from './collection-tabs.component';
     FormsModule,
     TranslatePipe,
     PageHeaderComponent,
-    CollectionTabsComponent,
     ButtonComponent,
     ConfirmDialogComponent,
     DialogComponent,
@@ -49,14 +47,13 @@ import { CollectionTabsComponent } from './collection-tabs.component';
   ],
   template: `
     <div class="page co">
-      <app-page-header [title]="'nav.collection' | t" [meta]="'collection.tab.notifiers' | t">
+      <app-page-header [title]="'collection.tab.notifiers' | t">
         <ng-container ngProjectAs="[actions]">
           <app-button size="sm" (click)="openNew()">
             <span class="btn-label"><app-icon name="plus" />{{ 'notifiers.new' | t }}</span>
           </app-button>
         </ng-container>
       </app-page-header>
-      <app-collection-tabs active="notifiers" />
 
       @if (error()) {
         <app-note kind="error" icon="alert" retryable (retry)="load()">{{
@@ -66,7 +63,7 @@ import { CollectionTabsComponent } from './collection-tabs.component';
         <app-skeleton variant="rows" [count]="3" [lead]="true" [label]="'common.loading' | t" />
       } @else if (sorted().length === 0) {
         <app-empty-state
-          icon="alert"
+          icon="bell"
           [heading]="'notifiers.empty' | t"
           [body]="'notifiers.body' | t"
         />
@@ -75,7 +72,7 @@ import { CollectionTabsComponent } from './collection-tabs.component';
         <div class="rowgroup">
           @for (n of sorted(); track n.id) {
             <div class="co__row">
-              <span class="co__lead-icon"><app-icon name="alert" [size]="18" /></span>
+              <span class="co__lead-icon"><app-icon name="bell" [size]="18" /></span>
               <div class="co__text">
                 <span class="co__name">{{ n.name }}</span>
                 <span class="muted co__sub"

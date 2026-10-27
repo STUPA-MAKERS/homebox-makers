@@ -6,7 +6,11 @@
   gap: var(--space-6);
   align-items: start;
 }
-@media (max-width: 1100px) {
+// The detail sits beside the list on a wide screen, so the columns follow its own width.
+:host {
+  container-type: inline-size;
+}
+@container (max-width: 960px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
   }

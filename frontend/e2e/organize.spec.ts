@@ -7,12 +7,14 @@ test('locations nest and show their items', async ({ signedIn: page }) => {
 
   await page.goto('/locations');
   await page.getByRole('link', { name: 'Haus' }).click();
-  await expect(page.getByRole('link', { name: 'Arbeitszimmer' })).toBeVisible();
-  await expect(page.getByText('Hier liegt noch nichts.')).toBeVisible();
+  // The detail opens beside the tree of all locations.
+  const detail = page.locator('app-location-detail');
+  await expect(detail.getByRole('link', { name: 'Arbeitszimmer' })).toBeVisible();
+  await expect(detail.getByText('Hier liegt noch nichts.')).toBeVisible();
 
-  await page.getByRole('link', { name: 'Arbeitszimmer' }).click();
-  await expect(page.getByRole('navigation', { name: 'Ablageort' })).toContainText('Haus');
-  await expect(page.getByRole('link', { name: 'Monitor' })).toBeVisible();
+  await detail.getByRole('link', { name: 'Arbeitszimmer' }).click();
+  await expect(detail.getByRole('navigation', { name: 'Ablageort' })).toContainText('Haus');
+  await expect(detail.getByRole('link', { name: 'Monitor' })).toBeVisible();
 });
 
 test('create a tag, give it to an item and find the item under the tag', async ({

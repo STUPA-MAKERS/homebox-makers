@@ -1,15 +1,29 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  forwardRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ApiClient } from '@core/api/api-client.service';
 import type { TagOut } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
+import { injectListDetailPage } from '@shared/list-detail-page';
+import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
   EmptyStateComponent,
   IconComponent,
+  ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
+  ScrollFadeDirective,
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
@@ -38,60 +52,77 @@ interface TagRow {
     SkeletonComponent,
     StickyBarComponent,
     TagDialogComponent,
+    ListDetailLayoutComponent,
+    RouterOutlet,
+    ScrollFadeDirective,
   ],
+  providers: [{ provide: LIST_PAGE_STATE, useExisting: forwardRef(() => TagsComponent) }],
+  host: { '[class.pane-page]': 'split()' },
   template: `
-    <div class="page">
-      <app-page-header
-        [title]="'nav.tags' | t"
-        [meta]="loading() ? null : ('tags.count' | t: { count: ref.tags().length })"
-      >
-        <ng-container ngProjectAs="[actions]">
-          <app-button size="sm" (click)="creating.set(true)">
-            <span class="btn-label"><app-icon name="plus" />{{ 'tag.short' | t }}</span>
-          </app-button>
-        </ng-container>
-      </app-page-header>
+    <div class="tg" [class.tg--split]="split()">
+      <app-list-detail [detailOpen]="selectedId() !== null" (back)="closeDetail()">
+        <section list class="ld-pane tg__pane" aria-labelledby="tg-title">
+          <app-page-header [pane]="true" titleId="tg-title" [title]="'nav.tags' | t">
+            <ng-container ngProjectAs="[actions]">
+              <app-button size="sm" (click)="creating.set(true)">
+                <span class="btn-label"><app-icon name="plus" />{{ 'tag.short' | t }}</span>
+              </app-button>
+            </ng-container>
+          </app-page-header>
 
-      @if (ref.tags().length > 8) {
-        <app-sticky-bar>
-          <app-search-pill
-            [placeholder]="'tags.search' | t"
-            [label]="'tags.search' | t"
-            [clearable]="true"
-            [value]="search()"
-            (valueChange)="search.set($event)"
-          />
-        </app-sticky-bar>
-      }
-
-      @if (error()) {
-        <app-note kind="error" icon="alert" retryable (retry)="load()">{{
-          'common.loadError' | t
-        }}</app-note>
-      } @else if (loading()) {
-        <app-skeleton variant="rows" [count]="6" [lead]="true" [label]="'common.loading' | t" />
-      } @else if (rows().length === 0) {
-        <app-empty-state
-          icon="tag"
-          [heading]="(search() ? 'tags.noMatch' : 'tags.empty') | t"
-          [body]="search() ? '' : ('tags.emptyBody' | t)"
-        />
-      } @else {
-        <div class="rowgroup" role="list">
-          @for (r of rows(); track r.tag.id) {
-            <app-list-item
-              role="listitem"
-              [title]="r.tag.name"
-              [sub]="r.tag.description || null"
-              [link]="['/tags', r.tag.id]"
-            >
-              <span lead class="tg__lead" [style.margin-left.px]="r.depth * 20">
-                <span class="tg__dot" [style.background]="r.tag.color || null"></span>
-              </span>
-            </app-list-item>
+          @if (ref.tags().length > 8) {
+            <app-sticky-bar class="ld-pane__filters">
+              <app-search-pill
+                [placeholder]="'tags.search' | t"
+                [label]="'tags.search' | t"
+                [clearable]="true"
+                [value]="search()"
+                (valueChange)="search.set($event)"
+              />
+            </app-sticky-bar>
           }
+
+          <div class="tg__scroll" appScrollFade="y">
+            @if (error()) {
+              <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+                'common.loadError' | t
+              }}</app-note>
+            } @else if (loading()) {
+              <app-skeleton
+                variant="rows"
+                [count]="6"
+                [lead]="true"
+                [label]="'common.loading' | t"
+              />
+            } @else if (rows().length === 0) {
+              <app-empty-state
+                icon="tag"
+                [heading]="(search() ? 'tags.noMatch' : 'tags.empty') | t"
+                [body]="search() ? '' : ('tags.emptyBody' | t)"
+              />
+            } @else {
+              <div class="tg__rows" [class.rowgroup]="!split()" role="list">
+                @for (r of rows(); track r.tag.id) {
+                  <app-list-item
+                    role="listitem"
+                    [title]="r.tag.name"
+                    [sub]="r.tag.description || null"
+                    [link]="['/tags', r.tag.id]"
+                    [selected]="r.tag.id === selectedId()"
+                  >
+                    <span lead class="tg__lead" [style.margin-left.px]="r.depth * 20">
+                      <span class="tg__dot" [style.background]="r.tag.color || null"></span>
+                    </span>
+                  </app-list-item>
+                }
+              </div>
+            }
+          </div>
+        </section>
+        <div detail class="tg__detail">
+          <router-outlet />
         </div>
-      }
+      </app-list-detail>
     </div>
 
     <app-tag-dialog
@@ -100,27 +131,17 @@ interface TagRow {
       (saved)="onCreated($event)"
     />
   `,
-  styles: `
-    .tg__lead {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm, 8px);
-      background: var(--color-surface-3);
-    }
-    .tg__dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--color-accent);
-    }
-  `,
+  styleUrl: './tags.component.scss',
 })
 export class TagsComponent {
   private readonly router = inject(Router);
   readonly ref = inject(RefDataService);
+
+  private readonly layout = viewChild(ListDetailLayoutComponent);
+  private readonly panes = injectListDetailPage(this.layout);
+  readonly selectedId = this.panes.selectedId;
+  readonly split = this.panes.split;
+  readonly hasRows = computed(() => this.ref.tags().length > 0);
 
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -159,6 +180,9 @@ export class TagsComponent {
 
   constructor() {
     this.load();
+    inject(ApiClient)
+      .changed$.pipe(takeUntilDestroyed())
+      .subscribe((kind) => kind === 'tag' && this.load());
   }
 
   load(): void {
@@ -170,6 +194,11 @@ export class TagsComponent {
         this.error.set(true);
       },
     });
+  }
+
+  /** "Zur Liste" (one pane at a time). */
+  closeDetail(): void {
+    void this.router.navigate(['/tags']);
   }
 
   onCreated(tag: TagOut): void {

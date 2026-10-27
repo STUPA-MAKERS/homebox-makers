@@ -136,7 +136,7 @@ export class ItemDetailComponent {
         items: [
           { id: 'duplicate', label: this.i18n.translate('item.duplicate'), icon: 'copy' },
           { id: 'sub', label: this.i18n.translate('item.addSub'), icon: 'plus' },
-          { id: 'label', label: this.i18n.translate('item.label'), icon: 'tag' },
+          { id: 'label', label: this.i18n.translate('item.label'), icon: 'printer' },
           {
             id: 'archive',
             label: this.i18n.translate(item?.archived ? 'item.unarchive' : 'item.archive'),

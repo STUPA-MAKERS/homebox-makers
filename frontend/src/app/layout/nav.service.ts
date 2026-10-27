@@ -15,11 +15,11 @@ export interface NavItem {
 
 const ITEMS: readonly NavItem[] = [
   { key: 'home', path: '/home', icon: 'home', labelKey: 'nav.home', place: 'main' },
-  { key: 'items', path: '/items', icon: 'box', labelKey: 'nav.items', place: 'main' },
+  { key: 'items', path: '/items', icon: 'package', labelKey: 'nav.items', place: 'main' },
   {
     key: 'locations',
     path: '/locations',
-    icon: 'building',
+    icon: 'mappin',
     labelKey: 'nav.locations',
     place: 'main',
   },
@@ -27,7 +27,7 @@ const ITEMS: readonly NavItem[] = [
   {
     key: 'maintenance',
     path: '/maintenance',
-    icon: 'clock',
+    icon: 'wrench',
     labelKey: 'nav.maintenance',
     place: 'main',
   },
