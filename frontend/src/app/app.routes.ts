@@ -135,11 +135,30 @@ export const routes: Routes = [
           },
           {
             path: 'maintenance',
-            data: { title: 'nav.maintenance' },
+            data: { title: 'nav.maintenance', wide: true },
             loadComponent: () =>
               import('./pages/maintenance/maintenance.component').then(
                 (m) => m.MaintenanceComponent,
               ),
+            children: [
+              {
+                path: '',
+                data: {
+                  none: { icon: 'wrench', heading: 'maint.pick', emptyHeading: 'maint.emptyNone' },
+                },
+                loadComponent: () =>
+                  import('./shared/ui/detail-none/list-none.component').then(
+                    (m) => m.ListNoneComponent,
+                  ),
+              },
+              {
+                path: ':id',
+                loadComponent: () =>
+                  import('./pages/maintenance/maintenance-detail.component').then(
+                    (m) => m.MaintenanceDetailComponent,
+                  ),
+              },
+            ],
           },
           {
             // The scanner: the camera, the manual entry of an asset id and the last scans.
@@ -147,27 +166,6 @@ export const routes: Routes = [
             data: { title: 'nav.scan', wide: true },
             loadComponent: () =>
               import('./pages/scan/scan.component').then((m) => m.ScanComponent),
-          },
-          {
-            path: 'mockups',
-            data: { title: 'nav.maintenance', wide: true },
-            children: [
-              {
-                path: '',
-                loadComponent: () =>
-                  import('./pages/mockups/mockups.component').then((m) => m.MockupsComponent),
-              },
-              {
-                path: 'maintenance-a',
-                loadComponent: () =>
-                  import('./pages/mockups/maint-a.component').then((m) => m.MockMaintAComponent),
-              },
-              {
-                path: 'maintenance-b',
-                loadComponent: () =>
-                  import('./pages/mockups/maint-b.component').then((m) => m.MockMaintBComponent),
-              },
-            ],
           },
           {
             path: 'profile',
