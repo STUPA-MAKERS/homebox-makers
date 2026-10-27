@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { type Observable, concatMap, from, last, of, switchMap } from 'rxjs';
@@ -87,7 +95,9 @@ export class CreateDialogComponent {
         this.reset();
         this.parentId.set(req.parentId ?? '');
         this.tagIds.set(req.tagId ? [req.tagId] : []);
-        this.ref.ensureLoaded().subscribe(() => this.typeId.set(this.typeOptions()[0]?.value ?? ''));
+        this.ref
+          .ensureLoaded()
+          .subscribe(() => this.typeId.set(this.typeOptions()[0]?.value ?? ''));
       });
     });
   }

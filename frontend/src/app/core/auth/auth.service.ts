@@ -1,14 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import {
-  type Observable,
-  catchError,
-  finalize,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { type Observable, catchError, finalize, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
 import type { UserOut } from '@core/api/models';
 import { CollectionService } from '@core/collection/collection.service';

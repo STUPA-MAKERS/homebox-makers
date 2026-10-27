@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
 import { RefDataService } from '@core/data/ref-data.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
-import { ChipComponent, FilterSelectComponent, type FilterSelectOption } from '@stupa-makers/ui-kit';
+import {
+  ChipComponent,
+  FilterSelectComponent,
+  type FilterSelectOption,
+} from '@stupa-makers/ui-kit';
 
 /**
  * Pick tags of the collection: a chip opens the list with several choices, the chosen tags

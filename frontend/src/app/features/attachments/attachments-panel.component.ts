@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { ApiClient } from '@core/api/api-client.service';
 import type { AttachmentKind, EntityOut, ItemAttachment } from '@core/api/models';
 import { I18nService } from '@core/i18n/i18n.service';
@@ -130,7 +138,11 @@ export class AttachmentsPanelComponent {
       return;
     }
     this.api
-      .updateAttachment(this.entity().id, att.id, { primary: true, title: att.title, type: att.type })
+      .updateAttachment(this.entity().id, att.id, {
+        primary: true,
+        title: att.title,
+        type: att.type,
+      })
       .subscribe({
         next: (entity) => this.changed.emit(entity),
         error: (err) =>

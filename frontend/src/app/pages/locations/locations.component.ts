@@ -132,7 +132,11 @@ export class LocationsComponent {
     this.collapsed.set(
       this.allCollapsed()
         ? new Set()
-        : new Set(this.ordered().filter((r) => r.hasChildren).map((r) => r.loc.id)),
+        : new Set(
+            this.ordered()
+              .filter((r) => r.hasChildren)
+              .map((r) => r.loc.id),
+          ),
     );
   }
 

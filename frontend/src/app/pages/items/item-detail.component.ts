@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
@@ -136,7 +144,12 @@ export class ItemDetailComponent {
       },
       {
         items: [
-          { id: 'delete', label: this.i18n.translate('common.delete'), icon: 'trash', danger: true },
+          {
+            id: 'delete',
+            label: this.i18n.translate('common.delete'),
+            icon: 'trash',
+            danger: true,
+          },
         ],
       },
     ];

@@ -11,7 +11,9 @@
       <a appButton="tonal" routerLink="/locations">{{ 'home.allLocations' | t }}</a>
     </app-empty-state>
   } @else if (error()) {
-    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
   } @else if (location(); as loc) {
     @if (crumbs().length) {
       <nav class="crumbs" [attr.aria-label]="'item.path' | t">
@@ -24,16 +26,16 @@
       </nav>
     }
 
-    <app-page-header
-      [title]="loc.name"
-      [meta]="loc.entityType?.name ?? null"
-      [flush]="true"
-    >
+    <app-page-header [title]="loc.name" [meta]="loc.entityType?.name ?? null" [flush]="true">
       <ng-container ngProjectAs="[actions]">
         <a appButton="tonal" size="sm" [routerLink]="['/locations', loc.id, 'edit']">
           <span class="btn-label"><app-icon name="edit" />{{ 'common.edit' | t }}</span>
         </a>
-        <app-row-menu [label]="'common.actions' | t" [sections]="menu()" (selected)="onMenu($event)" />
+        <app-row-menu
+          [label]="'common.actions' | t"
+          [sections]="menu()"
+          (selected)="onMenu($event)"
+        />
       </ng-container>
     </app-page-header>
 
@@ -71,7 +73,11 @@
           } @else {
             <div class="rowgroup">
               @for (item of items(); track item.id) {
-                <app-list-item [title]="item.name" [sub]="subLine(item)" [link]="['/items', item.id]">
+                <app-list-item
+                  [title]="item.name"
+                  [sub]="subLine(item)"
+                  [link]="['/items', item.id]"
+                >
                   <app-entity-thumb lead [entity]="item" [size]="40" />
                   <span trail class="ld__trail">
                     @if (item.quantity > 1) {
@@ -91,7 +97,9 @@
               }}</app-button>
             }
             @if (itemsValue()) {
-              <p class="muted ld__sum">{{ 'items.totalValue' | t: { value: (itemsValue() | money) } }}</p>
+              <p class="muted ld__sum">
+                {{ 'items.totalValue' | t: { value: (itemsValue() | money) } }}
+              </p>
             }
           }
         </section>
@@ -102,7 +110,9 @@
           <div class="ld__head">
             <h2 class="section-title" id="ld-subs">{{ 'location.subLocations' | t }}</h2>
             <app-button variant="tonal" size="sm" (click)="addSub()">
-              <span class="btn-label"><app-icon name="plus" />{{ 'create.location.short' | t }}</span>
+              <span class="btn-label"
+                ><app-icon name="plus" />{{ 'create.location.short' | t }}</span
+              >
             </app-button>
           </div>
           @if (subLocations().length === 0) {
@@ -113,7 +123,9 @@
                 <app-list-item [title]="sub.name" [link]="['/locations', sub.id]">
                   <span lead class="ld__icon"><app-icon name="building" [size]="18" /></span>
                   @if (sub.itemCount) {
-                    <span trail class="muted num">{{ 'locations.itemCount' | t: { count: sub.itemCount } }}</span>
+                    <span trail class="muted num">{{
+                      'locations.itemCount' | t: { count: sub.itemCount }
+                    }}</span>
                   }
                 </app-list-item>
               }

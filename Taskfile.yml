@@ -19,7 +19,7 @@ tasks:
       - go install github.com/swaggo/swag/cmd/swag@latest
       - go install github.com/pressly/goose/v3/cmd/goose@v3.8.0
       - cd backend && go mod tidy
-      - cd frontend && pnpm install
+      - cd frontend && npm ci
 
   swag:
     desc: Generate swagger docs
@@ -45,7 +45,7 @@ tasks:
     desc: Generates typescript types from swagger definition
     cmds:
       - |
-        pnpm dlx swagger-typescript-api generate \
+        npx swagger-typescript-api generate \
           --no-client \
           --modular \
           --path ./backend/app/api/static/docs/swagger.json \
@@ -107,9 +107,9 @@ tasks:
       desc: Run backend with frontend in CI mode
       dir: frontend
       cmds:
-        - pnpm install
-        - pnpm run build
-        - cp -r ./.output/public ../backend/app/api/static/
+        - npm ci
+        - npx ng build
+        - rm -rf ../backend/app/api/static/public && cp -r ./dist/homebox/browser ../backend/app/api/static/public
         - task: go:ci
       silent: true
 
@@ -177,35 +177,35 @@ tasks:
       - "./backend/internal/data/ent/schema/**/*"
 
   ui:watch:
-    desc: Starts the vitest test runner in watch mode
+    desc: Starts the jest test runner in watch mode
     dir: frontend
     cmds:
-      - pnpm run test:watch
+      - npx jest --watch
 
   ui:dev:
     desc: Run frontend development server
     dir: frontend
     cmds:
-      - pnpm dev --no-fork
+      - npm start
 
   ui:ci:
     desc: Run frontend build in CI mode
     dir: frontend
     cmds:
-      - pnpm dev &
+      - npm start &
     silent: true
 
   ui:fix:
     desc: Runs prettier and eslint on the frontend
     dir: frontend
     cmds:
-      - pnpm run lint:fix
+      - npm run lint:fix
 
   ui:check:
     desc: Runs type checking
     dir: frontend
     cmds:
-      - pnpm run typecheck
+      - npm run typecheck
 
   test:ci:
     env:
@@ -215,7 +215,7 @@ tasks:
       - cd backend && go build ./app/api
       - backend/api &
       - sleep 15
-      - cd frontend && pnpm run test:ci
+      - cd frontend && npm run test:ci
     silent: true
 
   test:ci:postgresql:
@@ -233,7 +233,7 @@ tasks:
       - cd backend && go build ./app/api
       - backend/api &
       - sleep 15
-      - cd frontend && pnpm run test:ci
+      - cd frontend && npm run test:ci
     silent: true
 
   test:e2e:

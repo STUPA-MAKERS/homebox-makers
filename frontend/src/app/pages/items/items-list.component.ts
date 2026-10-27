@@ -273,7 +273,11 @@ export class ItemsListComponent {
   }
 
   newItem(): void {
-    this.createSvc.open({ kind: 'item', parentId: this.loc() ?? null, tagId: this.tagIds()[0] ?? null });
+    this.createSvc.open({
+      kind: 'item',
+      parentId: this.loc() ?? null,
+      tagId: this.tagIds()[0] ?? null,
+    });
   }
 
   /** Location path and tags of a row, as its second line. */

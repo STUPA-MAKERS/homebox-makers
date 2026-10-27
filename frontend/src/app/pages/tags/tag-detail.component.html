@@ -2,11 +2,18 @@
   @if (loading() && !tag()) {
     <app-skeleton variant="panel" [label]="'common.loading' | t" />
   } @else if (notFound()) {
-    <app-empty-state code="404" icon="tag" [heading]="'tag.notFound' | t" [body]="'item.notFoundBody' | t">
+    <app-empty-state
+      code="404"
+      icon="tag"
+      [heading]="'tag.notFound' | t"
+      [body]="'item.notFoundBody' | t"
+    >
       <a appButton="tonal" routerLink="/tags">{{ 'home.allTags' | t }}</a>
     </app-empty-state>
   } @else if (error()) {
-    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
   } @else if (tag(); as tg) {
     @if (tg.parent) {
       <nav class="crumbs" [attr.aria-label]="'tag.parent' | t">
@@ -20,7 +27,11 @@
         <app-button variant="tonal" size="sm" (click)="editing.set(true)">
           <span class="btn-label"><app-icon name="edit" />{{ 'common.edit' | t }}</span>
         </app-button>
-        <app-row-menu [label]="'common.actions' | t" [sections]="menu()" (selected)="onMenu($event)" />
+        <app-row-menu
+          [label]="'common.actions' | t"
+          [sections]="menu()"
+          (selected)="onMenu($event)"
+        />
       </ng-container>
     </app-page-header>
 
@@ -60,7 +71,11 @@
       } @else {
         <div class="rowgroup">
           @for (item of items(); track item.id) {
-            <app-list-item [title]="item.name" [sub]="item.parent?.name ?? null" [link]="['/items', item.id]">
+            <app-list-item
+              [title]="item.name"
+              [sub]="item.parent?.name ?? null"
+              [link]="['/items', item.id]"
+            >
               <app-entity-thumb lead [entity]="item" [size]="40" />
               <span trail class="td__trail">
                 @if (item.quantity > 1) {
@@ -80,12 +95,19 @@
           }}</app-button>
         }
         @if (itemsValue()) {
-          <p class="muted td__sum">{{ 'items.totalValue' | t: { value: (itemsValue() | money) } }}</p>
+          <p class="muted td__sum">
+            {{ 'items.totalValue' | t: { value: (itemsValue() | money) } }}
+          </p>
         }
       }
     </section>
 
-    <app-tag-dialog [open]="editing()" [tag]="tg" (closed)="editing.set(false)" (saved)="onSaved($event)" />
+    <app-tag-dialog
+      [open]="editing()"
+      [tag]="tg"
+      (closed)="editing.set(false)"
+      (saved)="onSaved($event)"
+    />
     <app-tag-dialog
       [open]="addingSub()"
       [parent]="tg.id"

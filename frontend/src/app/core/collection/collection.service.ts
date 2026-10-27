@@ -24,9 +24,7 @@ export class CollectionService {
   /** The id that goes into `X-Tenant`, or `null` for the default group. */
   readonly selectedId = this._selectedId.asReadonly();
   /** The selected collection, once the list is loaded. */
-  readonly selected = computed(
-    () => this._all().find((g) => g.id === this._selectedId()) ?? null,
-  );
+  readonly selected = computed(() => this._all().find((g) => g.id === this._selectedId()) ?? null);
   /** Currency of the selected collection, for the money formats. */
   readonly currency = computed(() => this.selected()?.currency || 'EUR');
 

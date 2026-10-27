@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -80,7 +87,12 @@ export class HomeComponent {
     if (!s) return [];
     return [
       { icon: 'box', labelKey: 'home.stat.items', value: s.totalItems, link: '/items' },
-      { icon: 'building', labelKey: 'home.stat.locations', value: s.totalLocations, link: '/locations' },
+      {
+        icon: 'building',
+        labelKey: 'home.stat.locations',
+        value: s.totalLocations,
+        link: '/locations',
+      },
       { icon: 'tag', labelKey: 'home.stat.tags', value: s.totalTags, link: '/tags' },
       { icon: 'euro', labelKey: 'home.stat.value', value: s.totalItemPrice, money: true },
     ];

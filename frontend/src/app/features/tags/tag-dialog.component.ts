@@ -216,7 +216,9 @@ export class TagDialogComponent {
     };
     this.busy.set(true);
     this.error.set(null);
-    const req = tag ? this.api.updateTag(tag.id, { ...body, id: tag.id }) : this.api.createTag(body);
+    const req = tag
+      ? this.api.updateTag(tag.id, { ...body, id: tag.id })
+      : this.api.createTag(body);
     req.subscribe({
       next: (saved) => {
         this.busy.set(false);

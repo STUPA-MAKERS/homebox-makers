@@ -8,7 +8,12 @@
     }
     <form class="form-stack pf__form" (ngSubmit)="saveAccount()" novalidate>
       <div class="form-grid">
-        <app-input name="name" [label]="'auth.field.name' | t" [required]="true" [(ngModel)]="name" />
+        <app-input
+          name="name"
+          [label]="'auth.field.name' | t"
+          [required]="true"
+          [(ngModel)]="name"
+        />
         <app-input
           name="email"
           type="email"
@@ -73,7 +78,9 @@
     </div>
     <p class="muted pf__lead">{{ 'profile.keys.body' | t }}</p>
     @if (keysError()) {
-      <app-note kind="error" icon="alert" retryable (retry)="loadKeys()">{{ 'common.loadError' | t }}</app-note>
+      <app-note kind="error" icon="alert" retryable (retry)="loadKeys()">{{
+        'common.loadError' | t
+      }}</app-note>
     } @else if (!keysLoading() && keys().length === 0) {
       <p class="muted">{{ 'profile.keys.empty' | t }}</p>
     } @else {
@@ -97,7 +104,11 @@
                 }
               </span>
             </div>
-            <app-row-menu [label]="'common.actions' | t" [sections]="keyMenu()" (selected)="onKeyMenu(key, $event)" />
+            <app-row-menu
+              [label]="'common.actions' | t"
+              [sections]="keyMenu()"
+              (selected)="onKeyMenu(key, $event)"
+            />
           </div>
         }
       </div>
@@ -134,8 +145,17 @@
     </div>
   } @else {
     <form class="form-stack" (ngSubmit)="createKey()" novalidate>
-      <app-input name="keyName" [label]="'field.name' | t" [required]="true" [(ngModel)]="keyName" />
-      <app-datepicker name="keyExpires" [label]="'profile.keys.expiresAt' | t" [(ngModel)]="keyExpires" />
+      <app-input
+        name="keyName"
+        [label]="'field.name' | t"
+        [required]="true"
+        [(ngModel)]="keyName"
+      />
+      <app-datepicker
+        name="keyExpires"
+        [label]="'profile.keys.expiresAt' | t"
+        [(ngModel)]="keyExpires"
+      />
       @if (keyError()) {
         <app-note kind="error" icon="alert">{{ keyError() }}</app-note>
       }

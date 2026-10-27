@@ -10,7 +10,9 @@
   </div>
 
   @if (error()) {
-    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
   } @else if (!loading() && entries().length === 0) {
     <p class="muted ml__empty">{{ 'maint.empty' | t }}</p>
   } @else {
@@ -20,11 +22,7 @@
         <div class="rowgroup">
           @for (entry of group; track entry.id) {
             <div class="ml__row">
-              <app-icon
-                class="ml__icon"
-                [name]="$index === 0 ? 'clock' : 'circleok'"
-                [size]="20"
-              />
+              <app-icon class="ml__icon" [name]="$index === 0 ? 'clock' : 'circleok'" [size]="20" />
               <div class="ml__text">
                 <span class="ml__name">{{ entry.name }}</span>
                 <span class="ml__sub muted">
@@ -60,8 +58,16 @@
   <form class="form-stack" (ngSubmit)="save()" novalidate>
     <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="name" />
     <div class="form-grid">
-      <app-datepicker name="scheduled" [label]="'maint.scheduledDate' | t" [(ngModel)]="scheduledDate" />
-      <app-datepicker name="completed" [label]="'maint.completedDate' | t" [(ngModel)]="completedDate" />
+      <app-datepicker
+        name="scheduled"
+        [label]="'maint.scheduledDate' | t"
+        [(ngModel)]="scheduledDate"
+      />
+      <app-datepicker
+        name="completed"
+        [label]="'maint.completedDate' | t"
+        [(ngModel)]="completedDate"
+      />
     </div>
     <app-input name="cost" type="number" [label]="'maint.cost' | t" [(ngModel)]="cost" />
     <app-textarea [label]="'field.description' | t">

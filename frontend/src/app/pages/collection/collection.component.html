@@ -1,7 +1,9 @@
 <div class="page co">
   <app-page-header [title]="'nav.collection' | t" [meta]="collections.selected()?.name ?? null">
     <ng-container ngProjectAs="[actions]">
-      <app-button variant="text" size="sm" (click)="openJoin()">{{ 'collection.join.title' | t }}</app-button>
+      <app-button variant="text" size="sm" (click)="openJoin()">{{
+        'collection.join.title' | t
+      }}</app-button>
       <app-button variant="tonal" size="sm" (click)="openNew()">
         <span class="btn-label"><app-icon name="plus" />{{ 'collection.new.short' | t }}</span>
       </app-button>
@@ -9,7 +11,9 @@
   </app-page-header>
 
   @if (error()) {
-    <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+    <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+      'common.loadError' | t
+    }}</app-note>
   } @else if (loading()) {
     <app-skeleton variant="panel" [label]="'common.loading' | t" />
   } @else {
@@ -89,7 +93,9 @@
                 [label]="'collection.invite.copy' | t"
                 [copiedLabel]="'profile.keys.copied' | t"
                 [share]="true"
-                [shareTitle]="'collection.invite.shareTitle' | t: { name: collections.selected()?.name ?? '' }"
+                [shareTitle]="
+                  'collection.invite.shareTitle' | t: { name: collections.selected()?.name ?? '' }
+                "
               />
               <app-button
                 variant="text"
@@ -116,16 +122,29 @@
 >
   <form class="form-stack" (ngSubmit)="createInvite()" novalidate>
     <div class="form-grid">
-      <app-input name="uses" type="number" [label]="'collection.invite.uses' | t" [(ngModel)]="inviteUses" />
-      <app-datepicker name="expires" [label]="'collection.invite.expires' | t" [(ngModel)]="inviteExpires" />
+      <app-input
+        name="uses"
+        type="number"
+        [label]="'collection.invite.uses' | t"
+        [(ngModel)]="inviteUses"
+      />
+      <app-datepicker
+        name="expires"
+        [label]="'collection.invite.expires' | t"
+        [(ngModel)]="inviteExpires"
+      />
     </div>
     @if (inviteError()) {
       <app-note kind="error" icon="alert">{{ inviteError() }}</app-note>
     }
   </form>
   <div dialog-footer>
-    <app-button variant="text" (click)="inviteDialog.set(false)">{{ 'common.cancel' | t }}</app-button>
-    <app-button [loading]="inviteBusy()" (click)="createInvite()">{{ 'common.create' | t }}</app-button>
+    <app-button variant="text" (click)="inviteDialog.set(false)">{{
+      'common.cancel' | t
+    }}</app-button>
+    <app-button [loading]="inviteBusy()" (click)="createInvite()">{{
+      'common.create' | t
+    }}</app-button>
   </div>
 </app-dialog>
 
@@ -144,8 +163,12 @@
     }
   </form>
   <div dialog-footer>
-    <app-button variant="text" (click)="joinDialog.set(false)">{{ 'common.cancel' | t }}</app-button>
-    <app-button [loading]="joinBusy()" (click)="acceptJoin()">{{ 'collection.join.submit' | t }}</app-button>
+    <app-button variant="text" (click)="joinDialog.set(false)">{{
+      'common.cancel' | t
+    }}</app-button>
+    <app-button [loading]="joinBusy()" (click)="acceptJoin()">{{
+      'collection.join.submit' | t
+    }}</app-button>
   </div>
 </app-dialog>
 
@@ -164,7 +187,9 @@
   </form>
   <div dialog-footer>
     <app-button variant="text" (click)="newDialog.set(false)">{{ 'common.cancel' | t }}</app-button>
-    <app-button [loading]="newBusy()" (click)="createCollection()">{{ 'common.create' | t }}</app-button>
+    <app-button [loading]="newBusy()" (click)="createCollection()">{{
+      'common.create' | t
+    }}</app-button>
   </div>
 </app-dialog>
 

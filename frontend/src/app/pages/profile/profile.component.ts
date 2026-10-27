@@ -93,7 +93,12 @@ export class ProfileComponent {
   readonly keyMenu = computed<RowMenuSection[]>(() => [
     {
       items: [
-        { id: 'delete', label: this.i18n.translate('profile.keys.revoke'), icon: 'trash', danger: true },
+        {
+          id: 'delete',
+          label: this.i18n.translate('profile.keys.revoke'),
+          icon: 'trash',
+          danger: true,
+        },
       ],
     },
   ]);

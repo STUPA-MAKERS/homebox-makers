@@ -106,7 +106,6 @@
   --main-pad-bottom: var(--pane-foot-gap);
 }
 
-
 .frame--phone ~ app-toast ::ng-deep .toasts {
   inset-block-end: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + var(--space-3));
 }

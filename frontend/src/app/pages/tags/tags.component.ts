@@ -65,7 +65,9 @@ interface TagRow {
       }
 
       @if (error()) {
-        <app-note kind="error" icon="alert" retryable (retry)="load()">{{ 'common.loadError' | t }}</app-note>
+        <app-note kind="error" icon="alert" retryable (retry)="load()">{{
+          'common.loadError' | t
+        }}</app-note>
       } @else if (loading()) {
         <app-skeleton variant="rows" [count]="6" [lead]="true" [label]="'common.loading' | t" />
       } @else if (rows().length === 0) {

@@ -69,6 +69,20 @@ function isoDay(date: Date): string {
 export type MaintenanceStatus = 'scheduled' | 'completed' | 'both';
 
 /**
+ * The server leaves out empty lists of an entity (`children` is `omitempty`, a nil slice is
+ * `null`); the pages can rely on arrays.
+ */
+function normalizeEntity(e: EntityOut): EntityOut {
+  return {
+    ...e,
+    tags: e.tags ?? [],
+    fields: e.fields ?? [],
+    attachments: e.attachments ?? [],
+    children: e.children ?? [],
+  };
+}
+
+/**
  * Typed facade over the Homebox REST API (`/api/v1`). One method per backend route, each
  * returns a cold `Observable`. The tenant header (`X-Tenant`) and the 401 handling come from
  * the interceptors, so the methods stay free of session state.
@@ -190,7 +204,10 @@ export class ApiClient {
   }
 
   acceptInvitation(id: string): Observable<{ id: string; name: string }> {
-    return this.http.post<{ id: string; name: string }>(this.url(`/groups/invitations/${id}`), null);
+    return this.http.post<{ id: string; name: string }>(
+      this.url(`/groups/invitations/${id}`),
+      null,
+    );
   }
 
   currencies(): Observable<CurrenciesCurrency[]> {
@@ -235,7 +252,7 @@ export class ApiClient {
   }
 
   entity(id: string): Observable<EntityOut> {
-    return this.http.get<EntityOut>(this.url(`/entities/${id}`));
+    return this.http.get<EntityOut>(this.url(`/entities/${id}`)).pipe(map(normalizeEntity));
   }
 
   entityPath(id: string): Observable<EntityPath[]> {
@@ -243,15 +260,15 @@ export class ApiClient {
   }
 
   createEntity(body: EntityCreate): Observable<EntityOut> {
-    return this.http.post<EntityOut>(this.url('/entities'), body);
+    return this.http.post<EntityOut>(this.url('/entities'), body).pipe(map(normalizeEntity));
   }
 
   updateEntity(id: string, body: EntityUpdate): Observable<EntityOut> {
-    return this.http.put<EntityOut>(this.url(`/entities/${id}`), body);
+    return this.http.put<EntityOut>(this.url(`/entities/${id}`), body).pipe(map(normalizeEntity));
   }
 
   patchEntity(id: string, body: EntityPatch): Observable<EntityOut> {
-    return this.http.patch<EntityOut>(this.url(`/entities/${id}`), body);
+    return this.http.patch<EntityOut>(this.url(`/entities/${id}`), body).pipe(map(normalizeEntity));
   }
 
   deleteEntity(id: string): Observable<void> {
@@ -267,7 +284,9 @@ export class ApiClient {
       copyPrefix?: string;
     } = {},
   ): Observable<EntityOut> {
-    return this.http.post<EntityOut>(this.url(`/entities/${id}/duplicate`), options);
+    return this.http
+      .post<EntityOut>(this.url(`/entities/${id}/duplicate`), options)
+      .pipe(map(normalizeEntity));
   }
 
   customFieldNames(): Observable<string[]> {
@@ -309,7 +328,9 @@ export class ApiClient {
     if (type) form.append('type', type);
     form.append('name', name);
     if (primary !== undefined) form.append('primary', String(primary));
-    return this.http.post<EntityOut>(this.url(`/entities/${entityId}/attachments`), form);
+    return this.http
+      .post<EntityOut>(this.url(`/entities/${entityId}/attachments`), form)
+      .pipe(map(normalizeEntity));
   }
 
   updateAttachment(
@@ -317,10 +338,9 @@ export class ApiClient {
     attachmentId: string,
     body: ItemAttachmentUpdate,
   ): Observable<EntityOut> {
-    return this.http.put<EntityOut>(
-      this.url(`/entities/${entityId}/attachments/${attachmentId}`),
-      body,
-    );
+    return this.http
+      .put<EntityOut>(this.url(`/entities/${entityId}/attachments/${attachmentId}`), body)
+      .pipe(map(normalizeEntity));
   }
 
   deleteAttachment(entityId: string, attachmentId: string): Observable<void> {

@@ -2,15 +2,29 @@
   @if (loading()) {
     <app-skeleton variant="panel" [label]="'common.loading' | t" />
   } @else if (item(); as it) {
-    <app-page-header [title]="(isLoc() ? 'location.edit.title' : 'item.edit.title') | t" [subtitle]="it.name" [flush]="true" />
+    <app-page-header
+      [title]="(isLoc() ? 'location.edit.title' : 'item.edit.title') | t"
+      [subtitle]="it.name"
+      [flush]="true"
+    />
 
     <form class="ie" (ngSubmit)="save()" novalidate>
       <section class="ie__sec" aria-labelledby="ie-basic">
         <h2 class="section-title" id="ie-basic">{{ 'item.details' | t }}</h2>
-        <app-input name="name" [label]="'field.name' | t" [required]="true" [(ngModel)]="form.name" />
+        <app-input
+          name="name"
+          [label]="'field.name' | t"
+          [required]="true"
+          [(ngModel)]="form.name"
+        />
         <div class="form-grid">
           @if (!isLoc()) {
-            <app-input name="quantity" type="number" [label]="'field.quantity' | t" [(ngModel)]="form.quantity" />
+            <app-input
+              name="quantity"
+              type="number"
+              [label]="'field.quantity' | t"
+              [(ngModel)]="form.quantity"
+            />
           }
           <app-input name="assetId" [label]="'items.sort.assetId' | t" [(ngModel)]="form.assetId" />
           @if (typeOptions().length > 1) {
@@ -35,9 +49,13 @@
         <app-tag-picker [value]="tagIds()" (valueChange)="tagIds.set($event)" />
         <div class="ie__checks">
           @if (!isLoc()) {
-            <app-checkbox name="insured" [(ngModel)]="form.insured">{{ 'item.insured' | t }}</app-checkbox>
+            <app-checkbox name="insured" [(ngModel)]="form.insured">{{
+              'item.insured' | t
+            }}</app-checkbox>
           }
-          <app-checkbox name="archived" [(ngModel)]="form.archived">{{ 'items.archived' | t }}</app-checkbox>
+          <app-checkbox name="archived" [(ngModel)]="form.archived">{{
+            'items.archived' | t
+          }}</app-checkbox>
           <app-checkbox name="sync" [(ngModel)]="form.syncChildEntityLocations">{{
             'item.syncChildren' | t
           }}</app-checkbox>
@@ -48,18 +66,42 @@
         <section class="ie__sec" aria-labelledby="ie-ident">
           <h2 class="section-title" id="ie-ident">{{ 'item.identification' | t }}</h2>
           <div class="form-grid">
-            <app-input name="manufacturer" [label]="'item.manufacturer' | t" [(ngModel)]="form.manufacturer" />
-            <app-input name="modelNumber" [label]="'item.modelNumber' | t" [(ngModel)]="form.modelNumber" />
-            <app-input name="serialNumber" [label]="'item.serialNumber' | t" [(ngModel)]="form.serialNumber" />
+            <app-input
+              name="manufacturer"
+              [label]="'item.manufacturer' | t"
+              [(ngModel)]="form.manufacturer"
+            />
+            <app-input
+              name="modelNumber"
+              [label]="'item.modelNumber' | t"
+              [(ngModel)]="form.modelNumber"
+            />
+            <app-input
+              name="serialNumber"
+              [label]="'item.serialNumber' | t"
+              [(ngModel)]="form.serialNumber"
+            />
           </div>
         </section>
 
         <section class="ie__sec" aria-labelledby="ie-purchase">
           <h2 class="section-title" id="ie-purchase">{{ 'item.purchase' | t }}</h2>
           <div class="form-grid">
-            <app-input name="purchaseFrom" [label]="'item.purchaseFrom' | t" [(ngModel)]="form.purchaseFrom" />
-            <app-currency-input name="purchasePrice" [label]="'item.purchasePrice' | t" [(ngModel)]="form.purchasePrice" />
-            <app-datepicker name="purchaseDate" [label]="'item.purchaseDate' | t" [(ngModel)]="form.purchaseDate" />
+            <app-input
+              name="purchaseFrom"
+              [label]="'item.purchaseFrom' | t"
+              [(ngModel)]="form.purchaseFrom"
+            />
+            <app-currency-input
+              name="purchasePrice"
+              [label]="'item.purchasePrice' | t"
+              [(ngModel)]="form.purchasePrice"
+            />
+            <app-datepicker
+              name="purchaseDate"
+              [label]="'item.purchaseDate' | t"
+              [(ngModel)]="form.purchaseDate"
+            />
           </div>
         </section>
 
@@ -70,7 +112,11 @@
           }}</app-checkbox>
           <div class="form-grid">
             @if (!form.lifetimeWarranty) {
-              <app-datepicker name="warrantyExpires" [label]="'item.warrantyExpires' | t" [(ngModel)]="form.warrantyExpires" />
+              <app-datepicker
+                name="warrantyExpires"
+                [label]="'item.warrantyExpires' | t"
+                [(ngModel)]="form.warrantyExpires"
+              />
             }
           </div>
           <app-textarea [label]="'item.warrantyDetails' | t">
@@ -82,14 +128,21 @@
           <h2 class="section-title" id="ie-sold">{{ 'item.sold' | t }}</h2>
           <div class="form-grid">
             <app-input name="soldTo" [label]="'item.soldTo' | t" [(ngModel)]="form.soldTo" />
-            <app-currency-input name="soldPrice" [label]="'item.soldPrice' | t" [(ngModel)]="form.soldPrice" />
-            <app-datepicker name="soldDate" [label]="'item.soldDate' | t" [(ngModel)]="form.soldDate" />
+            <app-currency-input
+              name="soldPrice"
+              [label]="'item.soldPrice' | t"
+              [(ngModel)]="form.soldPrice"
+            />
+            <app-datepicker
+              name="soldDate"
+              [label]="'item.soldDate' | t"
+              [(ngModel)]="form.soldDate"
+            />
           </div>
           <app-textarea [label]="'item.soldNotes' | t">
             <textarea name="soldNotes" rows="2" [(ngModel)]="form.soldNotes"></textarea>
           </app-textarea>
         </section>
-
       }
 
       <section class="ie__sec" aria-labelledby="ie-fields">

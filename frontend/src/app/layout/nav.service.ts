@@ -16,9 +16,21 @@ export interface NavItem {
 const ITEMS: readonly NavItem[] = [
   { key: 'home', path: '/home', icon: 'home', labelKey: 'nav.home', place: 'main' },
   { key: 'items', path: '/items', icon: 'box', labelKey: 'nav.items', place: 'main' },
-  { key: 'locations', path: '/locations', icon: 'building', labelKey: 'nav.locations', place: 'main' },
+  {
+    key: 'locations',
+    path: '/locations',
+    icon: 'building',
+    labelKey: 'nav.locations',
+    place: 'main',
+  },
   { key: 'tags', path: '/tags', icon: 'tag', labelKey: 'nav.tags', place: 'main' },
-  { key: 'collection', path: '/collection', icon: 'users', labelKey: 'nav.collection', place: 'end' },
+  {
+    key: 'collection',
+    path: '/collection',
+    icon: 'users',
+    labelKey: 'nav.collection',
+    place: 'end',
+  },
 ];
 
 /** The entries of the phone bottom bar, in bar order. The rest goes into "Mehr". */

@@ -138,8 +138,7 @@ export const routes: Routes = [
       {
         path: '**',
         data: { title: 'notFound.title' },
-        loadComponent: () =>
-          import('./pages/not-found.component').then((m) => m.NotFoundComponent),
+        loadComponent: () => import('./pages/not-found.component').then((m) => m.NotFoundComponent),
       },
     ],
   },

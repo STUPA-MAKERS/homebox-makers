@@ -47,7 +47,8 @@ import { injectAttachmentUrl, isLocation } from '@shared/entity.util';
   `,
 })
 export class EntityThumbComponent {
-  readonly entity = input.required<Pick<EntitySummary, 'id' | 'thumbnailId' | 'imageId' | 'entityType'>>();
+  readonly entity =
+    input.required<Pick<EntitySummary, 'id' | 'thumbnailId' | 'imageId' | 'entityType'>>();
   readonly size = input(40);
 
   private readonly url = injectAttachmentUrl();
