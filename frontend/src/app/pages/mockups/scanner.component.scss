@@ -90,6 +90,7 @@
 
 // The hit: a card over the lower part of the picture.
 .sc__hit {
+  overflow: hidden;
   position: absolute;
   inset: auto var(--space-3) var(--space-3);
   display: flex;
@@ -137,10 +138,52 @@
   color: var(--color-text-muted);
   font-size: var(--fs-small);
 }
+// The four next steps quarter the foot of the card: icon over label, the whole cell the
+// button.
+.sc__hit {
+  padding-bottom: 0;
+}
 .sc__hitActions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 calc(-1 * var(--space-4));
+  border-top: var(--border-width) solid var(--color-border);
+}
+.sc__act {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 64px;
+  padding: var(--space-2) var(--space-1);
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+.sc__act + .sc__act {
+  border-left: var(--border-width) solid var(--color-border);
+}
+.sc__act:hover {
+  background: var(--color-surface-2);
+}
+.sc__act:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+.sc__act--main {
+  background: var(--color-selected);
+}
+.sc__act > span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sc__lead {

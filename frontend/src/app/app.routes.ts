@@ -142,6 +142,13 @@ export const routes: Routes = [
               ),
           },
           {
+            // The scanner: for now the mockup, until the camera part is built.
+            path: 'scan',
+            data: { title: 'nav.scan', wide: true },
+            loadComponent: () =>
+              import('./pages/mockups/scanner.component').then((m) => m.MockScannerComponent),
+          },
+          {
             path: 'mockups',
             data: { title: 'nav.maintenance', wide: true },
             children: [

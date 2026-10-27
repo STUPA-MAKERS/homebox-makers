@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
-  ButtonLinkComponent,
   IconComponent,
   ListItemComponent,
   SearchPillComponent,
@@ -21,18 +19,20 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
-    PageHeaderComponent,
     ButtonComponent,
-    ButtonLinkComponent,
     IconComponent,
     ListItemComponent,
     SearchPillComponent,
   ],
   template: `
     <div class="page page--wide sc">
-      <app-page-header title="Scannen" />
+      <h1 class="sr-only">Scannen</h1>
       <div class="sc__grid">
         <section class="sc__cam" aria-label="Kamera">
+          <app-search-pill
+            placeholder="Inventarnummer eingeben, z. B. 000123"
+            label="Inventarnummer"
+          />
           <div class="sc__view" [class.sc__view--dim]="found()">
             <div class="sc__frame" aria-hidden="true">
               <span class="sc__c sc__c--tl"></span><span class="sc__c sc__c--tr"></span>
@@ -62,26 +62,22 @@ import {
                   </div>
                 </div>
                 <div class="sc__hitActions">
-                  <a appButton="tonal" routerLink="/items"
-                    ><span class="btn-label"><app-icon name="right" />Öffnen</span></a
+                  <a class="sc__act sc__act--main" routerLink="/items"
+                    ><app-icon name="right" [size]="22" /><span>Öffnen</span></a
                   >
-                  <app-button variant="text"
-                    ><span class="btn-label"><app-icon name="mappin" />Verschieben</span></app-button
-                  >
-                  <app-button variant="text"
-                    ><span class="btn-label"><app-icon name="wrench" />Wartung</span></app-button
-                  >
-                  <a appButton="text" routerLink="/mockups/scanner"
-                    ><span class="btn-label"><app-icon name="scan" />Weiter scannen</span></a
+                  <button type="button" class="sc__act">
+                    <app-icon name="mappin" [size]="22" /><span>Verschieben</span>
+                  </button>
+                  <button type="button" class="sc__act">
+                    <app-icon name="wrench" [size]="22" /><span>Wartung</span>
+                  </button>
+                  <a class="sc__act" routerLink="/scan"
+                    ><app-icon name="scan" [size]="22" /><span>Weiter</span></a
                   >
                 </div>
               </div>
             }
           </div>
-          <app-search-pill
-            placeholder="Inventarnummer eingeben, z. B. 000123"
-            label="Inventarnummer"
-          />
         </section>
 
         <section class="sc__recent" aria-labelledby="sc-recent">

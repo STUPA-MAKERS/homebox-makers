@@ -489,3 +489,11 @@ html,
 body {
   overscroll-behavior-y: none;
 }
+
+// The installed app stops the double-tap zoom; the pinch zoom stops in `lockInstalledAppZoom`.
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html,
+  body {
+    touch-action: manipulation;
+  }
+}

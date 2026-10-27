@@ -1,10 +1,12 @@
 import {
   type ApplicationConfig,
   inject,
+  isDevMode,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   TitleStrategy,
@@ -24,6 +26,10 @@ import { LoadingService } from '@core/loading/loading.service';
 import { ThemeService } from '@core/theme/theme.service';
 import { AppTitleStrategy } from '@core/title/title.strategy';
 import { UI_KIT_INTL, UI_KIT_LOADING, uiKitIntlFromLang } from '@stupa-makers/ui-kit';
+import { provideServiceWorker } from '@angular/service-worker';
+import { IS_INSTALLED_APP } from '@core/browser/installed-app.token';
+import { SwUpdateService } from '@core/pwa/sw-update.service';
+import { lockInstalledAppZoom } from '@core/touch/zoom-lock';
 import { routes } from './app.routes';
 
 /**
@@ -59,9 +65,17 @@ export const appConfig: ApplicationConfig = {
     { provide: UI_KIT_LOADING, useFactory: () => ({ visible: inject(LoadingService).visible }) },
     provideAppInitializer(() => {
       inject(ThemeService).init();
+      inject(SwUpdateService).init();
+      lockInstalledAppZoom(inject(DOCUMENT), inject(IS_INSTALLED_APP)());
       watchUAVisualTransitions();
       const session = firstValueFrom(inject(AuthService).ensureLoaded());
       return Promise.all([inject(I18nService).ready(), session]).then(() => undefined);
+    }),
+    // The installed app (manifest.webmanifest): the worker (ngsw-config.json) caches the app
+    // shell and the assets, not `/api`; SwUpdateService offers a reload for a new version.
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
     }),
   ],
 };

@@ -8,14 +8,16 @@ export interface NavItem {
   path: string;
   icon: IconName;
   labelKey: TranslationKey;
-  /** `main` sits in the upper group of the rail, `end` above the account. */
-  place: 'main' | 'end';
+  /** `main` sits in the upper group of the rail, `end` above the account, `bar` only in the
+   *  phone bottom bar (the scanner, which needs a camera). */
+  place: 'main' | 'end' | 'bar';
   exact?: boolean;
 }
 
 const ITEMS: readonly NavItem[] = [
   { key: 'home', path: '/home', icon: 'home', labelKey: 'nav.home', place: 'main' },
   { key: 'items', path: '/items', icon: 'package', labelKey: 'nav.items', place: 'main' },
+  { key: 'scan', path: '/scan', icon: 'scan', labelKey: 'nav.scan', place: 'bar' },
   {
     key: 'locations',
     path: '/locations',
@@ -41,7 +43,7 @@ const ITEMS: readonly NavItem[] = [
 ];
 
 /** The entries of the phone bottom bar, in bar order. The rest goes into "Mehr". */
-export const BOTTOM_BAR_KEYS: readonly string[] = ['home', 'items', 'locations', 'tags'];
+export const BOTTOM_BAR_KEYS: readonly string[] = ['home', 'items', 'scan', 'tags'];
 
 /**
  * The areas of the app, shared by the rail and the bottom bar. Homebox has no per-area

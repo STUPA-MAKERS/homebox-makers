@@ -462,5 +462,8 @@
   "tools.labelsBody": "Etiketten mit QR-Code für Gegenstände und Orte drucken.",
   "nav.collections": "Sammlungen",
   "tags.add": "Tag hinzufügen",
-  "tags.addShort": "Tag"
+  "tags.addShort": "Tag",
+  "nav.scan": "Scanner",
+  "pwa.updateReady": "Eine neue Version der App ist verfügbar.",
+  "pwa.reload": "Neu laden"
 }

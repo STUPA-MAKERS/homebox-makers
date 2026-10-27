@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -18,7 +17,6 @@ import { BOTTOM_BAR_KEYS, NavService, type NavItem } from '../nav.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    NgTemplateOutlet,
     RouterLink,
     RouterLinkActive,
     TranslatePipe,
@@ -61,11 +59,6 @@ export class BottomBarComponent {
         this.moreOpen.set(false);
       });
   }
-
-  /** Mockup only: the scanner in the middle of the bar, on the mockup pages. */
-  readonly mockScan = computed(() => this.url().startsWith('/mockups'));
-  readonly barStart = computed(() => (this.mockScan() ? this.barItems.slice(0, 2) : this.barItems));
-  readonly barEnd = computed(() => (this.mockScan() ? this.barItems.slice(2) : []));
 
   search(): void {
     this.moreOpen.set(false);

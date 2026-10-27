@@ -1,3 +1,4 @@
+import { SwUpdatePromptComponent } from '@core/pwa/sw-update-prompt.component';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -32,6 +33,7 @@ export type ShellFrame = 'rail' | 'public' | 'pending';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SwUpdatePromptComponent,
     RouterOutlet,
     TranslatePipe,
     ToastComponent,

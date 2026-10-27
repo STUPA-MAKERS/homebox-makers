@@ -462,5 +462,8 @@
   "tools.labelsBody": "Print QR labels for items and locations.",
   "nav.collections": "Collections",
   "tags.add": "Add tag",
-  "tags.addShort": "Tag"
+  "tags.addShort": "Tag",
+  "nav.scan": "Scanner",
+  "pwa.updateReady": "A new version of the app is available.",
+  "pwa.reload": "Reload"
 }
