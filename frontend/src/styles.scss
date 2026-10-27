@@ -459,9 +459,16 @@ app-checkbox {
 
 // "+ Tag": the dashed chip after a row of tags that opens the tag list (tag picker, tag
 // assign). The kit chip shows a check once tags are chosen; here it always reads "+ Tag".
+// The "+ Tag" chip: the shape of a tag chip (`app-chip`: pill, 32px), dashed. The plus is
+// a drawn glyph, so it sits on the centre line of the text; the select's own icon turns
+// into a check once a value is set and stays hidden.
 .tag-add .fs__chip,
 .tag-add .fs__chip.on {
+  height: var(--chip-min-height, 32px);
+  padding: 0 var(--space-3) 0 10px;
+  gap: 4px;
   border: 1.5px dashed var(--color-border-strong, var(--color-border));
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--color-text-muted);
 }
@@ -473,10 +480,13 @@ app-checkbox {
   display: none;
 }
 .tag-add .fs__chip::before {
-  content: '+';
-  margin-inline-end: 2px;
-  font-size: 1.1em;
-  line-height: 1;
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M7 2v10M2 7h10' stroke='%23000' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 // Beside the small tag chips of a sheet head the "+ Tag" chip takes their height.
 .sheet-chips .tag-add .fs__chip {

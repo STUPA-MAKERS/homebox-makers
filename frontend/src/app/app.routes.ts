@@ -142,11 +142,11 @@ export const routes: Routes = [
               ),
           },
           {
-            // The scanner: for now the mockup, until the camera part is built.
+            // The scanner: the camera, the manual entry of an asset id and the last scans.
             path: 'scan',
             data: { title: 'nav.scan', wide: true },
             loadComponent: () =>
-              import('./pages/mockups/scanner.component').then((m) => m.MockScannerComponent),
+              import('./pages/scan/scan.component').then((m) => m.ScanComponent),
           },
           {
             path: 'mockups',
@@ -166,17 +166,6 @@ export const routes: Routes = [
                 path: 'maintenance-b',
                 loadComponent: () =>
                   import('./pages/mockups/maint-b.component').then((m) => m.MockMaintBComponent),
-              },
-              {
-                path: 'scanner',
-                loadComponent: () =>
-                  import('./pages/mockups/scanner.component').then((m) => m.MockScannerComponent),
-              },
-              {
-                path: 'scanner-hit',
-                data: { found: true },
-                loadComponent: () =>
-                  import('./pages/mockups/scanner.component').then((m) => m.MockScannerComponent),
               },
             ],
           },

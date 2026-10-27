@@ -20,7 +20,7 @@
   gap: var(--space-3);
 }
 
-// The camera picture stands in as a dark, slightly lit surface.
+// Until the picture comes, a dark, slightly lit surface.
 .sc__view {
   position: relative;
   aspect-ratio: 4 / 3;
@@ -145,7 +145,7 @@
 }
 .sc__hitActions {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
   margin: 0 calc(-1 * var(--space-4));
   border-top: var(--border-width) solid var(--color-border);
 }
@@ -204,4 +204,69 @@
 .sc__note {
   margin: 0;
   font-size: var(--fs-small);
+}
+
+// The camera picture fills the viewfinder. A video sits on its own layer, which the
+// rounded `overflow: hidden` alone does not clip in Chrome; the clip path does.
+.sc__view {
+  clip-path: inset(0 round var(--radius-2xl));
+}
+.sc__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sc__view--off .sc__video {
+  visibility: hidden;
+}
+.sc__view--dim .sc__video {
+  filter: brightness(0.55);
+}
+
+// No picture: why, and the way out, in the middle of the viewfinder.
+.sc__off {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  color: #fff;
+  text-align: center;
+}
+.sc__offTitle {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+}
+.sc__offBody {
+  max-width: 34ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: var(--fs-small);
+}
+.sc__offActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.sc__tools app-button.on {
+  --btn-bg: var(--color-selected);
+}
+.sc__hitNone {
+  overflow-wrap: anywhere;
+}
+.sc__file {
+  display: none;
+}
+.sc__recentHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
 }

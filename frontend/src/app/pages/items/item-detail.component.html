@@ -234,7 +234,11 @@
         }
 
         <app-attachments-panel [entity]="it" (changed)="item.set($event)" />
-        <app-maintenance-log [entityId]="it.id" />
+        <app-maintenance-log
+          [entityId]="it.id"
+          [startNew]="maintenance() === 'new'"
+          (startedNew)="clearMaintenanceParam()"
+        />
 
       </div>
     </div>

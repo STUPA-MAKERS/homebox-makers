@@ -104,6 +104,8 @@ export class ItemDetailComponent {
   readonly split = computed(() => this.page?.split() ?? false);
 
   readonly id = input.required<string>();
+  /** `?maintenance=new` (from the scanner): the maintenance dialog opens at once. */
+  readonly maintenance = input<string>();
 
   readonly item = signal<EntityOut | null>(null);
   readonly path = signal<EntityPath[]>([]);
@@ -289,5 +291,14 @@ export class ItemDetailComponent {
 
   private fail(err: unknown): void {
     this.toast.show(errorMessage(err, this.i18n.translate('common.error')), 'danger');
+  }
+
+  /** The dialog is open: the query goes, so a reload does not open it again. */
+  clearMaintenanceParam(): void {
+    void this.router.navigate([], {
+      queryParams: { maintenance: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 }

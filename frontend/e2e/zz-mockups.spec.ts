@@ -8,7 +8,7 @@ test('mockup shots', async ({ signedIn: page }) => {
     [390, 844, 'phone'],
   ] as const) {
     await page.setViewportSize({ width: w, height: h });
-    for (const p of ['maintenance-a', 'maintenance-b', 'scanner', 'scanner-hit']) {
+    for (const p of ['maintenance-a', 'maintenance-b']) {
       await page.goto(`${p === 'scanner' || p === 'scanner-hit' ? '/mockups/' + p : '/mockups/' + p}`);
       await page.waitForTimeout(900);
       await page.screenshot({ path: `${S}/${p}-${n}.png`, fullPage: n === 'wide' && p === 'maintenance-b' });

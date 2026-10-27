@@ -36,7 +36,5 @@ export class MockupsComponent {
   readonly list = [
     { path: 'maintenance-a', title: 'Wartung A · Liste und Detail', sub: 'Gruppiert nach Fälligkeit, Eintrag als Blatt daneben', icon: 'wrench' as const },
     { path: 'maintenance-b', title: 'Wartung B · Agenda', sub: 'Eine Liste über die ganze Breite mit Datumsblöcken', icon: 'cal' as const },
-    { path: 'scanner', title: 'Scanner', sub: 'Sucher, manuelle Eingabe, zuletzt gescannt', icon: 'scan' as const },
-    { path: 'scanner-hit', title: 'Scanner · Treffer', sub: 'Nach dem Scan: der Gegenstand mit den nächsten Schritten', icon: 'scan' as const },
   ];
 }

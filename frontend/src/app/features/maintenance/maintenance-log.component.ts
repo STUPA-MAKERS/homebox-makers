@@ -5,7 +5,9 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
+  untracked,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiClient } from '@core/api/api-client.service';
@@ -75,6 +77,9 @@ export class MaintenanceLogComponent {
   private readonly toast = inject(ToastService);
 
   readonly entityId = input.required<string>();
+  /** Opens the dialog for a new entry once the log is there (the scanner's "Wartung"). */
+  readonly startNew = input(false);
+  readonly startedNew = output<void>();
 
   readonly entries = signal<MaintenanceEntryWithDetails[]>([]);
   readonly loading = signal(true);
@@ -108,6 +113,13 @@ export class MaintenanceLogComponent {
 
   constructor() {
     effect(() => this.load(this.entityId()));
+    effect(() => {
+      if (!this.startNew()) return;
+      untracked(() => {
+        this.openNew();
+        this.startedNew.emit();
+      });
+    });
   }
 
   load(id = this.entityId()): void {

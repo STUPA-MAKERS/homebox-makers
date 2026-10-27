@@ -26,7 +26,6 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
 import type { TranslationKey } from '@core/i18n/translations';
 import { injectListDetailPage } from '@shared/list-detail-page';
 import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
-import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
 import { FabComponent } from '@shared/ui/fab/fab.component';
 import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
@@ -77,7 +76,6 @@ const SORTS: readonly { value: string; key: TranslationKey }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     TranslatePipe,
-    MoneyPipe,
     PageHeaderComponent,
     FabComponent,
     TagStripComponent,
@@ -133,7 +131,6 @@ export class ItemsListComponent {
 
   readonly items = signal<EntitySummary[]>([]);
   readonly total = signal(0);
-  readonly totalPrice = signal(0);
   readonly page = signal(1);
   readonly loading = signal(true);
   /** The row whose deletion waits for the confirmation. */
@@ -229,7 +226,6 @@ export class ItemsListComponent {
         if (!res) return;
         this.loaded.set(true);
         this.total.set(res.total);
-        this.totalPrice.set(res.totalPrice);
         this.items.update((cur) => (first ? (res.items ?? []) : [...cur, ...(res.items ?? [])]));
       });
 

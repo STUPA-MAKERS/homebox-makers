@@ -1,0 +1,222 @@
+<div class="page page--wide sc">
+  <h1 class="sr-only">{{ 'nav.scan' | t }}</h1>
+  <div class="sc__grid">
+    <section class="sc__cam" [attr.aria-label]="'scan.camera' | t">
+      <app-search-pill
+        [placeholder]="'scan.manualPlaceholder' | t"
+        [label]="'scan.manualLabel' | t"
+        [clearable]="true"
+        [busy]="resolving()"
+        [(value)]="manual"
+        (commit)="submitManual()"
+      />
+      <div
+        class="sc__view"
+        [class.sc__view--dim]="hit()"
+        [class.sc__view--off]="camera.state() !== 'live'"
+      >
+        <video #video class="sc__video" playsinline muted aria-hidden="true"></video>
+
+        @if (camera.state() === 'live') {
+          <div class="sc__frame" aria-hidden="true">
+            <span class="sc__c sc__c--tl"></span><span class="sc__c sc__c--tr"></span>
+            <span class="sc__c sc__c--bl"></span><span class="sc__c sc__c--br"></span>
+            @if (!hit() && !resolving()) {
+              <span class="sc__line"></span>
+            }
+          </div>
+          <div class="sc__tools">
+            @if (camera.torchable()) {
+              <app-button
+                variant="tonal"
+                [iconOnly]="true"
+                [class.on]="camera.torch()"
+                [ariaLabel]="'scan.torch' | t"
+                [attr.aria-pressed]="camera.torch()"
+                (click)="camera.toggleTorch()"
+                ><app-icon name="bulb"
+              /></app-button>
+            }
+            @if (camera.cameras().length > 1) {
+              <app-button
+                variant="tonal"
+                [iconOnly]="true"
+                [ariaLabel]="'scan.switchCamera' | t"
+                (click)="camera.switchCamera()"
+                ><app-icon name="repeat"
+              /></app-button>
+            }
+          </div>
+        } @else {
+          <div class="sc__off" role="status">
+            @switch (camera.state()) {
+              @case ('denied') {
+                <app-icon name="alert" [size]="32" />
+                <p class="sc__offTitle">{{ 'scan.deniedTitle' | t }}</p>
+                <p class="sc__offBody">{{ 'scan.deniedBody' | t }}</p>
+              }
+              @case ('insecure') {
+                <app-icon name="lock" [size]="32" />
+                <p class="sc__offTitle">{{ 'scan.insecureTitle' | t }}</p>
+                <p class="sc__offBody">{{ 'scan.insecureBody' | t }}</p>
+              }
+              @case ('missing') {
+                <app-icon name="scan" [size]="32" />
+                <p class="sc__offTitle">{{ 'scan.missingTitle' | t }}</p>
+                <p class="sc__offBody">{{ 'scan.missingBody' | t }}</p>
+              }
+              @case ('failed') {
+                <app-icon name="alert" [size]="32" />
+                <p class="sc__offTitle">{{ 'scan.failedTitle' | t }}</p>
+                <p class="sc__offBody">{{ 'scan.failedBody' | t }}</p>
+              }
+              @default {
+                <app-icon name="scan" [size]="32" />
+                <p class="sc__offTitle">{{ 'scan.starting' | t }}</p>
+              }
+            }
+            @if (camera.state() !== 'starting') {
+              <div class="sc__offActions">
+                @if (camera.state() !== 'insecure') {
+                  <app-button variant="tonal" (click)="retryCamera()">{{
+                    'scan.retry' | t
+                  }}</app-button>
+                }
+                <app-button variant="tonal" (click)="pickPhoto()">
+                  <span class="btn-label"><app-icon name="image" />{{ 'scan.photo' | t }}</span>
+                </app-button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (!hit() && camera.state() === 'live') {
+          <p class="sc__hint">{{ 'scan.hint' | t }}</p>
+        }
+
+        @if (hit(); as h) {
+          <div class="sc__hit" role="status" aria-live="polite">
+            @if (hitEntity(); as e) {
+              <div class="sc__hitHead">
+                <app-entity-thumb [entity]="e" [size]="52" />
+                <div class="sc__hitText">
+                  <span class="sc__hitKicker"
+                    >{{ (hitLocation() ? 'scan.foundLocation' : 'scan.found') | t }}
+                    @if (e.assetId && e.assetId !== '0') {
+                      · #{{ e.assetId }}
+                    }
+                  </span>
+                  <span class="sc__hitName">{{ e.name }}</span>
+                  @if (hitPath()) {
+                    <span class="sc__hitSub">{{ hitPath() }}</span>
+                  }
+                </div>
+              </div>
+              <div class="sc__hitActions" [style.--n]="hitLocation() ? 3 : 4">
+                <a class="sc__act sc__act--main" [routerLink]="entityLink(e)"
+                  ><app-icon name="right" [size]="22" /><span>{{ 'scan.open' | t }}</span></a
+                >
+                <button type="button" class="sc__act" (click)="openMove()">
+                  <app-icon name="mappin" [size]="22" /><span>{{ 'scan.move' | t }}</span>
+                </button>
+                @if (!hitLocation()) {
+                  <button type="button" class="sc__act" (click)="addMaintenance()">
+                    <app-icon name="wrench" [size]="22" /><span>{{ 'scan.maintenance' | t }}</span>
+                  </button>
+                }
+                <button type="button" class="sc__act" (click)="next()">
+                  <app-icon name="scan" [size]="22" /><span>{{ 'scan.next' | t }}</span>
+                </button>
+              </div>
+            } @else {
+              <div class="sc__hitHead">
+                <span class="sc__thumb"
+                  ><app-icon [name]="h.kind === 'many' ? 'search' : 'alert'" [size]="26"
+                /></span>
+                <div class="sc__hitText">
+                  <span class="sc__hitKicker">{{
+                    h.kind === 'many'
+                      ? ('scan.many' | t: { count: h.kind === 'many' ? h.count : 0 })
+                      : ('scan.none' | t)
+                  }}</span>
+                  <span class="sc__hitName sc__hitNone">{{ h.code }}</span>
+                </div>
+              </div>
+              <div class="sc__hitActions" [style.--n]="2">
+                <a class="sc__act sc__act--main" routerLink="/items" [queryParams]="{ q: h.code }"
+                  ><app-icon name="search" [size]="22" /><span>{{
+                    'scan.searchItems' | t
+                  }}</span></a
+                >
+                <button type="button" class="sc__act" (click)="next()">
+                  <app-icon name="scan" [size]="22" /><span>{{ 'scan.next' | t }}</span>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <input
+        #photo
+        class="sc__file"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        (change)="onPhoto($event)"
+      />
+    </section>
+
+    <section class="sc__recent" aria-labelledby="sc-recent">
+      <div class="sc__recentHead">
+        <h2 class="sec" id="sc-recent">{{ 'scan.recent' | t }}</h2>
+        @if (recent().length) {
+          <app-button variant="text" size="sm" (click)="clearRecent()">{{
+            'scan.clearRecent' | t
+          }}</app-button>
+        }
+      </div>
+      @if (recent().length) {
+        <div class="rowgroup">
+          @for (r of recent(); track r.id) {
+            <app-list-item
+              [title]="r.name"
+              [sub]="r.assetId ? (r.path ? r.path + ' · #' + r.assetId : '#' + r.assetId) : r.path"
+              [link]="link(r)"
+            >
+              <span lead class="sc__lead"
+                ><app-icon [name]="r.location ? 'mappin' : 'package'" [size]="20"
+              /></span>
+              <span trail class="sc__when">{{ when(r.at) }}</span>
+            </app-list-item>
+          }
+        </div>
+      } @else {
+        <app-empty-state rows="3" [heading]="'scan.recentEmpty' | t" />
+      }
+      <p class="muted sc__note">{{ 'scan.labelsNote' | t }}</p>
+    </section>
+  </div>
+</div>
+
+<app-dialog
+  [open]="moving()"
+  size="form"
+  [title]="'scan.moveTitle' | t: { name: hitEntity()?.name ?? '' }"
+  [closeLabel]="'common.close' | t"
+  (closed)="moving.set(false)"
+>
+  <div class="form-stack">
+    <app-location-select
+      [label]="'scan.moveTo' | t"
+      [required]="true"
+      [exclude]="hitLocation() ? (hitEntity()?.id ?? null) : null"
+      [(value)]="moveTarget"
+    />
+  </div>
+  <div dialog-footer>
+    <app-button variant="text" (click)="moving.set(false)">{{ 'common.cancel' | t }}</app-button>
+    <app-button [loading]="moveBusy()" [disabled]="!moveTarget()" (click)="saveMove()">{{
+      'scan.moveSave' | t
+    }}</app-button>
+  </div>
+</app-dialog>

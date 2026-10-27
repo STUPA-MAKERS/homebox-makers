@@ -111,12 +111,6 @@
               }}</app-button>
             </div>
           }
-          <p class="il__sum muted">
-            {{ 'items.count' | t: { count: total() } }}
-            @if (totalPrice()) {
-              · {{ 'items.totalValue' | t: { value: (totalPrice() | money) } }}
-            }
-          </p>
         }
       </div>
       <app-fab [label]="'fab.item' | t" [contained]="split()" (activate)="newItem()" />
