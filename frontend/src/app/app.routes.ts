@@ -58,12 +58,8 @@ export const routes: Routes = [
             data: { title: 'nav.home', wide: true },
             loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
           },
-          {
-            path: 'items/:id/edit',
-            data: { title: 'item.edit.title' },
-            loadComponent: () =>
-              import('./pages/items/item-edit.component').then((m) => m.ItemEditComponent),
-          },
+          // The editor is a side pane over the detail (`EditDrawerService`).
+          { path: 'items/:id/edit', redirectTo: 'items/:id' },
           {
             path: 'items',
             data: { title: 'nav.items', wide: true },
@@ -87,12 +83,7 @@ export const routes: Routes = [
               },
             ],
           },
-          {
-            path: 'locations/:id/edit',
-            data: { title: 'location.edit.title' },
-            loadComponent: () =>
-              import('./pages/items/item-edit.component').then((m) => m.ItemEditComponent),
-          },
+          { path: 'locations/:id/edit', redirectTo: 'locations/:id' },
           {
             path: 'locations',
             data: { title: 'nav.locations', wide: true },

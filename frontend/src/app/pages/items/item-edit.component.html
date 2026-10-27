@@ -1,12 +1,24 @@
-<div class="page">
+<div class="ie-host">
+  <header class="sheet-head ie__head-bar">
+    <app-sheet-bar [bleed]="true">
+      <h2 appSheetBarTitle id="ie-title" class="sheet-title">
+        {{ (isLoc() ? 'location.edit.title' : 'item.edit.title') | t }}
+      </h2>
+      <app-button
+        variant="text"
+        [iconOnly]="true"
+        [ariaLabel]="'common.close' | t"
+        (click)="done.emit(null)"
+        ><app-icon name="x"
+      /></app-button>
+    </app-sheet-bar>
+    @if (item(); as it) {
+      <p class="sheet-line">{{ it.name }}</p>
+    }
+  </header>
   @if (loading()) {
     <app-skeleton variant="panel" [label]="'common.loading' | t" />
   } @else if (item(); as it) {
-    <app-page-header
-      [title]="(isLoc() ? 'location.edit.title' : 'item.edit.title') | t"
-      [subtitle]="it.name"
-      [flush]="true"
-    />
 
     <form class="ie" (ngSubmit)="save()" novalidate>
       <section class="ie__sec" aria-labelledby="ie-basic">
@@ -156,15 +168,16 @@
         </app-textarea>
       </section>
 
-      <app-sticky-bar class="ie__bar">
-        @if (error()) {
-          <app-note kind="error" icon="alert">{{ error() }}</app-note>
-        }
-        <div class="form-actions">
-          <a appButton="text" [routerLink]="backLink()">{{ 'common.cancel' | t }}</a>
-          <app-button type="submit" [loading]="busy()">{{ 'common.save' | t }}</app-button>
-        </div>
-      </app-sticky-bar>
+      @if (error()) {
+        <app-note kind="error" icon="alert">{{ error() }}</app-note>
+      }
+      <app-fab
+        icon="check"
+        [label]="'common.save' | t"
+        [contained]="true"
+        [loading]="busy()"
+        (activate)="save()"
+      />
     </form>
   } @else if (error()) {
     <app-note kind="error" icon="alert">{{ error() }}</app-note>

@@ -43,6 +43,7 @@ import {
 import { AttachmentsPanelComponent } from '../../features/attachments/attachments-panel.component';
 import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';
+import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 
 const PAGE_SIZE = 30;
 
@@ -88,6 +89,7 @@ export class LocationDetailComponent {
   private readonly createSvc = inject(CreateService);
   private readonly collections = inject(CollectionService);
   private readonly ref = inject(RefDataService);
+  private readonly editor = inject(EditDrawerService);
   private readonly page = inject(LIST_PAGE_STATE, { optional: true });
 
   /** The detail sits beside the list, so the sheet bar reaches into its padding. */
@@ -141,6 +143,11 @@ export class LocationDetailComponent {
     this.createSvc.created.pipe(takeUntilDestroyed()).subscribe(() => {
       this.ref.reload().subscribe();
       this.loadItems(true);
+    });
+    this.editor.saved.pipe(takeUntilDestroyed()).subscribe((saved) => {
+      if (saved.id !== this.id()) return;
+      this.ref.reload().subscribe();
+      this.load();
     });
   }
 
@@ -201,7 +208,7 @@ export class LocationDetailComponent {
 
   edit(): void {
     const loc = this.location();
-    if (loc) void this.router.navigate(['/locations', loc.id, 'edit']);
+    if (loc) this.editor.open(loc.id);
   }
 
   addSub(): void {

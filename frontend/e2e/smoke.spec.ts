@@ -12,7 +12,6 @@ test('main pages load cleanly', async ({ signedIn: page }) => {
     '/home',
     '/items',
     `/items/${item}`,
-    `/items/${item}/edit`,
     '/locations',
     `/locations/${loc}`,
     '/tags',

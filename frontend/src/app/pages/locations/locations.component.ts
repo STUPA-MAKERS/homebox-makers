@@ -38,6 +38,7 @@ import {
   ToastService,
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
+import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 
 /** One row of the tree: a location, its depth and whether it has sub-locations. */
 interface TreeRow {
@@ -85,6 +86,7 @@ export class LocationsComponent {
   private readonly api = inject(ApiClient);
   private readonly i18n = inject(I18nService);
   private readonly toast = inject(ToastService);
+  private readonly editor = inject(EditDrawerService);
 
   /** The row whose deletion waits for the confirmation. */
   readonly deleting = signal<EntitySummary | null>(null);
@@ -205,7 +207,7 @@ export class LocationsComponent {
   onRowMenu(action: RowMenuItem, loc: EntitySummary): void {
     switch (action.id) {
       case 'edit':
-        void this.router.navigate(['/locations', loc.id, 'edit']);
+        this.editor.open(loc.id);
         break;
       case 'sub':
         this.createSvc.open({ kind: 'location', parentId: loc.id });

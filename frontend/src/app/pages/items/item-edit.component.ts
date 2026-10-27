@@ -5,35 +5,35 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { ApiClient } from '@core/api/api-client.service';
 import type { EntityFieldData, EntityOut, EntityUpdate } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
 import { apiDate } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
-import { AppTitleStrategy } from '@core/title/title.strategy';
-import { entityLink, isLocation } from '@shared/entity.util';
+import { isLocation } from '@shared/entity.util';
 import { CustomFieldsEditorComponent } from '../../features/fields/custom-fields-editor.component';
 import { errorMessage } from '@shared/http-error';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
+import { FabComponent } from '@shared/ui/fab/fab.component';
 import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
 import {
   ButtonComponent,
-  ButtonLinkComponent,
   CheckboxComponent,
   CurrencyInputComponent,
   DatepickerComponent,
+  IconComponent,
   InputComponent,
   NoteComponent,
   SelectFieldComponent,
   type SelectFieldOption,
   SkeletonComponent,
-  StickyBarComponent,
+  SheetBarComponent,
+  SheetBarTitleDirective,
   TextareaComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
@@ -91,13 +91,14 @@ function money(value: number | null | undefined): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
-    RouterLink,
     TranslatePipe,
-    PageHeaderComponent,
+    FabComponent,
+    SheetBarComponent,
+    SheetBarTitleDirective,
+    IconComponent,
     LocationSelectComponent,
     TagPickerComponent,
     ButtonComponent,
-    ButtonLinkComponent,
     CheckboxComponent,
     CustomFieldsEditorComponent,
     CurrencyInputComponent,
@@ -106,7 +107,6 @@ function money(value: number | null | undefined): string {
     NoteComponent,
     SelectFieldComponent,
     SkeletonComponent,
-    StickyBarComponent,
     TextareaComponent,
   ],
   templateUrl: './item-edit.component.html',
@@ -114,13 +114,13 @@ function money(value: number | null | undefined): string {
 })
 export class ItemEditComponent {
   private readonly api = inject(ApiClient);
-  private readonly router = inject(Router);
   private readonly i18n = inject(I18nService);
   private readonly toast = inject(ToastService);
-  private readonly title = inject(AppTitleStrategy);
   readonly ref = inject(RefDataService);
 
   readonly id = input.required<string>();
+  /** The saved entity, or null when the editor closes without saving. */
+  readonly done = output<EntityOut | null>();
 
   readonly item = signal<EntityOut | null>(null);
   readonly loading = signal(true);
@@ -137,10 +137,6 @@ export class ItemEditComponent {
   readonly isLoc = computed(() => {
     const item = this.item();
     return !!item && isLocation(item);
-  });
-  readonly backLink = computed(() => {
-    const item = this.item();
-    return item ? entityLink(item) : ['/items'];
   });
 
   readonly typeOptions = computed<SelectFieldOption[]>(() =>
@@ -161,7 +157,6 @@ export class ItemEditComponent {
         this.item.set(item);
         this.fill(item);
         this.loading.set(false);
-        this.title.setPageTitle(item.name);
       },
       error: (err) => {
         this.loading.set(false);
@@ -212,7 +207,7 @@ export class ItemEditComponent {
       next: (saved) => {
         this.busy.set(false);
         this.toast.show(this.i18n.translate('common.saved'), 'success');
-        void this.router.navigate(entityLink(saved));
+        this.done.emit(saved);
       },
       error: (err) => {
         this.busy.set(false);

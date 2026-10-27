@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: 56rem;
 }
 .ie__sec {
   display: flex;
@@ -22,12 +21,14 @@
   flex-wrap: wrap;
   gap: var(--space-3) var(--space-6);
 }
-.ie__bar {
-  position: sticky;
-  bottom: var(--app-bottom-inset, 0px);
+.ie-host {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding-block: var(--space-3);
-  background: var(--color-bg);
+  gap: var(--space-5);
+}
+.ie__head-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-surface);
 }

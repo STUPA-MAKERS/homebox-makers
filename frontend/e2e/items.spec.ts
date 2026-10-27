@@ -22,11 +22,11 @@ test('edit an item and see the change on its page', async ({ signedIn: page }) =
   await expect(page.getByRole('heading', { name: 'Akkuschrauber' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Bearbeiten' }).first().click();
-  await page.getByLabel('Hersteller').fill('Makita');
-  await page.getByLabel('Seriennummer').fill('SN-42');
-  await page.getByRole('button', { name: 'Speichern' }).click();
-
-  await page.waitForURL(`**/items/${id}`);
+  const pane = page.getByRole('dialog', { name: 'Gegenstand bearbeiten' });
+  await pane.getByLabel('Hersteller').fill('Makita');
+  await pane.getByLabel('Seriennummer').fill('SN-42');
+  await pane.getByRole('button', { name: 'Speichern' }).click();
+  await expect(pane).toHaveCount(0);
   await expect(page.getByText('Makita')).toBeVisible();
   await expect(page.getByText('SN-42')).toBeVisible();
 });

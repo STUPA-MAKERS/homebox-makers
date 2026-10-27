@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiClient } from '@core/api/api-client.service';
 import { CollectionService } from '@core/collection/collection.service';
 import type { EntityOut, EntityPath } from '@core/api/models';
@@ -46,6 +47,7 @@ import {
 import { AttachmentsPanelComponent } from '../../features/attachments/attachments-panel.component';
 import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';
+import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-log.component';
 
 /**
@@ -95,6 +97,7 @@ export class ItemDetailComponent {
   private readonly createSvc = inject(CreateService);
   private readonly collections = inject(CollectionService);
   private readonly url = injectAttachmentUrl();
+  private readonly editor = inject(EditDrawerService);
   private readonly page = inject(LIST_PAGE_STATE, { optional: true });
 
   /** The detail sits beside the list, so the sheet bar reaches into its padding. */
@@ -172,6 +175,9 @@ export class ItemDetailComponent {
 
   constructor() {
     effect(() => this.load(this.id()));
+    this.editor.saved.pipe(takeUntilDestroyed()).subscribe((saved) => {
+      if (saved.id === this.id()) this.load();
+    });
   }
 
   load(id = this.id()): void {
@@ -200,7 +206,7 @@ export class ItemDetailComponent {
   childLink = entityLink;
 
   edit(): void {
-    void this.router.navigate(['/items', this.id(), 'edit']);
+    this.editor.open(this.id());
   }
 
   openPhoto(index: number): void {

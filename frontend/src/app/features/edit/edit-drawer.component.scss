@@ -1,0 +1,83 @@
+@use 'breakpoints' as bp;
+
+// The geometry of the to-do card drawer of STUPA-Workflow (`td__drawer`).
+.ed__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  background: var(--color-scrim);
+}
+.ed {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-dialog);
+  display: flex;
+  flex-direction: column;
+  width: min(48rem, calc(100vw - var(--space-8)));
+  border-top-left-radius: var(--radius-xl);
+  border-bottom-left-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-elevated);
+  outline: 0;
+  // The save button floats at the bottom end of the pane, over the scrolling form.
+  --fab-inset: var(--space-6);
+}
+.ed__body {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 var(--space-6) calc(56px + 2 * var(--space-6));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@include bp.phone {
+  .ed__scrim,
+  .ed {
+    bottom: var(--app-bottom-inset, 0px);
+  }
+  .ed {
+    width: 100vw;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .ed__body {
+    padding-inline: var(--space-4);
+  }
+}
+
+.ed__scrim--entering {
+  animation: ed-fade-in var(--motion-base) var(--ease-standard);
+}
+.ed__scrim--leaving {
+  animation: ed-fade-out var(--motion-base) var(--ease-exit) forwards;
+}
+.ed--entering {
+  animation: ed-in var(--motion-slow) var(--ease-enter);
+}
+.ed--leaving {
+  pointer-events: none;
+  animation: ed-out var(--motion-base) var(--ease-exit) forwards;
+}
+@keyframes ed-in {
+  from {
+    transform: translateX(calc(100% + 12px));
+  }
+}
+@keyframes ed-out {
+  to {
+    transform: translateX(calc(100% + 12px));
+  }
+}
+@keyframes ed-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ed-fade-out {
+  to {
+    opacity: 0;
+  }
+}

@@ -51,6 +51,7 @@ import {
   ToastService,
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
+import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 
 const PAGE_SIZE = 30;
 
@@ -107,6 +108,7 @@ export class ItemsListComponent {
   private readonly i18n = inject(I18nService);
   private readonly createSvc = inject(CreateService);
   private readonly toast = inject(ToastService);
+  private readonly editor = inject(EditDrawerService);
   private readonly collections = inject(CollectionService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -349,7 +351,7 @@ export class ItemsListComponent {
   onRowMenu(action: RowMenuItem, item: EntitySummary): void {
     switch (action.id) {
       case 'edit':
-        void this.router.navigate(['/items', item.id, 'edit']);
+        this.editor.open(item.id);
         break;
       case 'duplicate':
         this.api

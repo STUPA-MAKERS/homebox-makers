@@ -30,12 +30,14 @@ test('create a tag, give it to an item and find the item under the tag', async (
   await page.waitForURL('**/tags/*');
   await expect(page.getByRole('heading', { name: 'Elektronik' })).toBeVisible();
 
-  await page.goto(`/items/${item}/edit`);
-  await page.getByRole('button', { name: /Tags/ }).click();
+  await page.goto(`/items/${item}`);
+  await page.getByRole('button', { name: 'Bearbeiten' }).first().click();
+  const pane = page.getByRole('dialog', { name: 'Gegenstand bearbeiten' });
+  await pane.getByRole('button', { name: /Tags/ }).click();
   await page.getByRole('option', { name: 'Elektronik' }).click();
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Speichern' }).click();
-  await page.waitForURL(`**/items/${item}`);
+  await pane.getByRole('button', { name: 'Speichern' }).click();
+  await expect(pane).toHaveCount(0);
 
   await page.getByRole('link', { name: 'Elektronik' }).click();
   await expect(page.getByRole('link', { name: 'Lötstation' })).toBeVisible();
