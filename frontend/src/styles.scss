@@ -2,6 +2,9 @@
 // list/detail geometry (vendor/ui-kit/src/styles/index.scss).
 @use 'index';
 
+// The utilities the kit's templates use (tailwind.config.js); preflight is off.
+@tailwind utilities;
+
 .sec {
   margin: 0;
   font-size: 0.84375rem;
