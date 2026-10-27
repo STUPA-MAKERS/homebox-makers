@@ -6,12 +6,12 @@ unless index.html links a launch image of the exact screen size of the device. E
 image is the page background of a theme with the app mark in the centre, at a quarter
 of the screen width, so the start looks like the first frame of the app.
 
-The mark comes from public/icons/icon-512x512.png (the mark on an opaque white square,
-rendered from public/favicon.svg).
-The white is taken out as alpha, so the mark sits on the dark background without a
-white box. The images are palette PNGs, a few KB each.
+The mark comes from public/icons/icon-512x512.png in the light theme and from
+public/icons/icon-dark-512x512.png in the dark one (rendered from public/favicon.svg by
+scripts/make-icons.mjs, on transparent). The images are palette PNGs, a few KB each.
 
-Run from frontend/ after a change of the sizes, the colours or the icon:
+Run from frontend/ after a change of the sizes, the colours or the icon (after
+scripts/make-icons.mjs):
 
     python3 scripts/make-splash.py
 
@@ -23,7 +23,10 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-ICON = ROOT / "public" / "icons" / "icon-512x512.png"
+ICONS = {
+    "light": ROOT / "public" / "icons" / "icon-512x512.png",
+    "dark": ROOT / "public" / "icons" / "icon-dark-512x512.png",
+}
 OUT = ROOT / "public" / "splash"
 
 # The page background (--color-bg of the ui-kit tokens) per theme.
@@ -47,31 +50,13 @@ SCREENS = [
 ]
 
 
-def mark() -> Image.Image:
-    """The mark of the icon, cut to its bounds, with the white background as alpha.
-
-    Each pixel of the icon is a colour of the mark over white: c = a*P + (1 - a)*W. The
-    smallest alpha that explains it is the largest distance of a channel from white; the
-    colour follows from it. The inside of a shape stays opaque in its own colour and only
-    the edges blend into the background of the theme.
-    """
-    icon = Image.open(ICON).convert("RGB")
-    out = Image.new("RGBA", icon.size)
-    pixels: list[tuple[int, int, int, int]] = []
-    raw = icon.tobytes()
-    for i in range(0, len(raw), 3):
-        c = (raw[i], raw[i + 1], raw[i + 2])
-        a = max(255 - v for v in c)
-        if a == 0:
-            pixels.append((255, 255, 255, 0))
-            continue
-        colour = tuple(max(0, min(255, round(255 - (255 - v) * 255 / a))) for v in c)
-        pixels.append((*colour, a))
-    out.putdata(pixels)
-    bbox = out.getbbox()
+def mark(path: Path) -> Image.Image:
+    """The mark of an icon, cut to its bounds."""
+    icon = Image.open(path).convert("RGBA")
+    bbox = icon.getbbox()
     if bbox is None:
-        raise SystemExit(f"{ICON} holds no mark")
-    return out.crop(bbox)
+        raise SystemExit(f"{path} holds no mark")
+    return icon.crop(bbox)
 
 
 def splash(
@@ -89,9 +74,9 @@ def splash(
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    logo = mark()
     links = []
     for theme, background in THEMES.items():
+        logo = mark(ICONS[theme])
         for w, h, ratio in SCREENS:
             name = f"splash-{theme}-{w * ratio}x{h * ratio}.png"
             splash(logo, w * ratio, h * ratio, background).save(OUT / name, optimize=True)
