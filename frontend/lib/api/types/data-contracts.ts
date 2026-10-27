@@ -250,6 +250,10 @@ export interface EntEntityEdges {
   fields: EntEntityField[];
   /** Group holds the value of the group edge. */
   group: EntGroup;
+  /** Location holds the value of the location edge. */
+  location: EntEntity;
+  /** LocationEntities holds the value of the location_entities edge. */
+  location_entities: EntEntity[];
   /** MaintenanceEntries holds the value of the maintenance_entries edge. */
   maintenance_entries: EntMaintenanceEntry[];
   /** Parent holds the value of the parent edge. */
@@ -550,6 +554,8 @@ export interface EntPasswordResetTokens {
   updated_at: string;
   /** UsedAt holds the value of the "used_at" field. */
   used_at: string;
+  /** UserID holds the value of the "user_id" field. */
+  user_id: string;
 }
 
 export interface EntPasswordResetTokensEdges {
@@ -743,6 +749,16 @@ export interface EntityCreate {
   /** @maxLength 1000 */
   description: string;
   entityTypeId: string;
+  /** Only needed when ParentID is another item and this lives elsewhere (#1688). */
+  locationId?: string | null;
+  /** @maxLength 255 */
+  manufacturer?: string | null;
+  /**
+   * Identifications — optional at create time; populated e.g. by the
+   * barcode product-search import flow (#1578).
+   * @maxLength 255
+   */
+  modelNumber?: string | null;
   /**
    * @minLength 1
    * @maxLength 255
@@ -789,6 +805,17 @@ export interface EntityOut {
   itemCount: number;
   /** Warranty */
   lifetimeWarranty: boolean;
+  /**
+   * Location is resolved: this entity's own location, else the nearest
+   * location ancestor. Read-only — write via LocationID.
+   */
+  location?: EntitySummary | null;
+  /**
+   * LocationID is set only when this entity has its own location, nil when
+   * inherited. Same name as the EntityUpdate field so a GET/PUT round trip
+   * doesn't pin an inherited location or drop an explicit one.
+   */
+  locationId?: string | null;
   manufacturer: string;
   modelNumber: string;
   name: string;
@@ -819,6 +846,7 @@ export interface EntityOut {
 export interface EntityPatch {
   entityTypeId?: string | null;
   id: string;
+  locationId?: string | null;
   parentId?: string | null;
   quantity?: number | null;
   tagIds?: string[] | null;
@@ -998,6 +1026,11 @@ export interface EntityUpdate {
   insured: boolean;
   /** Warranty */
   lifetimeWarranty: boolean;
+  /**
+   * Only needed when ParentID is another item and this lives elsewhere (#1688).
+   * Otherwise ParentID carries the location. See resolveLocationOverride.
+   */
+  locationId?: string | null;
   manufacturer: string;
   modelNumber: string;
   /**
@@ -1347,6 +1380,7 @@ export interface EntityTemplateCreateItemRequest {
    * precedence; when empty the repository falls back to the group's default.
    */
   entityTypeId: string;
+  locationId?: string | null;
   /**
    * @minLength 1
    * @maxLength 255

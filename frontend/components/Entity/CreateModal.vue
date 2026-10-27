@@ -172,6 +172,7 @@
         "
         type="number"
         step="any"
+        :min="0"
       />
       <FormTextArea
         v-model="form.description"
@@ -233,6 +234,7 @@
     EntityTemplateOut,
     EntityTemplateSummary,
     EntityOut,
+    EntitySummary,
     EntityTypeSummary,
   } from "~~/lib/api/types/data-contracts";
   import { useTagStore } from "~/stores/tags";
@@ -373,6 +375,9 @@
     quantity: 1,
     description: "",
     color: "",
+    // Populated by the barcode product-import flow; passed through on create (#1578).
+    manufacturer: "",
+    modelNumber: "",
     tags: [] as string[],
     photos: [] as PhotoPreview[],
   });
@@ -471,14 +476,51 @@
     localStorage.removeItem(LAST_TEMPLATE_KEY);
   }
 
+  // Used at submit to tell "left at the default" from "stored elsewhere".
+  const inheritedLocationId = ref<string | null>(null);
+
+  function resolveInheritedLocation(entity: EntityOut | EntitySummary | null | undefined): string | null {
+    if (!entity) return null;
+    const resolved = (entity as EntityOut).location?.id;
+    if (resolved) return resolved;
+    return entity.parent?.entityType?.isLocation ? entity.parent.id : null;
+  }
+
+  const resolvedParent = ref<EntityOut | null>(null);
+  let parentLookup = 0;
+
   watch(
     parent,
-    newParent => {
+    async newParent => {
       if (newParent && newParent.id && subItemCreate.value) {
         form.parentId = newParent.id;
       } else {
         form.parentId = null;
       }
+
+      const lookup = ++parentLookup;
+
+      if (!newParent?.id) {
+        inheritedLocationId.value = null;
+        return;
+      }
+
+      if (resolvedParent.value?.id === newParent.id) {
+        inheritedLocationId.value = resolveInheritedLocation(resolvedParent.value);
+        return;
+      }
+
+      const { data, error } = await api.items.get(newParent.id);
+      if (lookup !== parentLookup) return;
+
+      if (error || !data) {
+        console.error("Parent item fetch error:", error);
+        inheritedLocationId.value = resolveInheritedLocation(newParent);
+        return;
+      }
+
+      resolvedParent.value = data;
+      inheritedLocationId.value = resolveInheritedLocation(data);
     },
     { immediate: true }
   );
@@ -513,6 +555,7 @@
       subItemCreate.value = false;
       let parentItemLocationId = null;
       parent.value = {};
+      resolvedParent.value = null;
       form.parentId = null;
 
       if (params.baseType === "item") {
@@ -526,21 +569,24 @@
           if (error || !data) {
             toast.error(t("components.entity.create_modal.toast.failed_load_parent"));
             console.error("Parent item fetch error:", error);
+            return;
           }
 
-          if (data) {
-            parent.value = data;
-          }
+          resolvedParent.value = data;
+          parent.value = data;
 
-          if (data.parent) {
-            const loc = data.parent;
-            parentItemLocationId = loc.id;
-          }
+          // What the sub-item inherits if left alone. Resolved location, not the
+          // direct parent — those only match when the parent sits in one.
+          parentItemLocationId = resolveInheritedLocation(data);
         }
 
         if (params.product) {
           form.name = params.product.item.name;
           form.description = params.product.item.description;
+          // Carry the looked-up identifications into the create payload so the
+          // created item isn't missing manufacturer/model (#1578).
+          form.manufacturer = params.product.manufacturer ?? "";
+          form.modelNumber = params.product.modelNumber ?? "";
 
           if (params.product.imageURL) {
             appendPhotos([
@@ -552,10 +598,13 @@
               },
             ]);
           }
+        } else {
+          // Restore last used template if available. Skipped for barcode
+          // product imports: a template's defaults (name, quantity, …) would
+          // clobber the just-looked-up product data, and the template create
+          // endpoint has no way to carry manufacturer/model (#1578).
+          await restoreLastTemplate();
         }
-
-        // Restore last used template if available
-        await restoreLastTemplate();
       } else {
         selectedEntityType.value = entityTypes.value.find(t => t.isLocation) || null;
       }
@@ -635,11 +684,18 @@
       data = result.data;
     } else {
       // Normal item creation without template
+      // Only pin a location when it differs from what the item would inherit,
+      // so it otherwise still follows the parent (#1688).
+      const chosenLocationId = (form.location?.id as string) || null;
       const out: EntityCreate = {
         parentId: form.parentId || (form.location.id as string),
+        locationId:
+          form.parentId && chosenLocationId && chosenLocationId !== inheritedLocationId.value ? chosenLocationId : null,
         name: form.name,
         quantity: form.quantity,
         description: form.description,
+        manufacturer: form.manufacturer,
+        modelNumber: form.modelNumber,
         tagIds: form.tags,
         entityTypeId: selectedEntityType.value?.id || "",
       };
@@ -694,6 +750,8 @@
     form.quantity = 1;
     form.description = "";
     form.color = "";
+    form.manufacturer = "";
+    form.modelNumber = "";
     form.photos = [];
     form.tags = [];
     selectedTemplate.value = null;
@@ -710,6 +768,11 @@
       } else {
         navigateTo(`/item/${data.id}`);
       }
+    } else if (!selectedEntityType.value?.isLocation) {
+      // "Create and Add Another" keeps the dialog open, so the open-dialog
+      // callback (which normally restores the persisted template) never
+      // fires — re-apply it here so the selection isn't cleared (#1489).
+      await restoreLastTemplate();
     }
   }
 

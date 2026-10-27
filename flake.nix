@@ -15,7 +15,7 @@
         devShells.default =
           with pkgs;
           let
-            go = go_1_26;
+            go = go_1_27;
           in
           pkgs.mkShell {
             buildInputs = [
@@ -25,8 +25,8 @@
               # frontend
               nodejs_24
               pnpm
-              nodePackages.typescript
-              nodePackages.typescript-language-server
+              typescript
+              typescript-language-server
 
               # backend
               go

@@ -69,6 +69,15 @@
       parent.value = data.parent;
     }
 
+    // The "Location" selector shows the resolved location (nearest ancestor
+    // that is a location-type entity), not the direct parent — when the item
+    // sits inside another item, the parent is shown in "Parent Item" and the
+    // location stays e.g. "Attic" (#1589).
+    location.value = data.location ?? (data.parent?.entityType?.isLocation ? data.parent : null);
+    // locationId is only set when the item has its own location, so it tells us
+    // whether to keep sending it back or let the item follow its parent (#1688).
+    locationExplicit.value = !!data.locationId;
+
     return data;
   });
 
@@ -90,7 +99,7 @@
   const saving = ref(false);
 
   async function saveItem(redirect: boolean) {
-    if (!item.value.parent?.id && !parent.value?.id) {
+    if (!location.value?.id && !parent.value?.id) {
       toast.error(t("items.toast.failed_save_no_location"));
       return;
     }
@@ -119,7 +128,12 @@
 
     const payload: EntityUpdate = {
       ...item.value,
-      parentId: parent.value?.id || item.value.parent?.id || null,
+      // A selected parent item is the entity's real parent; otherwise the
+      // item hangs directly off the chosen location.
+      parentId: parent.value?.id || location.value?.id || null,
+      // Only when it's inside another item and the user picked a location —
+      // echoing back an inherited one would pin it (#1688).
+      locationId: parent.value?.id && locationExplicit.value ? location.value?.id || null : null,
       tagIds: item.value.tagIds,
       assetId: item.value.assetId,
       purchasePrice,
@@ -165,6 +179,7 @@
     type: "number";
     label: string;
     ref: NonNullableNumberKeys<EntityOut> | NonNullableStringKeys<EntityOut>;
+    min?: number;
   };
 
   interface BoolFormField {
@@ -193,6 +208,7 @@
       type: "number",
       label: "items.quantity",
       ref: "quantity",
+      min: 0,
     },
     {
       type: "markdown",
@@ -407,10 +423,10 @@
       return;
     }
 
-    const { data, error } = await api.items.attachments.add(itemId.value, files[0], files[0].name, type);
+    const { data, error, status } = await api.items.attachments.add(itemId.value, files[0], files[0].name, type);
 
     if (error) {
-      toast.error(t("items.toast.failed_upload_attachment"));
+      toast.error(status === 413 ? t("items.toast.attachment_too_large") : t("items.toast.failed_upload_attachment"));
       return;
     }
 
@@ -506,6 +522,14 @@
 
   const { query, results, isLoading, triggerSearch } = useItemSearch(api, { immediate: false });
   const parent = ref();
+  // Resolved location shown in the "Location" selector. Kept separate from
+  // `parent` (the "Parent Item" selector): when a parent item is chosen it
+  // becomes the entity's real parent, while this stays the location the item
+  // ultimately lives in (#1589).
+  const location = ref();
+  // True when `location` is the user's own choice, not inherited. Only explicit
+  // choices are written back, so nested items follow their parent by default.
+  const locationExplicit = ref(false);
 
   async function keyboardSave(e: KeyboardEvent) {
     // Cmd + S
@@ -530,37 +554,34 @@
         return;
       }
 
+      // Show where it lands by default, i.e. the parent's location (#1589).
+      // Leave a location the user picked alone — overwriting it here is what
+      // made "child of X, stored in Y" impossible (#1688).
+      if (!locationExplicit.value) {
+        location.value = data.location ?? (data.parent?.entityType?.isLocation ? data.parent : null);
+      }
       if (data.syncChildEntityLocations) {
         toast.info(t("items.toast.sync_child_location"));
-        item.value.parent = data.parent;
       }
     }
   }
 
-  async function informAboutDesyncingLocationFromParent() {
-    if (parent.value && parent.value.id) {
-      const { data, error } = await api.items.get(parent.value.id);
-
-      if (error) {
-        toast.error(t("items.toast.error_loading_parent_data"));
-        return;
-      }
-
-      if (data.syncChildEntityLocations) {
-        toast.info(t("items.toast.child_location_desync"));
-      }
-    }
+  function onLocationChanged() {
+    // Location says where the item is stored, not what it belongs to, so the
+    // parent stays selected (#1688).
+    locationExplicit.value = !!location.value?.id;
   }
 
   async function syncChildEntityLocations() {
-    if (!item.value.parent?.id && !parent.value?.id) {
+    if (!location.value?.id && !parent.value?.id) {
       toast.error(t("items.toast.failed_save_no_location"));
       return;
     }
 
     const payload: EntityUpdate = {
       ...item.value,
-      parentId: parent.value?.id || item.value.parent?.id || null,
+      parentId: parent.value?.id || location.value?.id || null,
+      locationId: parent.value?.id && locationExplicit.value ? location.value?.id || null : null,
       tagIds: item.value.tagIds,
       assetId: item.value.assetId,
       syncChildEntityLocations: item.value.syncChildEntityLocations,
@@ -662,7 +683,7 @@
         <BaseCard class="overflow-visible">
           <template #title> {{ $t("items.edit_details") }} </template>
           <div class="mb-6 grid gap-4 border-t px-5 pt-2 md:grid-cols-2">
-            <LocationSelector v-model="item.parent" @update:model-value="informAboutDesyncingLocationFromParent()" />
+            <LocationSelector v-model="location" @update:model-value="onLocationChanged()" />
             <ItemSelector
               v-model="parent"
               v-model:search="query"
@@ -722,6 +743,7 @@
                   v-model.number="item[field.ref]"
                   type="number"
                   step="any"
+                  :min="field.min"
                   :label="$t(field.label)"
                   inline
                 />
@@ -729,7 +751,6 @@
                   v-else-if="field.type === 'date'"
                   v-model="item[field.ref]"
                   :label="$t(field.label)"
-                  date-only
                   inline
                 />
                 <FormCheckbox
@@ -909,6 +930,7 @@
                   v-model.number="item[field.ref]"
                   type="number"
                   step="any"
+                  :min="field.min"
                   :label="$t(field.label)"
                   inline
                 />
@@ -916,7 +938,6 @@
                   v-else-if="field.type === 'date'"
                   v-model="item[field.ref]"
                   :label="$t(field.label)"
-                  date-only
                   inline
                 />
                 <FormCheckbox
@@ -958,6 +979,7 @@
                   v-model.number="item[field.ref]"
                   type="number"
                   step="any"
+                  :min="field.min"
                   :label="$t(field.label)"
                   inline
                 />
@@ -965,7 +987,6 @@
                   v-else-if="field.type === 'date'"
                   v-model="item[field.ref]"
                   :label="$t(field.label)"
-                  date-only
                   inline
                 />
                 <FormCheckbox
@@ -1007,6 +1028,7 @@
                   v-model.number="item[field.ref]"
                   type="number"
                   step="any"
+                  :min="field.min"
                   :label="$t(field.label)"
                   inline
                 />
@@ -1014,7 +1036,6 @@
                   v-else-if="field.type === 'date'"
                   v-model="item[field.ref]"
                   :label="$t(field.label)"
-                  date-only
                   inline
                 />
                 <FormCheckbox
