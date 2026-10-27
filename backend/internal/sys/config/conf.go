@@ -157,11 +157,11 @@ type DebugConf struct {
 }
 
 type WebConfig struct {
-	Port          string        `yaml:"port"            conf:"default:7745"`
-	Host          string        `yaml:"host"`
+	Port string `yaml:"port"            conf:"default:7745"`
+	Host string `yaml:"host"`
 	// MaxUploadSize is the body cap (in MB) applied to ordinary upload
 	// endpoints (attachments, item imports, etc.). Defaults to 10 MB.
-	MaxUploadSize int64         `yaml:"max_file_upload" conf:"default:10"`
+	MaxUploadSize int64 `yaml:"max_file_upload" conf:"default:10"`
 	// MaxImportSize is the body cap (in MB) for collection-restore uploads
 	// (POST /v1/group/import). Set independently because a full collection
 	// backup including attachments can be much larger than a single asset
@@ -177,14 +177,13 @@ type WebConfig struct {
 }
 
 type LabelMakerConf struct {
-	Width                 int64          `yaml:"width"                 conf:"default:526"`
-	Height                int64          `yaml:"height"                conf:"default:200"`
-	Padding               int64          `yaml:"padding"               conf:"default:32"`
-	Margin                int64          `yaml:"margin"                conf:"default:32"`
-	FontSize              float64        `yaml:"font_size"             conf:"default:32.0"`
+	// TapeWidth and Length are the size of a label in mm: the width of the
+	// continuous tape and the length the printer cuts after.
+	TapeWidth             float64        `yaml:"tape_width"            conf:"default:62"`
+	Length                float64        `yaml:"length"                conf:"default:24"`
+	Dpi                   float64        `yaml:"dpi"                   conf:"default:300"`
 	PrintCommand          *string        `yaml:"string"`
 	AdditionalInformation *string        `yaml:"string"`
-	DynamicLength         bool           `yaml:"bool"                  conf:"default:true"`
 	LabelServiceUrl       *string        `yaml:"label_service_url"`
 	LabelServiceTimeout   *time.Duration `yaml:"label_service_timeout"`
 	RegularFontPath       *string        `yaml:"regular_font_path"`

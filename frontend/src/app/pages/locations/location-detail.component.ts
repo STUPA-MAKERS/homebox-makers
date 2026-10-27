@@ -11,7 +11,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
-import { CollectionService } from '@core/collection/collection.service';
 import type { EntityOut, EntityPath, EntitySummary } from '@core/api/models';
 import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
@@ -43,6 +42,7 @@ import { AttachmentsPanelComponent } from '../../features/attachments/attachment
 import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';
 import { EditDrawerService } from '../../features/edit/edit-drawer.service';
+import { LabelViewerComponent } from '../../features/labels/label-viewer.component';
 
 const PAGE_SIZE = 30;
 
@@ -55,6 +55,7 @@ const PAGE_SIZE = 30;
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    LabelViewerComponent,
     RouterLink,
     TranslatePipe,
     SheetBarComponent,
@@ -85,7 +86,6 @@ export class LocationDetailComponent {
   private readonly toast = inject(ToastService);
   private readonly title = inject(AppTitleStrategy);
   private readonly createSvc = inject(CreateService);
-  private readonly collections = inject(CollectionService);
   private readonly ref = inject(RefDataService);
   private readonly editor = inject(EditDrawerService);
   private readonly page = inject(LIST_PAGE_STATE, { optional: true });
@@ -101,6 +101,7 @@ export class LocationDetailComponent {
   readonly notFound = signal(false);
   readonly error = signal(false);
   readonly confirmDelete = signal(false);
+  readonly labelOpen = signal(false);
   readonly busy = signal(false);
 
   readonly items = signal<EntitySummary[]>([]);
@@ -222,7 +223,7 @@ export class LocationDetailComponent {
         this.createSvc.open({ kind: 'item', parentId: loc.id });
         break;
       case 'label':
-        window.open(this.api.labelUrl(loc.id, this.collections.selectedId()), '_blank', 'noopener');
+        this.labelOpen.set(true);
         break;
       case 'delete':
         this.confirmDelete.set(true);

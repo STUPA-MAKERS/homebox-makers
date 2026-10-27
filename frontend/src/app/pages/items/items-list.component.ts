@@ -15,7 +15,6 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterOutlet } from '@angular/router';
-import { CollectionService } from '@core/collection/collection.service';
 import { errorMessage } from '@shared/http-error';
 import { Subject, debounceTime, switchMap, catchError, of, tap } from 'rxjs';
 import { ApiClient } from '@core/api/api-client.service';
@@ -52,6 +51,7 @@ import {
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
 import { EditDrawerService } from '../../features/edit/edit-drawer.service';
+import { LabelViewerComponent, type LabelTarget } from '../../features/labels/label-viewer.component';
 
 const PAGE_SIZE = 30;
 
@@ -76,6 +76,7 @@ const SORTS: readonly { value: string; key: TranslationKey }[] = [
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    LabelViewerComponent,
     TranslatePipe,
     IconComponent,
     PageHeaderComponent,
@@ -109,10 +110,12 @@ export class ItemsListComponent {
   private readonly createSvc = inject(CreateService);
   private readonly toast = inject(ToastService);
   private readonly editor = inject(EditDrawerService);
-  private readonly collections = inject(CollectionService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly ref = inject(RefDataService);
+  /** The item whose label the label viewer shows. */
+  readonly labelTarget = signal<LabelTarget | null>(null);
+  readonly labelOpen = signal(false);
 
   private readonly layout = viewChild(ListDetailLayoutComponent);
   private readonly panes = injectListDetailPage(this.layout);
@@ -368,7 +371,8 @@ export class ItemsListComponent {
           });
         break;
       case 'label':
-        window.open(this.api.labelUrl(item.id, this.collections.selectedId()), '_blank', 'noopener');
+        this.labelTarget.set(item);
+        this.labelOpen.set(true);
         break;
       case 'archive':
         this.api.entity(item.id).pipe(

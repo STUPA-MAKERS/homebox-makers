@@ -11,7 +11,6 @@ import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiClient } from '@core/api/api-client.service';
-import { CollectionService } from '@core/collection/collection.service';
 import type { EntityOut, EntityPath, EntitySummary } from '@core/api/models';
 import { I18nService } from '@core/i18n/i18n.service';
 import { LocalizedDatePipe, apiDate } from '@core/i18n/localized-date.pipe';
@@ -49,6 +48,7 @@ import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';
 import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-log.component';
+import { LabelViewerComponent } from '../../features/labels/label-viewer.component';
 
 /**
  * One item: the photos, the facts (identification, purchase, warranty, sale), the custom
@@ -60,6 +60,7 @@ import { MaintenanceLogComponent } from '../../features/maintenance/maintenance-
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    LabelViewerComponent,
     RouterLink,
     TranslatePipe,
     LocalizedDatePipe,
@@ -95,7 +96,6 @@ export class ItemDetailComponent {
   private readonly toast = inject(ToastService);
   private readonly title = inject(AppTitleStrategy);
   private readonly createSvc = inject(CreateService);
-  private readonly collections = inject(CollectionService);
   private readonly url = injectAttachmentUrl();
   private readonly editor = inject(EditDrawerService);
   private readonly page = inject(LIST_PAGE_STATE, { optional: true });
@@ -124,6 +124,7 @@ export class ItemDetailComponent {
   readonly busy = signal(false);
   readonly viewerOpen = signal(false);
   readonly viewerIndex = signal(0);
+  readonly labelOpen = signal(false);
 
   readonly photos = computed(() => {
     const item = this.item();
@@ -253,11 +254,7 @@ export class ItemDetailComponent {
         this.createSvc.open({ kind: 'item', parentId: current.id });
         break;
       case 'label':
-        window.open(
-          this.api.labelUrl(current.id, this.collections.selectedId()),
-          '_blank',
-          'noopener',
-        );
+        this.labelOpen.set(true);
         break;
       case 'archive':
         this.toggleArchive(current);

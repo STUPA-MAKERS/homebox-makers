@@ -154,5 +154,7 @@
       (confirm)="delete()"
       (cancel)="confirmDelete.set(false)"
     />
+
+    <app-label-viewer [target]="loc" [(open)]="labelOpen" />
   }
 </div>

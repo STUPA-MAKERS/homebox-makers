@@ -1,14 +1,13 @@
-// Package labelmaker provides functionality for generating and printing labels for items, locations and assets stored in Homebox
+// Package labelmaker provides functionality for generating and printing labels for items, locations and assets stored in Homebox.
+// The labels follow the STUPA MAKERS inventory label, see makers_label.go.
 package labelmaker
 
 import (
 	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
 	"image/png"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,13 +18,8 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
-	"github.com/skip2/go-qrcode"
 	"github.com/sysadminsmedia/homebox/backend/internal/sys/config"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/gofont/gobold"
-	"golang.org/x/image/font/gofont/gomedium"
 )
 
 type FontType int
@@ -35,119 +29,72 @@ const (
 	FontTypeBold
 )
 
+// GenerateParameters holds the size and the content of one label. Lengths are
+// in mm; Width and Height are the size of the image in pixels at Dpi.
 type GenerateParameters struct {
+	TapeWidth             float64
+	Length                float64
+	Dpi                   float64
 	Width                 int
 	Height                int
-	QrSize                int
-	Margin                int
-	ComponentPadding      int
 	TitleText             string
-	TitleFontSize         float64
 	DescriptionText       string
-	DescriptionFontSize   float64
+	Maker                 string
+	Model                 string
+	AssetID               string
 	AdditionalInformation *string
-	Dpi                   float64
 	URL                   string
-	DynamicLength         bool
 }
 
 func (p *GenerateParameters) Validate() error {
-	if p.Width <= 0 {
-		return fmt.Errorf("invalid width")
+	if p.TapeWidth <= 0 {
+		return fmt.Errorf("invalid tape width")
 	}
-	if p.Height <= 0 {
-		return fmt.Errorf("invalid height")
+	if p.Length < minLength {
+		return fmt.Errorf("invalid length: a label must be at least %.0f mm long", minLength)
 	}
-	if p.Margin < 0 {
-		return fmt.Errorf("invalid margin")
-	}
-	if p.ComponentPadding < 0 {
-		return fmt.Errorf("invalid component padding")
+	if p.Dpi <= 0 {
+		return fmt.Errorf("invalid dpi")
 	}
 	return nil
 }
 
-func NewGenerateParams(width int, height int, margin int, padding int, fontSize float64, title string, description string, url string, dynamicLength bool, additionalInformation *string) GenerateParameters {
+// LabelContent is the text of a label.
+type LabelContent struct {
+	// Title is what the item is, on the first line of the box.
+	Title string
+	// Description is the text below the title. Empty leaves room for notes by
+	// hand.
+	Description string
+	// Maker and Model are in the black bar.
+	Maker string
+	Model string
+	// AssetID is below the QR code.
+	AssetID string
+	// URL is the content of the QR code.
+	URL string
+}
+
+func NewGenerateParams(tapeWidth float64, length float64, dpi float64, content LabelContent, additionalInformation *string) GenerateParameters {
 	return GenerateParameters{
-		Width:                 width,
-		Height:                height,
-		QrSize:                height - (padding * 2),
-		Margin:                margin,
-		ComponentPadding:      padding,
-		TitleText:             title,
-		DescriptionText:       description,
-		TitleFontSize:         fontSize,
-		DescriptionFontSize:   fontSize * 0.8,
-		Dpi:                   72,
-		URL:                   url,
+		TapeWidth:             tapeWidth,
+		Length:                length,
+		Dpi:                   dpi,
+		Width:                 int(math.Round(tapeWidth * dpi / 25.4)),
+		Height:                int(math.Round(length * dpi / 25.4)),
+		TitleText:             content.Title,
+		DescriptionText:       content.Description,
+		Maker:                 content.Maker,
+		Model:                 content.Model,
+		AssetID:               content.AssetID,
 		AdditionalInformation: additionalInformation,
-		DynamicLength:         dynamicLength,
+		URL:                   content.URL,
 	}
 }
 
-func measureString(text string, face font.Face, ctx *freetype.Context) int {
-	width := 0
-	for _, r := range text {
-		awidth, _ := face.GlyphAdvance(r)
-		width += awidth.Round()
-	}
-	return ctx.PointToFixed(float64(width)).Round()
-}
-
-func wrapText(text string, face font.Face, maxWidth int, maxHeight int, lineHeight int, ctx *freetype.Context) ([]string, string) {
-	lines := strings.Split(text, "\n")
-	unlimitedHeight := maxHeight == -1
-	var wrappedLines []string
-	currentHeight := 0
-	processedChars := 0
-
-	for _, line := range lines {
-		words := strings.Fields(line)
-		if len(words) == 0 {
-			wrappedLines = append(wrappedLines, "")
-			processedChars += 1
-			if !unlimitedHeight {
-				currentHeight += lineHeight
-				if currentHeight > maxHeight {
-					return wrappedLines[:len(wrappedLines)-1], text[min(processedChars, len(text)):]
-				}
-			}
-			continue
-		}
-
-		currentLine := words[0]
-		for _, word := range words[1:] {
-			testLine := currentLine + " " + word
-			width := measureString(testLine, face, ctx)
-
-			if width <= maxWidth {
-				currentLine = testLine
-			} else {
-				wrappedLines = append(wrappedLines, currentLine)
-				processedChars += len(currentLine) + 1
-				if !unlimitedHeight {
-					currentHeight += lineHeight
-					if currentHeight > maxHeight {
-						return wrappedLines[:len(wrappedLines)-1], text[processedChars-len(currentLine)-1:]
-					}
-				}
-				currentLine = word
-			}
-		}
-
-		wrappedLines = append(wrappedLines, currentLine)
-		processedChars += len(currentLine) + 1
-		if !unlimitedHeight {
-			currentHeight += lineHeight
-			if currentHeight > maxHeight {
-				return wrappedLines[:len(wrappedLines)-1], text[processedChars-len(currentLine)-1:]
-			}
-		}
-	}
-
-	return wrappedLines, ""
-}
-
+// loadFont loads the regular or the bold monospaced font of the label. The
+// configured font paths replace the embedded DejaVu Sans Mono, for example for
+// CJK text.
 func loadFont(cfg *config.Config, fontType FontType) (*truetype.Font, error) {
 	var fontPath *string
 	var fallbackData []byte
@@ -157,12 +104,12 @@ func loadFont(cfg *config.Config, fontType FontType) (*truetype.Font, error) {
 		if cfg != nil && cfg.LabelMaker.RegularFontPath != nil {
 			fontPath = cfg.LabelMaker.RegularFontPath
 		}
-		fallbackData = gomedium.TTF
+		fallbackData = monoTTF
 	case FontTypeBold:
 		if cfg != nil && cfg.LabelMaker.BoldFontPath != nil {
 			fontPath = cfg.LabelMaker.BoldFontPath
 		}
-		fallbackData = gobold.TTF
+		fallbackData = monoBoldTTF
 	default:
 		return nil, fmt.Errorf("unknown font type: %d", fontType)
 	}
@@ -202,140 +149,25 @@ func GenerateLabel(w io.Writer, params *GenerateParameters, cfg *config.Config) 
 		return fetchLabelFromURL(w, *cfg.LabelMaker.LabelServiceUrl, params, cfg)
 	}
 
-	bodyText := params.DescriptionText
-	if params.AdditionalInformation != nil {
-		bodyText = bodyText + "\n" + *params.AdditionalInformation
-	}
-
-	// Create QR code
-	qr, err := qrcode.New(params.URL, qrcode.Medium)
-	if err != nil {
+	var fonts labelFonts
+	var err error
+	if fonts.mono, err = loadFont(cfg, FontTypeRegular); err != nil {
 		return err
 	}
-	qr.DisableBorder = true
-	qrImage := qr.Image(params.QrSize)
-
-	regularFont, err := loadFont(cfg, FontTypeRegular)
-	if err != nil {
+	if fonts.monoBold, err = loadFont(cfg, FontTypeBold); err != nil {
+		return err
+	}
+	// The asset id is ASCII, so it always uses the embedded font.
+	if fonts.sansBold, err = truetype.Parse(sansBoldTTF); err != nil {
 		return err
 	}
 
-	boldFont, err := loadFont(cfg, FontTypeBold)
+	img, err := renderMakersLabel(params, fonts)
 	if err != nil {
 		return err
-	}
-
-	regularFace := truetype.NewFace(regularFont, &truetype.Options{
-		Size: params.DescriptionFontSize,
-		DPI:  params.Dpi,
-	})
-	boldFace := truetype.NewFace(boldFont, &truetype.Options{
-		Size: params.TitleFontSize,
-		DPI:  params.Dpi,
-	})
-
-	// Calculate text area dimensions
-	maxWidth := params.Width - (params.Margin * 2) - params.ComponentPadding
-
-	// Create temporary contexts for text measurement
-	tmpImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
-	boldContext := createContext(boldFont, params.TitleFontSize, tmpImg, params.Dpi)
-	regularContext := createContext(regularFont, params.DescriptionFontSize, tmpImg, params.Dpi)
-
-	// Calculate total height needed
-	totalHeight := params.Margin
-	titleLineSpacing := boldContext.PointToFixed(params.TitleFontSize).Round()
-
-	titleLines, _ := wrapText(params.TitleText, boldFace, maxWidth-params.QrSize, -1, titleLineSpacing, boldContext)
-	titleHeight := titleLineSpacing * len(titleLines)
-	totalHeight += titleHeight
-
-	totalHeight += params.ComponentPadding / 4
-
-	regularLineSpacing := regularContext.PointToFixed(params.DescriptionFontSize).Round()
-	descriptionLinesRight, descriptionRemaining := wrapText(bodyText, regularFace, maxWidth-params.QrSize, params.QrSize-titleHeight, regularLineSpacing, regularContext)
-	totalHeight += regularLineSpacing * len(descriptionLinesRight)
-
-	var textYBottomText int
-	var descriptionLinesBottom []string
-	hasBottomText := descriptionRemaining != ""
-	if hasBottomText {
-		totalHeight = max(params.Margin+params.QrSize+params.ComponentPadding/2, totalHeight)
-		textYBottomText = totalHeight
-		descriptionLinesBottom, _ = wrapText(descriptionRemaining, regularFace, maxWidth, -1, regularLineSpacing, regularContext)
-		totalHeight += regularLineSpacing * len(descriptionLinesBottom)
-		totalHeight += params.Margin
-	}
-
-	var requiredHeight int
-	if params.DynamicLength {
-		requiredHeight = max(totalHeight, params.QrSize+(params.Margin*2))
-	} else {
-		requiredHeight = params.Height
-	}
-
-	// Create the actual image with calculated height
-	bounds := image.Rect(0, 0, params.Width, requiredHeight)
-	img := image.NewRGBA(bounds)
-	draw.Draw(img, bounds, &image.Uniform{C: color.White}, image.Point{}, draw.Src)
-
-	// Draw QR code onto the image
-	draw.Draw(img,
-		image.Rect(params.Margin, params.Margin, params.QrSize+params.Margin, params.QrSize+params.Margin),
-		qrImage,
-		image.Point{},
-		draw.Over)
-
-	// Create final drawing contexts
-	boldContext = createContext(boldFont, params.TitleFontSize, img, params.Dpi)
-	regularContext = createContext(regularFont, params.DescriptionFontSize, img, params.Dpi)
-
-	textXRight := params.Margin + params.ComponentPadding + params.QrSize
-	textY := params.Margin - 8
-
-	// Draw title
-	for _, line := range titleLines {
-		pt := freetype.Pt(textXRight, textY+titleLineSpacing)
-		if _, err = boldContext.DrawString(line, pt); err != nil {
-			return err
-		}
-		textY += titleLineSpacing
-	}
-
-	// Draw description right from QR Code
-	textY += params.ComponentPadding / 4
-	for _, line := range descriptionLinesRight {
-		pt := freetype.Pt(textXRight, textY+regularLineSpacing)
-		if _, err = regularContext.DrawString(line, pt); err != nil {
-			return err
-		}
-		textY += regularLineSpacing
-	}
-
-	// Draw description below QR Code
-	if hasBottomText {
-		for _, line := range descriptionLinesBottom {
-			pt := freetype.Pt(params.Margin, textYBottomText+regularLineSpacing)
-			if _, err = regularContext.DrawString(line, pt); err != nil {
-				return err
-			}
-			textYBottomText += regularLineSpacing
-		}
 	}
 
 	return png.Encode(w, img)
-}
-
-// Helper function to create freetype context
-func createContext(font *truetype.Font, size float64, img *image.RGBA, dpi float64) *freetype.Context {
-	c := freetype.NewContext()
-	c.SetDPI(dpi)
-	c.SetFont(font)
-	c.SetFontSize(size)
-	c.SetClip(img.Bounds())
-	c.SetDst(img)
-	c.SetSrc(image.NewUniform(color.Black))
-	return c
 }
 
 // fetchLabelFromURL fetches an image from the specified URL and writes it to the writer
@@ -350,16 +182,15 @@ func fetchLabelFromURL(w io.Writer, serviceURL string, params *GenerateParameter
 	query := url.Values{}
 	query.Set("Width", fmt.Sprintf("%d", params.Width))
 	query.Set("Height", fmt.Sprintf("%d", params.Height))
-	query.Set("QrSize", fmt.Sprintf("%d", params.QrSize))
-	query.Set("Margin", fmt.Sprintf("%d", params.Margin))
-	query.Set("ComponentPadding", fmt.Sprintf("%d", params.ComponentPadding))
-	query.Set("TitleText", params.TitleText)
-	query.Set("TitleFontSize", fmt.Sprintf("%f", params.TitleFontSize))
-	query.Set("DescriptionText", params.DescriptionText)
-	query.Set("DescriptionFontSize", fmt.Sprintf("%f", params.DescriptionFontSize))
+	query.Set("TapeWidth", fmt.Sprintf("%f", params.TapeWidth))
+	query.Set("Length", fmt.Sprintf("%f", params.Length))
 	query.Set("Dpi", fmt.Sprintf("%f", params.Dpi))
+	query.Set("TitleText", params.TitleText)
+	query.Set("DescriptionText", params.DescriptionText)
+	query.Set("Maker", params.Maker)
+	query.Set("Model", params.Model)
+	query.Set("AssetID", params.AssetID)
 	query.Set("URL", params.URL)
-	query.Set("DynamicLength", fmt.Sprintf("%t", params.DynamicLength))
 
 	// Add AdditionalInformation if it exists
 	if params.AdditionalInformation != nil {
@@ -501,17 +332,16 @@ func PrintLabel(cfg *config.Config, params *GenerateParameters) error {
 		"FileName":              f.Name(),
 		"Width":                 fmt.Sprintf("%d", params.Width),
 		"Height":                fmt.Sprintf("%d", params.Height),
-		"QrSize":                fmt.Sprintf("%d", params.QrSize),
-		"Margin":                fmt.Sprintf("%d", params.Margin),
-		"ComponentPadding":      fmt.Sprintf("%d", params.ComponentPadding),
-		"TitleText":             params.TitleText,
-		"TitleFontSize":         fmt.Sprintf("%f", params.TitleFontSize),
-		"DescriptionText":       params.DescriptionText,
-		"DescriptionFontSize":   fmt.Sprintf("%f", params.DescriptionFontSize),
-		"AdditionalInformation": additionalInformation,
+		"TapeWidth":             fmt.Sprintf("%f", params.TapeWidth),
+		"Length":                fmt.Sprintf("%f", params.Length),
 		"Dpi":                   fmt.Sprintf("%f", params.Dpi),
+		"TitleText":             params.TitleText,
+		"DescriptionText":       params.DescriptionText,
+		"Maker":                 params.Maker,
+		"Model":                 params.Model,
+		"AssetID":               params.AssetID,
+		"AdditionalInformation": additionalInformation,
 		"URL":                   params.URL,
-		"DynamicLength":         fmt.Sprintf("%t", params.DynamicLength),
 	}
 
 	// SECURITY: split the admin-configured command into argv tokens *before*
