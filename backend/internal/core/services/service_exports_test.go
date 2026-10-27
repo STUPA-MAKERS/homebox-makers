@@ -563,8 +563,7 @@ func TestImportRejectsForeignKeyOutsideArchive(t *testing.T) {
 			require.NoError(t, err)
 
 			err = tSvc.Exports.runImport(ctx, dst.ID, tUser.ID, impRow.ID, importKey)
-			require.Error(t, err, "import pointing at another group's row must fail")
-			assert.ErrorContains(t, err, "not part of this export")
+			require.ErrorContains(t, err, "not part of this export", "import pointing at another group's row must fail")
 
 			// The tx rolled back: nothing from the archive landed in dst and no
 			// row anywhere references the victim's location.

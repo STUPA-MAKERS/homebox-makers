@@ -27,8 +27,8 @@ var (
 	// the account. Callers that need a longer-lived key pass ExpiresAt.
 	defaultAPIKeyTTL          = time.Hour * 24 * 30
 	passwordResetTokenTTL     = time.Hour
-	ErrorInvalidLogin = errors.New("invalid username or password")
-	ErrorInvalidToken = errors.New("invalid token")
+	ErrorInvalidLogin         = errors.New("invalid username or password")
+	ErrorInvalidToken         = errors.New("invalid token")
 	ErrorMailerNotConfigured  = errors.New("password reset by email is unavailable: SMTP is not configured")
 	ErrorPasswordResetInvalid = errors.New("password reset link is invalid or has expired")
 	ErrorPasswordTooShort     = fmt.Errorf("password must be at least %d characters", PasswordMinLength)
@@ -40,7 +40,7 @@ var (
 const PasswordMinLength = 6
 
 type UserService struct {
-	repos *repo.AllRepos
+	repos  *repo.AllRepos
 	mailer *mailer.Mailer
 }
 
@@ -883,7 +883,7 @@ func (svc *UserService) EnsureUserPassword(ctx context.Context, email, password 
 			return cerr
 		}
 		span.SetAttributes(attribute.String("ensure.outcome", "rehashed"))
-	return nil
+		return nil
 	}
 	span.SetAttributes(attribute.String("ensure.outcome", "noop_match"))
 	return nil

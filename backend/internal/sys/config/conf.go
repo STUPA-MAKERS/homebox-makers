@@ -157,11 +157,11 @@ type DebugConf struct {
 }
 
 type WebConfig struct {
-	Port          string        `yaml:"port"            conf:"default:7745"`
-	Host          string        `yaml:"host"`
+	Port string `yaml:"port" conf:"default:7745"`
+	Host string `yaml:"host"`
 	// MaxUploadSize is the body cap (in MB) applied to ordinary upload
 	// endpoints (attachments, item imports, etc.). Defaults to 10 MB.
-	MaxUploadSize int64         `yaml:"max_file_upload" conf:"default:10"`
+	MaxUploadSize int64 `yaml:"max_file_upload" conf:"default:10"`
 	// MaxImportSize is the body cap (in MB) for collection-restore uploads
 	// (POST /v1/group/import). Set independently because a full collection
 	// backup including attachments can be much larger than a single asset
@@ -220,7 +220,7 @@ func (c OIDCConf) MarshalJSON() ([]byte, error) {
 }
 
 type BarcodeAPIConf struct {
-	TokenBarcodespider string `yaml:"token_barcodespider"`
+	TokenBarcodespider   string `yaml:"token_barcodespider"`
 	OpenFoodFactsContact string `yaml:"openfoodfacts_contact"`
 }
 
