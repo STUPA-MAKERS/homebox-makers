@@ -16,7 +16,6 @@ import { LocalizedDatePipe } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import type { TranslationKey } from '@core/i18n/translations';
 import { errorMessage } from '@shared/http-error';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
   ButtonLinkComponent,
@@ -28,6 +27,7 @@ import {
   IconComponent,
   type IconName,
   NoteComponent,
+  PageHeaderComponent,
   StatusTextComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';

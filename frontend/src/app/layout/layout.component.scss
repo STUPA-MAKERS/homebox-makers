@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+// The public pages (login, registration) centre a single card on the page background.
+app-shell ::ng-deep .frame--public .main {
+  justify-content: center;
+}

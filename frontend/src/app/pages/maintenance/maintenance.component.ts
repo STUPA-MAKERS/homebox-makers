@@ -17,19 +17,17 @@ import { apiDate } from '@core/i18n/localized-date.pipe';
 import type { TranslationKey } from '@core/i18n/translations';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { errorMessage } from '@shared/http-error';
-import { injectListDetailPage } from '@shared/list-detail-page';
-import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
-import { FabComponent } from '@shared/ui/fab/fab.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ConfirmDialogComponent,
   DateBlockComponent,
   EmptyStateComponent,
+  FabComponent,
   FilterSelectComponent,
   type FilterSelectOption,
   ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
+  PageHeaderComponent,
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
@@ -39,6 +37,7 @@ import {
   StickyBarComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
+import { injectListDetailPage, LIST_PAGE_STATE } from '@stupa-makers/ui-kit/shell';
 import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 import {
   MAINTENANCE_PAGE,

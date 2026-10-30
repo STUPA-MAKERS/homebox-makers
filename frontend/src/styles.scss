@@ -1,5 +1,5 @@
-// The design system of the kit: fonts, tokens, base reset, skeletons, row groups and the
-// list/detail geometry (vendor/ui-kit/src/styles/index.scss).
+// The design system of the kit: fonts, tokens, base reset, skeletons, row groups, the
+// list/detail geometry and the motion (vendor/ui-kit/src/styles/index.scss).
 @use 'index';
 @use 'breakpoints' as bp;
 
@@ -325,124 +325,19 @@ app-list-detail .page {
   color: var(--color-text-muted);
 }
 
-// The motion utilities of STUPA-Workflow, for `animate.enter` / `animate.leave`.
-.motion-pop-in {
-  animation: motion-pop-in var(--motion-fast) var(--ease-enter);
-}
-.motion-rise-in {
-  animation: motion-rise-in var(--motion-base) var(--ease-enter);
-}
-.motion-fade-in {
-  animation: motion-fade-in var(--motion-base) var(--ease-standard);
-}
-.motion-fade-out {
-  pointer-events: none;
-  animation: motion-fade-out var(--motion-xs) var(--ease-exit) forwards;
-}
-@keyframes motion-pop-in {
-  from {
-    opacity: 0;
-    scale: var(--motion-scale-in);
-  }
-}
-@keyframes motion-rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(var(--motion-shift-sm));
-  }
-}
-@keyframes motion-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-@keyframes motion-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-// Route transitions (STUPA-Workflow, `core/motion/motion.ts`): a fade between the sections of
-// the rail, a slide one level deeper or back on a phone.
-// The page moves as the root snapshot, not as a group of `.main`, because `.main` moves with the
-// document scroll and its own group would morph from the old box to the new one. The frame gets
-// groups of its own, so it stays still.
-:root[data-motion] .frame__rail {
-  view-transition-name: rail;
-}
-// A group of its own, so the moving page never paints over the bottom bar.
-:root[data-motion] .bb {
-  view-transition-name: bottom-bar;
-}
-:root[data-motion]::view-transition {
-  background: var(--color-bg);
-}
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--motion-base);
-  animation-timing-function: var(--ease-standard);
-}
-// The rail does not crossfade: its old and new pictures are the same but for the active
-// entry, and a crossfade of the half transparent snapshots showed garbage on some GPUs. The
-// new picture shows at once on an opaque ground.
+// The rail keeps the motion of this app: no cross-fade during a route transition. Its old and
+// new pictures are the same but for the active entry, and a cross-fade of the half transparent
+// snapshots showed garbage on some GPUs. The new picture shows at once on an opaque ground. The
+// motion classes and the other route transitions come from the kit (`motion.scss`).
 :root[data-motion] .frame__rail {
   background: var(--color-bg);
 }
-::view-transition-old(rail),
-::view-transition-old(bottom-bar) {
+::view-transition-old(rail) {
   display: none;
 }
 ::view-transition-group(rail),
-::view-transition-new(rail),
-::view-transition-group(bottom-bar),
-::view-transition-new(bottom-bar) {
+::view-transition-new(rail) {
   animation: none;
-}
-:root[data-motion='section']::view-transition-old(root) {
-  animation: vt-fade-out var(--motion-xs) var(--ease-exit) both;
-}
-:root[data-motion='section']::view-transition-new(root) {
-  animation: vt-rise-in var(--motion-base) var(--ease-enter) var(--motion-xs) both;
-}
-:root[data-motion='push']::view-transition-old(root) {
-  animation: vt-recede var(--motion-slow) var(--ease-standard) both;
-}
-:root[data-motion='push']::view-transition-new(root) {
-  animation: vt-from-end var(--motion-slow) var(--ease-standard) both;
-}
-:root[data-motion='pop']::view-transition-old(root) {
-  z-index: 1;
-  animation: vt-to-end var(--motion-base) var(--ease-exit) both;
-}
-:root[data-motion='pop']::view-transition-new(root) {
-  animation: vt-recede var(--motion-base) var(--ease-standard) reverse both;
-}
-@keyframes vt-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-@keyframes vt-rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(var(--motion-shift-sm));
-  }
-}
-@keyframes vt-recede {
-  to {
-    opacity: 0.6;
-    transform: translateX(-25%);
-  }
-}
-@keyframes vt-from-end {
-  from {
-    transform: translateX(100%);
-  }
-}
-@keyframes vt-to-end {
-  to {
-    transform: translateX(100%);
-  }
 }
 
 // The trailing slot of a list row sits above the stretched title link. Only its controls

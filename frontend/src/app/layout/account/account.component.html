@@ -1,0 +1,33 @@
+<app-account-menu
+  #menu
+  [variant]="variant()"
+  [name]="displayName()"
+  [languages]="languages"
+  [language]="i18n.locale()"
+  [dark]="theme.resolved() === 'dark'"
+  (languageChange)="setLocale($event)"
+  (darkChange)="setDark($event)"
+  (logout)="logout()"
+  (navigated)="navigated.emit()"
+>
+  <ng-container accountItems>
+    <!-- On a desktop the rail switches the collection; the phone has no rail. -->
+    @if (menu.look() === 'sheet' && collectionOptions().length > 1) {
+      <div class="am__collection">
+        <app-select
+          [label]="'collection.switch' | t"
+          [options]="collectionOptions()"
+          [clearable]="false"
+          [value]="collections.selectedId() ?? ''"
+          (valueChange)="switchCollection($event)"
+        />
+      </div>
+    }
+    <a class="am__item" routerLink="/profile">
+      <app-icon name="user" [size]="19" />{{ 'nav.profile' | t }}
+    </a>
+    <a class="am__item" routerLink="/collection">
+      <app-icon name="gear" [size]="19" />{{ 'nav.collection' | t }}
+    </a>
+  </ng-container>
+</app-account-menu>

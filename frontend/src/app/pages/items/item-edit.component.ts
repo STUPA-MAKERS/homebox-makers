@@ -20,21 +20,21 @@ import { CustomFieldsEditorComponent } from '../../features/fields/custom-fields
 import { errorMessage } from '@shared/http-error';
 import { ItemPickerComponent } from '@shared/ui/item-picker/item-picker.component';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
-import { FabComponent } from '@shared/ui/fab/fab.component';
 import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
 import {
   ButtonComponent,
   CheckboxComponent,
   CurrencyInputComponent,
   DatepickerComponent,
+  FabComponent,
   IconComponent,
   InputComponent,
   NoteComponent,
   SelectFieldComponent,
   type SelectFieldOption,
-  SkeletonComponent,
   SheetBarComponent,
   SheetBarTitleDirective,
+  SkeletonComponent,
   TextareaComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';

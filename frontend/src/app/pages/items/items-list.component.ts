@@ -23,16 +23,13 @@ import { RefDataService } from '@core/data/ref-data.service';
 import { I18nService } from '@core/i18n/i18n.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import type { TranslationKey } from '@core/i18n/translations';
-import { injectListDetailPage } from '@shared/list-detail-page';
-import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { FabComponent } from '@shared/ui/fab/fab.component';
 import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
   ButtonComponent,
   ConfirmDialogComponent,
   EmptyStateComponent,
+  FabComponent,
   FilterSelectComponent,
   type FilterSelectOption,
   IconComponent,
@@ -40,6 +37,7 @@ import {
   ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
+  PageHeaderComponent,
   RowMenuComponent,
   type RowMenuItem,
   type RowMenuSection,
@@ -49,6 +47,7 @@ import {
   StickyBarComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
+import { injectListDetailPage, LIST_PAGE_STATE } from '@stupa-makers/ui-kit/shell';
 import { CreateService } from '../../features/create/create.service';
 import { EditDrawerService } from '../../features/edit/edit-drawer.service';
 import { LabelViewerComponent, type LabelTarget } from '../../features/labels/label-viewer.component';

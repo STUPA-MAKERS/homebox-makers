@@ -6,11 +6,11 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { apiDate } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { errorMessage } from '@shared/http-error';
-import { FabComponent } from '@shared/ui/fab/fab.component';
 import {
   ButtonComponent,
   CurrencyInputComponent,
   DatepickerComponent,
+  FabComponent,
   IconComponent,
   InputComponent,
   NoteComponent,

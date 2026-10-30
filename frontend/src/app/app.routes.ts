@@ -2,10 +2,10 @@ import { inject } from '@angular/core';
 import { Router, type Routes } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { authGuard, guestGuard } from '@core/auth/auth.guard';
-import { ShellComponent } from './layout/shell.component';
+import { LayoutComponent } from './layout/layout.component';
 
 /**
- * Routing. Every route sits under `ShellComponent` and loads its page lazily. `authGuard`
+ * Routing. Every route sits under `LayoutComponent` and loads its page lazily. `authGuard`
  * protects the signed-in area, `guestGuard` sends a signed-in user past the login pages.
  * `data.title` is the i18n key of the document title. The redirects keep the URLs of the
  * former Nuxt frontend working (`/item/:id`, `/location/:id`, `/tag/:id`, `/label/:id`), so
@@ -14,7 +14,7 @@ import { ShellComponent } from './layout/shell.component';
 export const routes: Routes = [
   {
     path: '',
-    component: ShellComponent,
+    component: LayoutComponent,
     children: [
       {
         path: '',
@@ -72,7 +72,7 @@ export const routes: Routes = [
                   none: { icon: 'package', heading: 'items.none', emptyHeading: 'home.emptyItems' },
                 },
                 loadComponent: () =>
-                  import('./shared/ui/detail-none/list-none.component').then(
+                  import('@stupa-makers/ui-kit/shell').then(
                     (m) => m.ListNoneComponent,
                   ),
               },
@@ -100,7 +100,7 @@ export const routes: Routes = [
                   },
                 },
                 loadComponent: () =>
-                  import('./shared/ui/detail-none/list-none.component').then(
+                  import('@stupa-makers/ui-kit/shell').then(
                     (m) => m.ListNoneComponent,
                   ),
               },
@@ -122,7 +122,7 @@ export const routes: Routes = [
                 path: '',
                 data: { none: { icon: 'tag', heading: 'tags.pick', emptyHeading: 'tags.empty' } },
                 loadComponent: () =>
-                  import('./shared/ui/detail-none/list-none.component').then(
+                  import('@stupa-makers/ui-kit/shell').then(
                     (m) => m.ListNoneComponent,
                   ),
               },
@@ -147,7 +147,7 @@ export const routes: Routes = [
                   none: { icon: 'wrench', heading: 'maint.pick', emptyHeading: 'maint.emptyNone' },
                 },
                 loadComponent: () =>
-                  import('./shared/ui/detail-none/list-none.component').then(
+                  import('@stupa-makers/ui-kit/shell').then(
                     (m) => m.ListNoneComponent,
                   ),
               },

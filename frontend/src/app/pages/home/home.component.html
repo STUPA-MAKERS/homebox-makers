@@ -137,6 +137,6 @@
 
 @if (phone()) {
   <app-side-sheet side="bottom" [heading]="'shell.account.region' | t" [(open)]="accountOpen">
-    <app-account-menu variant="sheet" (navigated)="accountOpen.set(false)" />
+    <app-account variant="sheet" (navigated)="accountOpen.set(false)" />
   </app-side-sheet>
 }

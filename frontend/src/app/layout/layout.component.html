@@ -1,0 +1,20 @@
+<app-shell
+  [frame]="frame()"
+  [nav]="nav.shellItems()"
+  [barKeys]="barKeys"
+  [morePaths]="morePaths"
+  [brand]="brand"
+  (search)="palette.open()"
+>
+  <app-collection-switch shellRailTools />
+
+  <app-account shellAccount variant="auto" />
+
+  <app-sw-update-prompt shellPrompts />
+
+  <ng-container shellOverlays>
+    <app-create-dialog />
+    <app-edit-drawer />
+    <app-search-palette />
+  </ng-container>
+</app-shell>

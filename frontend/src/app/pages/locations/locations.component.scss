@@ -1,4 +1,4 @@
-@use '../../shared/ui/list-page' as lp;
+@use 'list-pane' as lp;
 
 @include lp.frame(loc);
 
