@@ -5,7 +5,7 @@ import type { TranslationKey } from './translations';
 
 /**
  * The texts of the kit shell that the app catalog already holds. The shell, the account
- * menu, the search palette and the update prompt show the app wording through this map.
+ * menu, the search palette and the update toast show the app wording through this map.
  * Every other kit text comes from the built-in DE/EN texts of the kit.
  */
 const APP_KEYS: Partial<Record<UiKitTextKey, TranslationKey>> = {

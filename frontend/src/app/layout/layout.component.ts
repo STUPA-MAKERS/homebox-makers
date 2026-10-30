@@ -7,7 +7,6 @@ import {
   type ShellFrame,
   ShellComponent,
 } from '@stupa-makers/ui-kit/shell';
-import { SwUpdatePromptComponent } from '@stupa-makers/ui-kit/pwa';
 import { CreateDialogComponent } from '../features/create/create-dialog.component';
 import { EditDrawerComponent } from '../features/edit/edit-drawer.component';
 import { SearchPaletteComponent } from '../features/search/search-palette.component';
@@ -33,7 +32,6 @@ import { BOTTOM_BAR_KEYS, NavService } from './nav.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ShellComponent,
-    SwUpdatePromptComponent,
     AccountComponent,
     CollectionSwitchComponent,
     CreateDialogComponent,

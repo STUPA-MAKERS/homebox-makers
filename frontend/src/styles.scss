@@ -325,21 +325,6 @@ app-list-detail .page {
   color: var(--color-text-muted);
 }
 
-// The rail keeps the motion of this app: no cross-fade during a route transition. Its old and
-// new pictures are the same but for the active entry, and a cross-fade of the half transparent
-// snapshots showed garbage on some GPUs. The new picture shows at once on an opaque ground. The
-// motion classes and the other route transitions come from the kit (`motion.scss`).
-:root[data-motion] .frame__rail {
-  background: var(--color-bg);
-}
-::view-transition-old(rail) {
-  display: none;
-}
-::view-transition-group(rail),
-::view-transition-new(rail) {
-  animation: none;
-}
-
 // The trailing slot of a list row sits above the stretched title link. Only its controls
 // (row menu, buttons) take the pointer; the space and the text around them pass the click
 // through to the row.

@@ -22,7 +22,7 @@ import { I18nService } from '@core/i18n/i18n.service';
 import type { TranslationKey } from '@core/i18n/translations';
 import { appUiKitIntl } from '@core/i18n/ui-kit-intl';
 import { AppTitleStrategy } from '@core/title/title.strategy';
-import { ThemeService, UI_KIT_INTL, loadingInterceptor, provideUiKit } from '@stupa-makers/ui-kit';
+import { ThemeService, loadingInterceptor, provideUiKit } from '@stupa-makers/ui-kit';
 import {
   LIST_NONE_TEXT,
   provideRouteMotion,
@@ -36,11 +36,11 @@ import { routes } from './app.routes';
  * The root providers of the app.
  *
  * Interceptor order: loading (outermost, measures the full duration) → tenant (adds
- * `X-Tenant`) → auth (401 and lost-tenant handling). The kit reads the locale of the app
- * through `UI_KIT_INTL`, and its `LoadingService` counts the reads for the load bar. The
- * route data of the empty list details holds catalog keys, which `LIST_NONE_TEXT`
- * translates. The app initializer waits for the catalog of the active locale and for the
- * session, so the first paint is in the right language and frame.
+ * `X-Tenant`) → auth (401 and lost-tenant handling). The kit reads the locale and the
+ * texts of the app through the `intl` factory of `provideUiKit`, and its `LoadingService`
+ * counts the reads for the load bar. The route data of the empty list details holds catalog
+ * keys, which `LIST_NONE_TEXT` translates. The app initializer waits for the catalog of the
+ * active locale and for the session, so the first paint is in the right language and frame.
  */
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -59,9 +59,8 @@ export const appConfig: ApplicationConfig = {
         storageKey: 'hb.theme',
         manifest: { light: 'manifest.webmanifest', dark: 'manifest-dark.webmanifest' },
       },
+      intl: () => appUiKitIntl(inject(I18nService)),
     }),
-    // After `provideUiKit`, so this intl replaces the one it provides.
-    { provide: UI_KIT_INTL, useFactory: () => appUiKitIntl(inject(I18nService)) },
     {
       provide: LIST_NONE_TEXT,
       useFactory: () => {
@@ -78,7 +77,7 @@ export const appConfig: ApplicationConfig = {
       return Promise.all([inject(I18nService).ready(), session]).then(() => undefined);
     }),
     // The installed app (manifest.webmanifest): the worker (ngsw-config.json) caches the app
-    // shell and the assets, not `/api`; SwUpdateService offers a reload for a new version.
+    // shell and the assets, not `/api`; SwUpdateService offers a reload in a toast.
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

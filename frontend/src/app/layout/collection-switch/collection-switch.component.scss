@@ -1,35 +1,17 @@
-// The look of a rail entry (the kit rail draws its own entries in its own styles), with the
-// row menu in the place and the shape of the pill. Its hit area covers the whole entry, the
-// label too.
+// The look of a rail entry (the `rail-item` mixin of the kit, as the kit rail draws its own
+// entries), with the row menu in the place and the shape of the pill. Its hit area covers
+// the whole entry, the label too.
+@use 'nav-items';
+
 :host {
   display: block;
   width: 100%;
 }
 
+@include nav-items.rail-item;
+
 .rail__item {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-  min-height: 60px;
-  color: var(--color-text-muted);
-  font-size: 11.5px;
-  font-weight: var(--fw-medium);
-  line-height: 14px;
-}
-@media (hover: hover) {
-  .rail__item:hover {
-    color: var(--color-text);
-  }
-}
-
-.rail__label {
-  max-width: 88px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .rail__coll ::ng-deep app-row-menu,
@@ -47,16 +29,4 @@
   content: '';
   position: absolute;
   inset: 0;
-}
-
-// The steps of the kit rail: 56px up to about 1080px high, 52px on a low laptop screen.
-@media (max-height: 1080px) {
-  .rail__item {
-    min-height: 56px;
-  }
-}
-@media (max-height: 760px) {
-  .rail__item {
-    min-height: 52px;
-  }
 }
