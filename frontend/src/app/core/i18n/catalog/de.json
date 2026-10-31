@@ -471,6 +471,7 @@
   "nav.scan": "Scanner",
   "pwa.updateReady": "Eine neue Version der App ist verfügbar.",
   "pwa.reload": "Neu laden",
+  "pwa.offline": "Keine Verbindung",
   "scan.camera": "Kamera",
   "scan.manualPlaceholder": "Inventarnummer eingeben, z. B. 000-123",
   "scan.manualLabel": "Inventarnummer oder Code",

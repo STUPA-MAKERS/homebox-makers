@@ -13,6 +13,7 @@ describe('appUiKitIntl', () => {
     expect(intl.translate('shell.brand', { name: 'Homebox' })).toBe('Homebox, Start');
     expect(intl.translate('account.open', { name: 'Ada' })).toBe('Konto: Ada');
     expect(intl.translate('palette.placeholder')).toBe('Gegenstände, Orte, Tags und Seiten suchen');
+    expect(intl.translate('pwa.offline')).toBe('Keine Verbindung');
   });
 
   it('keeps the kit texts for every other key', () => {

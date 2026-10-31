@@ -28,7 +28,12 @@ import {
   provideRouteMotion,
   watchUAVisualTransitions,
 } from '@stupa-makers/ui-kit/shell';
-import { IS_INSTALLED_APP, SwUpdateService, lockInstalledAppZoom } from '@stupa-makers/ui-kit/pwa';
+import {
+  IS_INSTALLED_APP,
+  OfflineService,
+  SwUpdateService,
+  lockInstalledAppZoom,
+} from '@stupa-makers/ui-kit/pwa';
 import { provideServiceWorker } from '@angular/service-worker';
 import { routes } from './app.routes';
 
@@ -71,13 +76,14 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       inject(ThemeService).init();
       inject(SwUpdateService).init();
+      inject(OfflineService).init();
       lockInstalledAppZoom(inject(DOCUMENT), inject(IS_INSTALLED_APP)());
       watchUAVisualTransitions();
       const session = firstValueFrom(inject(AuthService).ensureLoaded());
       return Promise.all([inject(I18nService).ready(), session]).then(() => undefined);
     }),
     // The installed app (manifest.webmanifest): the worker (ngsw-config.json) caches the app
-    // shell and the assets, not `/api`; SwUpdateService offers a reload in a toast.
+    // shell and the assets, not `/api`; SwUpdateService offers a reload in a notice.
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
