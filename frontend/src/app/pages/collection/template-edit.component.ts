@@ -9,15 +9,15 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
 import { errorMessage } from '@shared/http-error';
 import { LocationSelectComponent } from '@shared/ui/location-select/location-select.component';
-import { FabComponent } from '@shared/ui/fab/fab.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import { TagPickerComponent } from '@shared/ui/tag-picker/tag-picker.component';
 import {
   ButtonComponent,
   CheckboxComponent,
   ConfirmDialogComponent,
+  FabComponent,
   InputComponent,
   NoteComponent,
+  PageHeaderComponent,
   SkeletonComponent,
   TextareaComponent,
   ToastService,

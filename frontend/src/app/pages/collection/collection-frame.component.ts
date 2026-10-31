@@ -18,11 +18,11 @@ import {
   type IconName,
   ListDetailLayoutComponent,
   ListItemComponent,
+  PageFrame,
   SelectFieldComponent,
   type SelectFieldOption,
 } from '@stupa-makers/ui-kit';
 import { filter } from 'rxjs';
-import { PageFrameService } from '../../layout/page-frame.service';
 
 interface Section {
   /** The child path; `''` is the overview. */
@@ -126,7 +126,7 @@ const SECTIONS: readonly Section[] = [
 })
 export class CollectionFrameComponent {
   private readonly router = inject(Router);
-  private readonly frame = inject(PageFrameService);
+  private readonly frame = inject(PageFrame);
   readonly collections = inject(CollectionService);
 
   readonly sections = SECTIONS;

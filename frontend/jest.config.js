@@ -8,6 +8,8 @@ module.exports = {
     '^@core/(.*)$': '<rootDir>/src/app/core/$1',
     '^@shared/(.*)$': '<rootDir>/src/app/shared/$1',
     '^@stupa-makers/ui-kit$': '<rootDir>/vendor/ui-kit/src/public-api.ts',
+    '^@stupa-makers/ui-kit/shell$': '<rootDir>/vendor/ui-kit/shell/src/public-api.ts',
+    '^@stupa-makers/ui-kit/pwa$': '<rootDir>/vendor/ui-kit/pwa/src/public-api.ts',
     '\\.(css|scss)$': '<rootDir>/src/testing/style-mock.js',
   },
   transform: {

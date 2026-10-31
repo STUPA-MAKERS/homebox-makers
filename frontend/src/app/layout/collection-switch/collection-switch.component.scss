@@ -1,0 +1,32 @@
+// The look of a rail entry (the `rail-item` mixin of the kit, as the kit rail draws its own
+// entries), with the row menu in the place and the shape of the pill. Its hit area covers
+// the whole entry, the label too.
+@use 'nav-items';
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+@include nav-items.rail-item;
+
+.rail__item {
+  position: relative;
+}
+
+.rail__coll ::ng-deep app-row-menu,
+.rail__coll ::ng-deep .rm {
+  position: static;
+}
+.rail__coll ::ng-deep .rm__trigger {
+  position: static;
+  width: 56px;
+  height: 32px;
+  border-radius: 16px;
+  color: inherit;
+}
+.rail__coll ::ng-deep .rm__trigger::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}

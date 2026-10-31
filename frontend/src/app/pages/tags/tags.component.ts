@@ -15,25 +15,24 @@ import { RefDataService } from '@core/data/ref-data.service';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { I18nService } from '@core/i18n/i18n.service';
 import { errorMessage } from '@shared/http-error';
-import { injectListDetailPage } from '@shared/list-detail-page';
-import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
-import { FabComponent } from '@shared/ui/fab/fab.component';
-import { PageHeaderComponent } from '@shared/ui/page-header/page-header.component';
 import {
+  ConfirmDialogComponent,
   EmptyStateComponent,
+  FabComponent,
   ListDetailLayoutComponent,
   ListItemComponent,
   NoteComponent,
+  PageHeaderComponent,
+  RowMenuComponent,
+  type RowMenuItem,
+  type RowMenuSection,
   ScrollFadeDirective,
   SearchPillComponent,
   SkeletonComponent,
   StickyBarComponent,
-  ConfirmDialogComponent,
-  RowMenuComponent,
-  type RowMenuItem,
-  type RowMenuSection,
   ToastService,
 } from '@stupa-makers/ui-kit';
+import { injectListDetailPage, LIST_PAGE_STATE } from '@stupa-makers/ui-kit/shell';
 import { TagDialogComponent } from '../../features/tags/tag-dialog.component';
 
 interface TagRow {

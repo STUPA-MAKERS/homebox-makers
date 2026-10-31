@@ -34,8 +34,8 @@ import {
   mediaQuery,
 } from '@stupa-makers/ui-kit';
 import { CreateService } from '../../features/create/create.service';
-import { CommandPaletteService } from '../../features/search/command-palette.service';
-import { AccountMenuComponent } from '../../layout/account-menu/account-menu.component';
+import { CommandPalette } from '@stupa-makers/ui-kit/shell';
+import { AccountComponent } from '../../layout/account/account.component';
 
 interface StatTile {
   icon: IconName;
@@ -63,7 +63,7 @@ interface StatTile {
     AvatarComponent,
     SearchPillComponent,
     SideSheetComponent,
-    AccountMenuComponent,
+    AccountComponent,
     EntityThumbComponent,
     TagChipComponent,
     IconComponent,
@@ -82,7 +82,7 @@ export class HomeComponent {
   readonly auth = inject(AuthService);
   readonly collections = inject(CollectionService);
   readonly ref = inject(RefDataService);
-  readonly palette = inject(CommandPaletteService);
+  readonly palette = inject(CommandPalette);
 
   readonly phone = mediaQuery(MEDIA.phone);
   /** The account sheet of the phone, opened from the avatar in the search pill. */

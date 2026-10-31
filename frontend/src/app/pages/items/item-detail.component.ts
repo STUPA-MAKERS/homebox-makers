@@ -20,7 +20,6 @@ import { entityLink, isLocation, injectAttachmentUrl, photos } from '@shared/ent
 import { errorMessage } from '@shared/http-error';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import {
   ButtonComponent,
@@ -43,6 +42,7 @@ import {
   StatusTextComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
+import { LIST_PAGE_STATE } from '@stupa-makers/ui-kit/shell';
 import { AttachmentsPanelComponent } from '../../features/attachments/attachments-panel.component';
 import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';

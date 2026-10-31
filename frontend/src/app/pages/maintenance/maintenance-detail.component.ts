@@ -5,11 +5,11 @@ import { I18nService } from '@core/i18n/i18n.service';
 import { LocalizedDatePipe, apiDate } from '@core/i18n/localized-date.pipe';
 import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { MoneyPipe } from '@shared/pipes/money.pipe';
-import { FabComponent } from '@shared/ui/fab/fab.component';
 import {
   ButtonComponent,
   ButtonLinkComponent,
   EmptyStateComponent,
+  FabComponent,
   FieldGroupComponent,
   FieldRowComponent,
   IconComponent,

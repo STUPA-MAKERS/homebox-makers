@@ -18,7 +18,6 @@ import { TranslatePipe } from '@core/i18n/translate.pipe';
 import { AppTitleStrategy } from '@core/title/title.strategy';
 import { errorMessage } from '@shared/http-error';
 import { EntityThumbComponent } from '@shared/ui/entity-thumb/entity-thumb.component';
-import { LIST_PAGE_STATE } from '@shared/ui/detail-none/list-none.component';
 import { TagChipComponent } from '@shared/ui/tag-chip/tag-chip.component';
 import { TagStripComponent } from '@shared/ui/tag-chip/tag-strip.component';
 import {
@@ -38,6 +37,7 @@ import {
   SkeletonComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
+import { LIST_PAGE_STATE } from '@stupa-makers/ui-kit/shell';
 import { AttachmentsPanelComponent } from '../../features/attachments/attachments-panel.component';
 import { TagAssignComponent } from '../../features/tags/tag-assign.component';
 import { CreateService } from '../../features/create/create.service';

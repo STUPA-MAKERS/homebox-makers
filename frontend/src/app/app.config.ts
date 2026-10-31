@@ -13,31 +13,38 @@ import {
   provideRouter,
   withComponentInputBinding,
   withInMemoryScrolling,
-  withViewTransitions,
 } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { authInterceptor } from '@core/auth/auth.interceptor';
 import { AuthService } from '@core/auth/auth.service';
 import { tenantInterceptor } from '@core/collection/tenant.interceptor';
 import { I18nService } from '@core/i18n/i18n.service';
-import { onRouteViewTransition, watchUAVisualTransitions } from '@core/motion/motion';
-import { loadingInterceptor } from '@core/loading/loading.interceptor';
-import { LoadingService } from '@core/loading/loading.service';
-import { ThemeService } from '@core/theme/theme.service';
+import type { TranslationKey } from '@core/i18n/translations';
+import { appUiKitIntl } from '@core/i18n/ui-kit-intl';
 import { AppTitleStrategy } from '@core/title/title.strategy';
-import { UI_KIT_INTL, UI_KIT_LOADING, uiKitIntlFromLang } from '@stupa-makers/ui-kit';
+import { ThemeService, loadingInterceptor, provideUiKit } from '@stupa-makers/ui-kit';
+import {
+  LIST_NONE_TEXT,
+  provideRouteMotion,
+  watchUAVisualTransitions,
+} from '@stupa-makers/ui-kit/shell';
+import {
+  IS_INSTALLED_APP,
+  OfflineService,
+  SwUpdateService,
+  lockInstalledAppZoom,
+} from '@stupa-makers/ui-kit/pwa';
 import { provideServiceWorker } from '@angular/service-worker';
-import { IS_INSTALLED_APP } from '@core/browser/installed-app.token';
-import { SwUpdateService } from '@core/pwa/sw-update.service';
-import { lockInstalledAppZoom } from '@core/touch/zoom-lock';
 import { routes } from './app.routes';
 
 /**
  * The root providers of the app.
  *
  * Interceptor order: loading (outermost, measures the full duration) → tenant (adds
- * `X-Tenant`) → auth (401 and lost-tenant handling). The kit reads the locale and the loading
- * state of the app through its tokens. The app initializer waits for the catalog of the
+ * `X-Tenant`) → auth (401 and lost-tenant handling). The kit reads the locale and the
+ * texts of the app through the `intl` factory of `provideUiKit`, and its `LoadingService`
+ * counts the reads for the load bar. The route data of the empty list details holds catalog
+ * keys, which `LIST_NONE_TEXT` translates. The app initializer waits for the catalog of the
  * active locale and for the session, so the first paint is in the right language and frame.
  */
 export const appConfig: ApplicationConfig = {
@@ -48,31 +55,35 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
-      withViewTransitions({
-        skipInitialTransition: true,
-        onViewTransitionCreated: onRouteViewTransition,
-      }),
+      provideRouteMotion(),
     ),
     { provide: TitleStrategy, useExisting: AppTitleStrategy },
     provideHttpClient(withInterceptors([loadingInterceptor, tenantInterceptor, authInterceptor])),
+    provideUiKit({
+      theme: {
+        storageKey: 'hb.theme',
+        manifest: { light: 'manifest.webmanifest', dark: 'manifest-dark.webmanifest' },
+      },
+      intl: () => appUiKitIntl(inject(I18nService)),
+    }),
     {
-      provide: UI_KIT_INTL,
+      provide: LIST_NONE_TEXT,
       useFactory: () => {
         const i18n = inject(I18nService);
-        return uiKitIntlFromLang(i18n.locale, undefined, i18n.formatLocale);
+        return (key: string) => i18n.translate(key as TranslationKey);
       },
     },
-    { provide: UI_KIT_LOADING, useFactory: () => ({ visible: inject(LoadingService).visible }) },
     provideAppInitializer(() => {
       inject(ThemeService).init();
       inject(SwUpdateService).init();
+      inject(OfflineService).init();
       lockInstalledAppZoom(inject(DOCUMENT), inject(IS_INSTALLED_APP)());
       watchUAVisualTransitions();
       const session = firstValueFrom(inject(AuthService).ensureLoaded());
       return Promise.all([inject(I18nService).ready(), session]).then(() => undefined);
     }),
     // The installed app (manifest.webmanifest): the worker (ngsw-config.json) caches the app
-    // shell and the assets, not `/api`; SwUpdateService offers a reload for a new version.
+    // shell and the assets, not `/api`; SwUpdateService offers a reload in a notice.
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

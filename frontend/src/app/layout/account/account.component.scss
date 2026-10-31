@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+// The switch of the collection. It shows only in the sheet, so it has the inset of the sheet.
+.am__collection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 4px var(--space-2) 10px;
+}

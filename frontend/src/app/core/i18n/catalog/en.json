@@ -471,6 +471,7 @@
   "nav.scan": "Scanner",
   "pwa.updateReady": "A new version of the app is available.",
   "pwa.reload": "Reload",
+  "pwa.offline": "You are offline",
   "scan.camera": "Camera",
   "scan.manualPlaceholder": "Enter an asset ID, e.g. 000-123",
   "scan.manualLabel": "Asset ID or code",
