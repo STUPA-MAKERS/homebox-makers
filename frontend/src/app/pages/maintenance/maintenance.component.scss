@@ -2,20 +2,14 @@
 
 @include lp.frame(mt);
 
+// The head of each group (`app-list-group`) holds the space above the group.
+.mt__scroll {
+  gap: 0;
+}
+
 .mt__rows {
   display: flex;
   flex-direction: column;
-}
-.mt__group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.mt__sec {
-  margin: 0;
-}
-.mt__sec--over {
-  color: var(--color-warning);
 }
 .mt__late {
   pointer-events: none;
