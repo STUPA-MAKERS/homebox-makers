@@ -32,10 +32,7 @@
           />
         } @else {
           @for (g of groups(); track g.key) {
-            <section class="mt__group" [attr.aria-labelledby]="'mt-g-' + g.key">
-              <h2 class="sec mt__sec" [class.mt__sec--over]="g.key === 'over'" [id]="'mt-g-' + g.key">
-                {{ g.title | t }}
-              </h2>
+            <app-list-group [label]="g.title | t" [tone]="g.key === 'over' ? 'warn' : 'accent'">
               <div class="mt__rows" [class.rowgroup]="!split()" role="list">
                 @for (e of g.rows; track e.id) {
                   <app-list-item
@@ -65,7 +62,7 @@
                   </app-list-item>
                 }
               </div>
-            </section>
+            </app-list-group>
           }
         }
       </div>
