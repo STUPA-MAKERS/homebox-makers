@@ -48,8 +48,7 @@
                 libavif
                 libheif
                 libjxl
-              ]
-              ++ lib.optionals stdenv.hostPlatform.isLinux [ glibc.static ];
+              ];
             GO = "${go}/bin/go";
             GOROOT = "${go}/share/go";
           }
