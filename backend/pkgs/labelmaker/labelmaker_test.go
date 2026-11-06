@@ -228,6 +228,7 @@ func TestSplitCommandTemplate(t *testing.T) {
 // smuggle extra argv entries into the print binary. The fix renders each argv
 // token independently, so a malicious TitleText must arrive as a single
 // argument.
+// §NF/security/print/000080
 func TestPrintLabel_ArgumentInjection(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("recorder script relies on a POSIX shell")
@@ -261,6 +262,7 @@ func TestPrintLabel_ArgumentInjection(t *testing.T) {
 	assert.True(t, strings.HasSuffix(got[1], ".png"), "second arg should be the generated label file, got %q", got[1])
 }
 
+// §F/labels/print/000042
 func TestGenerateLabel_MakersLabelSize(t *testing.T) {
 	content := LabelContent{
 		Title:       "Labeldrucker",
@@ -284,11 +286,13 @@ func TestGenerateLabel_MakersLabelSize(t *testing.T) {
 	assert.Equal(t, params.Height, img.Bounds().Dy())
 }
 
+// §F/labels/print/000043
 func TestGenerateLabel_TooShort(t *testing.T) {
 	params := NewGenerateParams(62, 8, 300, LabelContent{URL: "x"}, nil)
 	require.Error(t, GenerateLabel(io.Discard, &params, nil))
 }
 
+// §F/labels/print/000046
 func TestWrap_BreaksLongWords(t *testing.T) {
 	f, err := loadFont(nil, FontTypeRegular)
 	require.NoError(t, err)

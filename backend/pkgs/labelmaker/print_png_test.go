@@ -74,9 +74,13 @@ func TestPrintPNG_RemovesTempFile(t *testing.T) {
 	assert.True(t, os.IsNotExist(err))
 }
 
+// §F/labels/print/000047
 func TestPrintCommandDefaults_NoMissingKeys(t *testing.T) {
 	d := printCommandDefaults()
-	for _, k := range []string{"FileName", "Width", "Height", "WidthMm", "HeightMm", "Dpi", "URL", "TitleText", "Copies"} {
+	for _, k := range []string{
+		"FileName", "Width", "Height", "WidthMm", "HeightMm", "Dpi", "URL", "TitleText", "Copies",
+		"TapeWidth", "Length", "Maker", "Model", "AssetID",
+	} {
 		assert.Contains(t, d, k)
 	}
 	assert.Equal(t, "1", d["Copies"])
@@ -96,6 +100,7 @@ func TestPrintPNG_StopsWhenContextCancelled(t *testing.T) {
 	assert.True(t, os.IsNotExist(err), "no copy must run once the context is cancelled")
 }
 
+// §F/labels/print/000048
 func TestRunPrintCommand_TimesOut(t *testing.T) {
 	skipOnWindows(t, "uses sleep")
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)

@@ -76,6 +76,12 @@ docker run -d \
 # ghcr.io/sysadminsmedia/homebox:latest-hardened
 ```
 
+## Specs
+
+The binding rules of this fork are in [specs/](specs/README.md), one rule per file, in the
+structure of STUPA-Workflow. A change request starts as a spec. `python3 scripts/check_specs.py`
+checks them.
+
 <!-- CONTRIBUTING -->
 
 ## Contributing
