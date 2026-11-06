@@ -79,7 +79,7 @@ import {Tabs, TabItem} from "@astrojs/starlight/components";
 | HBOX_LABEL_MAKER_TAPE_WIDTH             | 62                                                                                             | width of the label tape in mm (Brother QL-800: 62 mm continuous tape)                                                                                                                     |
 | HBOX_LABEL_MAKER_LENGTH                 | 24                                                                                             | length of one label in mm. The logo and the QR code scale with it; at 24 mm about three lines of description fit. At least 12 mm.                                                         |
 | HBOX_LABEL_MAKER_DPI                    | 300                                                                                            | resolution of the generated label image                                                                                                                                                   |
-| HBOX_LABEL_MAKER_PRINT_COMMAND          |                                                                                                | the command to use for printing labels. if empty, label printing is disabled. `{{.FileName}}` in the command will be replaced with the png filename of the label       |
+| HBOX_LABEL_MAKER_PRINT_COMMAND          |                                                                                                | the command used to print labels, for both the basic label and label templates. if empty, server-side printing is disabled. The command is split into arguments before substitution. Placeholders: `{{.FileName}}` (png path), `{{.TapeWidth}}`/`{{.Length}}` (mm, STUPA MAKERS label), `{{.Maker}}`, `{{.Model}}`, `{{.AssetID}}`, `{{.Width}}`/`{{.Height}}` (pixels), `{{.WidthMm}}`/`{{.HeightMm}}`, `{{.Dpi}}`, `{{.TitleText}}`, `{{.URL}}` and `{{.Copies}}` (if present the command runs once with the count, otherwise once per copy). Example: `lp -d labelprinter {{.FileName}}` |
 | HBOX_LABEL_MAKER_ADDITIONAL_INFORMATION |                                                                                                | Additional line added below the description, like a name or phone number                                                                                                                    |
 | HBOX_LABEL_MAKER_REGULAR_FONT_PATH      |                                                                                                | path to a regular monospaced font for the label text, replacing DejaVu Sans Mono (e.g., `/fonts/NotoSansKR-Regular.ttf`). If not set, uses embedded font. Supports TTF format.                                              |
 | HBOX_LABEL_MAKER_BOLD_FONT_PATH         |                                                                                                | path to a bold monospaced font for the maker/model bar, replacing DejaVu Sans Mono Bold (e.g., `/fonts/NotoSansKR-Bold.ttf`). If not set, uses embedded font. Supports TTF format.                                                    |
@@ -224,6 +224,27 @@ OPTIONS
 
     </TabItem>
 </Tabs>
+
+### Reading values from files
+
+Any `HBOX_*` environment variable can also be set from a file by appending `_FILE` to its name and pointing it
+at the file, e.g. `HBOX_AUTH_API_KEY_PEPPER_FILE=/run/secrets/homebox_pepper`. This works with Docker and
+Kubernetes secrets or systemd credentials, so secrets don't need to be stored in plain environment variables.
+Trailing newlines are trimmed, and the `_FILE` variant takes precedence when both are set.
+
+```yaml
+services:
+  homebox:
+    image: ghcr.io/sysadminsmedia/homebox:latest
+    environment:
+      HBOX_AUTH_API_KEY_PEPPER_FILE: /run/secrets/homebox_pepper
+    secrets:
+      - homebox_pepper
+
+secrets:
+  homebox_pepper:
+    file: ./homebox_pepper.txt
+```
 
 ### HBOX_WEB_HOST examples
 

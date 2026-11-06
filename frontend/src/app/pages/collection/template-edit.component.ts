@@ -22,7 +22,10 @@ import {
   TextareaComponent,
   ToastService,
 } from '@stupa-makers/ui-kit';
-import { CustomFieldsEditorComponent } from '../../features/fields/custom-fields-editor.component';
+import {
+  CustomFieldsEditorComponent,
+  type CustomField,
+} from '../../features/fields/custom-fields-editor.component';
 
 interface TemplateForm {
   name: string;
@@ -89,7 +92,7 @@ export class TemplateEditComponent {
   form: TemplateForm = this.fill(null);
   readonly locationId = signal('');
   readonly tagIds = signal<readonly string[]>([]);
-  readonly fields = signal<TemplateField[]>([]);
+  readonly fields = signal<TemplateFieldRow[]>([]);
 
   constructor() {
     this.ref.ensureLoaded().subscribe();
@@ -105,7 +108,7 @@ export class TemplateEditComponent {
         this.form = this.fill(tpl);
         this.locationId.set(tpl.defaultLocation?.id ?? '');
         this.tagIds.set((tpl.defaultTags ?? []).map((t) => t.id));
-        this.fields.set(tpl.fields ?? []);
+        this.fields.set((tpl.fields ?? []).map(toCustomField));
         this.pristine = this.snapshot();
         this.loading.set(false);
         this.title.setPageTitle(tpl.name);
@@ -157,7 +160,7 @@ export class TemplateEditComponent {
         includeSoldFields: f.includeSoldFields,
         fields: this.fields()
           .filter((x) => x.name.trim())
-          .map((x) => ({ ...x, timeValue: x.timeValue ?? '' })),
+          .map((x): TemplateField => ({ ...x, timeValue: x.timeValue || null })),
       })
       .subscribe({
         next: (saved) => {
@@ -210,4 +213,20 @@ export class TemplateEditComponent {
       includeSoldFields: tpl?.includeSoldFields ?? false,
     };
   }
+}
+
+/** A row of the fields editor that keeps the time value, which the editor does not show. */
+type TemplateFieldRow = CustomField & { timeValue: string | null };
+
+/** The API leaves out an unset number or yes/no value of a template field. */
+function toCustomField(f: TemplateField): TemplateFieldRow {
+  return {
+    id: f.id,
+    name: f.name,
+    type: f.type,
+    textValue: f.textValue ?? '',
+    numberValue: f.numberValue ?? 0,
+    booleanValue: f.booleanValue ?? false,
+    timeValue: f.timeValue ?? null,
+  };
 }

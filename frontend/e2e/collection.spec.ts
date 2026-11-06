@@ -50,6 +50,8 @@ test('global search finds items, places and pages', async ({ signedIn: page }) =
 
   await page.keyboard.press('Control+k');
   await dialog.getByRole('combobox').fill('werkz');
+  // Enter picks the first hit, so wait until the list shows the hits of the new query.
+  await expect(dialog.getByRole('option').first()).toContainText(/Werkzeug/);
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/collection\/tools/);
 });
